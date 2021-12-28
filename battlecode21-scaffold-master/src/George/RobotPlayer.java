@@ -5,12 +5,6 @@ import battlecode.common.*;
 public strictfp class RobotPlayer {
     static RobotController rc;
 
-    static final RobotType[] spawnableRobot = {
-        RobotType.POLITICIAN,
-        RobotType.SLANDERER,
-        RobotType.MUCKRAKER,
-    };
-
     static final Direction[] directions = {
         Direction.NORTH,
         Direction.NORTHEAST,
@@ -23,6 +17,7 @@ public strictfp class RobotPlayer {
     };
 
     static int turnCount;
+    static int earlyGame;
 
     /**
      * run() is the method that is called when a robot is instantiated in the Battlecode world.
@@ -36,6 +31,7 @@ public strictfp class RobotPlayer {
         RobotPlayer.rc = rc;
 
         turnCount = 0;
+        earlyGame = 100;
 
         System.out.println("I'm a " + rc.getType() + " and I just got created!");
         while (true) {
@@ -63,16 +59,23 @@ public strictfp class RobotPlayer {
     }
 
     static void runEnlightenmentCenter() throws GameActionException {
-        RobotType toBuild = randomSpawnableRobotType();
-        int influence = 50;
-        for (Direction dir : directions) {
-            if (rc.canBuildRobot(toBuild, dir, influence)) {
-                rc.buildRobot(toBuild, dir, influence);
+        if (turnCount < earlyGame) {
+            if (rc.getRobotCount() <= 8) {
+                randomDirSpawn(RobotType.MUCKRAKER, 1);
             } else {
+                randomDirSpawn(RobotType.SLANDERER, 25);
+            }
+            rc.bid(1);
+        }
+    }
+
+    static void randomDirSpawn(RobotType type, int inf) throws GameActionException {
+        for (Direction dir : directions) {
+            if (rc.canBuildRobot(type, dir, inf)) {
+                rc.buildRobot(type, dir, inf);
                 break;
             }
         }
-        rc.bid(1);
     }
 
     static void runPolitician() throws GameActionException {
@@ -95,6 +98,7 @@ public strictfp class RobotPlayer {
     }
 
     static void runMuckraker() throws GameActionException {
+
         Team enemy = rc.getTeam().opponent();
         int actionRadius = rc.getType().actionRadiusSquared;
         for (RobotInfo robot : rc.senseNearbyRobots(actionRadius, enemy)) {
@@ -118,15 +122,6 @@ public strictfp class RobotPlayer {
      */
     static Direction randomDirection() {
         return directions[(int) (Math.random() * directions.length)];
-    }
-
-    /**
-     * Returns a random spawnable RobotType
-     *
-     * @return a random RobotType
-     */
-    static RobotType randomSpawnableRobotType() {
-        return spawnableRobot[(int) (Math.random() * spawnableRobot.length)];
     }
 
     /**
