@@ -6,17 +6,6 @@ public class Archon {
 
     static int archonIndex;
 
-    static final Direction[] directions = {
-            Direction.NORTH,
-            Direction.NORTHEAST,
-            Direction.EAST,
-            Direction.SOUTHEAST,
-            Direction.SOUTH,
-            Direction.SOUTHWEST,
-            Direction.WEST,
-            Direction.NORTHWEST,
-    };
-
     public Archon() {
         archonIndex = -1;
     }
@@ -47,7 +36,7 @@ public class Archon {
         }
 
         // Build a miner in any direction
-        for (Direction dir : directions) {
+        for (Direction dir : Helper.directions) {
             if (rc.canBuildRobot(RobotType.MINER, dir)) {
                 rc.buildRobot(RobotType.MINER, dir);
                 rc.setIndicatorString("built miner");

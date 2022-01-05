@@ -20,7 +20,7 @@ public class Soldier {
         }
 
         // Also try to move randomly.
-        Direction dir = RobotPlayer.directions[RobotPlayer.rng.nextInt(RobotPlayer.directions.length)];
+        Direction dir = Helper.directions[Helper.rng.nextInt(Helper.directions.length)];
         if (rc.canMove(dir)) {
             rc.move(dir);
             System.out.println("I moved!");
