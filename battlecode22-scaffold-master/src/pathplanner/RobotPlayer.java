@@ -133,7 +133,7 @@ public strictfp class RobotPlayer {
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
      */
     static void runMiner(RobotController rc) throws GameActionException {
-        pathTo(rc, new MapLocation(rc.getMapWidth()-1, rc.getMapHeight()-1));
+        pathTo(rc, new MapLocation(rc.getMapWidth()/2, rc.getMapHeight()/2));
 
 
     }
@@ -147,7 +147,156 @@ public strictfp class RobotPlayer {
 
     }
 
-    static void pathTo(RobotController rc, MapLocation target) throws GameActionException {
+    static void pathTo(RobotController rc, MapLocation target)throws GameActionException{
+        Direction dir1 = rc.getLocation().directionTo(target);
+        int enum1 = 0;
+        for(int i = 0; i<directions.length; i++){
+            if(dir1.equals(directions[i])){
+                enum1 = i;
+            }
+        }
+        int minCost = 4000;
+        Direction dir = null;
+        int cost1;
+        int cost2;
+
+        if(target.distanceSquaredTo(rc.getLocation())==1){
+            if(rc.canMove(dir1)){
+                rc.move(dir1);
+            }
+        }else {
+
+            MapLocation ml;
+            MapLocation ml2;
+            if (rc.onTheMap(ml = rc.adjacentLocation(directions[enum1]))) {
+                Direction dir2 = ml.directionTo(target);
+                int enum2 = 2;
+
+                for (int i = 0; i < directions.length; i++) {
+                    if (dir2.equals(directions[i])) {
+                        enum2 = i;
+                    }
+                }
+
+                if (rc.onTheMap(ml2 = ml.add(directions[enum2]))) {
+                    cost1 = rc.isLocationOccupied(ml) ? 2000 : rc.senseRubble(ml) + 10;
+                    cost2 = rc.isLocationOccupied(ml2) ? 2000 : rc.senseRubble(ml2) + 10;
+
+                    if(cost1 + cost2 < minCost){
+                        dir = directions[enum1];
+                        minCost = cost1 + cost2;
+                    }
+                }
+                if (rc.onTheMap(ml2 = ml.add(directions[(enum2 - 1 + 8)% 8] ))) {
+                    cost1 = rc.isLocationOccupied(ml) ? 2000 : rc.senseRubble(ml) + 10;
+                    cost2 = rc.isLocationOccupied(ml2) ? 2000 : rc.senseRubble(ml2) + 10;
+
+                    if(cost1 + cost2 < minCost){
+                        dir = directions[enum1];
+                        minCost = cost1 + cost2;
+                    }
+                }
+                if (rc.onTheMap(ml2 = ml.add(directions[(enum2+1) % 8]))) {
+                    cost1 = rc.isLocationOccupied(ml) ? 2000 : rc.senseRubble(ml) + 10;
+                    cost2 = rc.isLocationOccupied(ml2) ? 2000 : rc.senseRubble(ml2) + 10;
+
+                    if(cost1 + cost2 < minCost){
+                        dir = directions[enum1];
+                        minCost = cost1 + cost2;
+                    }
+
+                }
+            }
+
+            if (rc.onTheMap(ml = rc.adjacentLocation(directions[(enum1 - 1 + 8) % 8]))) {
+                Direction dir2 = ml.directionTo(target);
+                int enum2 = 2;
+
+                for (int i = 0; i < directions.length; i++) {
+                    if (dir2.equals(directions[i])) {
+                        enum2 = i;
+                    }
+                }
+
+                if (rc.onTheMap(ml2 = ml.add(directions[enum2]))) {
+                    cost1 = rc.isLocationOccupied(ml) ? 2000 : rc.senseRubble(ml) + 10;
+                    cost2 = rc.isLocationOccupied(ml2) ? 2000 : rc.senseRubble(ml2) + 10;
+
+                    if(cost1 + cost2 < minCost){
+                        dir = directions[(enum1 - 1 + 8) % 8];
+                        minCost = cost1 + cost2;
+                    }
+                }
+                if (rc.onTheMap(ml2 = ml.add(directions[(enum2 - 1 + 8)% 8] ))) {
+                    cost1 = rc.isLocationOccupied(ml) ? 2000 : rc.senseRubble(ml) + 10;
+                    cost2 = rc.isLocationOccupied(ml2) ? 2000 : rc.senseRubble(ml2) + 10;
+
+                    if(cost1 + cost2 < minCost){
+                        dir = directions[(enum1 - 1 + 8) % 8];
+                        minCost = cost1 + cost2;
+                    }
+                }
+                if (rc.onTheMap(ml2 = ml.add(directions[(enum2+1) % 8]))) {
+                    cost1 = rc.isLocationOccupied(ml) ? 2000 : rc.senseRubble(ml) + 10;
+                    cost2 = rc.isLocationOccupied(ml2) ? 2000 : rc.senseRubble(ml2) + 10;
+
+                    if(cost1 + cost2 < minCost){
+                        dir = directions[(enum1 - 1 + 8) % 8];
+                        minCost = cost1 + cost2;
+                    }
+
+                }
+            }
+            if (rc.onTheMap(ml = rc.adjacentLocation(directions[(enum1 + 1) % 8]))) {
+                Direction dir2 = ml.directionTo(target);
+                int enum2 = 2;
+
+                for (int i = 0; i < directions.length; i++) {
+                    if (dir2.equals(directions[i])) {
+                        enum2 = i;
+                    }
+                }
+
+                if (rc.onTheMap(ml2 = ml.add(directions[enum2]))) {
+                    cost1 = rc.isLocationOccupied(ml) ? 2000 : rc.senseRubble(ml) + 10;
+                    cost2 = rc.isLocationOccupied(ml2) ? 2000 : rc.senseRubble(ml2) + 10;
+
+                    if(cost1 + cost2 < minCost){
+                        dir = directions[(enum1 + 1) % 8];
+                        minCost = cost1 + cost2;
+                    }
+                }
+                if (rc.onTheMap(ml2 = ml.add(directions[(enum2 - 1 + 8)% 8] ))) {
+                    cost1 = rc.isLocationOccupied(ml) ? 2000 : rc.senseRubble(ml) + 10;
+                    cost2 = rc.isLocationOccupied(ml2) ? 2000 : rc.senseRubble(ml2) + 10;
+
+                    if(cost1 + cost2 < minCost){
+                        dir = directions[(enum1 + 1) % 8];
+                        minCost = cost1 + cost2;
+                    }
+                }
+                if (rc.onTheMap(ml2 = ml.add(directions[(enum2 + 1) % 8]))) {
+                    cost1 = rc.isLocationOccupied(ml) ? 2000 : rc.senseRubble(ml) + 10;
+                    cost2 = rc.isLocationOccupied(ml2) ? 2000 : rc.senseRubble(ml2) + 10;
+
+                    if(cost1 + cost2 < minCost){
+                        dir = directions[(enum1 + 1) % 8];
+                        minCost = cost1 + cost2;
+                    }
+
+                }
+            }
+            if(dir!= null){
+                if(rc.canMove(dir)){
+                    rc.move(dir);
+                }
+            }
+
+        }
+
+    }
+
+    static void bfPathTo(RobotController rc, MapLocation target) throws GameActionException {
 
         MapLocation curPos = rc.getLocation();
         int height = rc.getMapHeight();
