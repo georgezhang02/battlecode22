@@ -4,12 +4,18 @@ import battlecode.common.*;
 import java.util.Random;
 
 strictfp class MinerStrategy {
+    static Direction exploreDir = null;
     /**
      * Run a single turn for a Miner.
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
      */
     static void runMiner(RobotController rc) throws GameActionException {
         // Try to mine on squares around us.
+        if(exploreDir == null) {
+            RobotPlayer.rng.setSeed(rc.getID());
+            exploreDir = RobotPlayer.directions[RobotPlayer.rng.nextInt(RobotPlayer.directions.length)];
+        }
+        rc.setIndicatorString(exploreDir.toString());
         MapLocation me = rc.getLocation();
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
@@ -19,7 +25,7 @@ strictfp class MinerStrategy {
                 while (rc.canMineGold(mineLocation)) {
                     rc.mineGold(mineLocation);
                 }
-                while (rc.canMineLead(mineLocation)) {
+                while (rc.canMineLead(mineLocation) && rc.senseLead(mineLocation) > 1) {
                     rc.mineLead(mineLocation);
                 }
             }
@@ -31,7 +37,7 @@ strictfp class MinerStrategy {
         int distanceToTarget = Integer.MAX_VALUE;
         //for each location is there a resource in that location
         for (MapLocation tryLocation: nearbyLocations) {
-            if (rc.senseLead(tryLocation) > 0 || rc.senseGold(tryLocation) > 0) {
+            if (rc.senseLead(tryLocation) > 1 || rc.senseGold(tryLocation) > 0) {
                 //yes go there
                 int distanceTo = me.distanceSquaredTo(tryLocation);
                 if (distanceTo < distanceToTarget) {
@@ -48,12 +54,14 @@ strictfp class MinerStrategy {
                 rc.move(toMove);
             }
         }
-        // Also try to move randomly.
-        int directionIndex = RobotPlayer.rng.nextInt(RobotPlayer.directions.length);
-        Direction dir = RobotPlayer.directions[directionIndex];
-        if (rc.canMove(dir)) {
-            rc.move(dir);
-            System.out.println("I moved!");
+        else {
+            if (rc.canMove(exploreDir)) {
+                rc.move(exploreDir);
+            }
+            else if (!rc.onTheMap(rc.getLocation().add(exploreDir))) {
+                exploreDir = exploreDir.opposite();
+            }
         }
+        // Also try to move randomly.
     }
 }
