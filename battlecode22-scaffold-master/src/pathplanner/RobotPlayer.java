@@ -147,7 +147,7 @@ public strictfp class RobotPlayer {
 
     }
 
-    static void pathTo(RobotController rc, MapLocation target)throws GameActionException{
+    static Direction pathTo(RobotController rc, MapLocation target)throws GameActionException{
         Direction dir1 = rc.getLocation().directionTo(target);
         int enum1 = 0;
         for(int i = 0; i<directions.length; i++){
@@ -287,10 +287,9 @@ public strictfp class RobotPlayer {
                 }
             }
             if(dir!= null){
-                if(rc.canMove(dir)){
-                    rc.move(dir);
-                }
+                return dir;
             }
+            return null;
 
         }
 
