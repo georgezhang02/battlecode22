@@ -51,10 +51,10 @@ public strictfp class RobotPlayer {
                     case ARCHON:     Archon.run(rc);  break;
                     case MINER:      Miner.run(rc);   break;
                     case SOLDIER:    Soldier.run(rc); break;
-                    case LABORATORY: // Examplefuncsplayer doesn't use any of these robot types below.
-                    case WATCHTOWER: // You might want to give them a try!
-                    case BUILDER:
-                    case SAGE:       break;
+                    case LABORATORY: Laboratory.run(rc); break;
+                    case WATCHTOWER: Watchtower.run(rc); break;
+                    case BUILDER: Builder.run(rc); break;
+                    case SAGE: Sage.run(rc); break;
                 }
             } catch (GameActionException e) {
                 // Oh no! It looks like we did something illegal in the Battlecode world. You should

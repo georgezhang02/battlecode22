@@ -2,7 +2,7 @@ package dontatme;
 
 import battlecode.common.*;
 
-public class Miner {
+public strictfp class Miner {
 
     static int archonIndex;
     static int minerPhase;

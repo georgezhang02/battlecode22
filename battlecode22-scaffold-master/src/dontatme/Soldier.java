@@ -2,12 +2,12 @@ package dontatme;
 
 import battlecode.common.*;
 
-public class Soldier {
+public strictfp class Soldier {
     /**
      * Run a single turn for a Soldier.
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
      */
-    static void run(RobotController rc) throws GameActionException {
+    public static void run(RobotController rc) throws GameActionException {
         // Try to attack someone
         int radius = rc.getType().actionRadiusSquared;
         Team opponent = rc.getTeam().opponent();

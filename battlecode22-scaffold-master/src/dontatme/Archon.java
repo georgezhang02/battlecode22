@@ -2,7 +2,7 @@ package dontatme;
 
 import battlecode.common.*;
 
-public class Archon {
+public strictfp class Archon {
 
     static int archonIndex;
 

@@ -3,7 +3,7 @@ package dontatme;
 import battlecode.common.*;
 import java.util.Random;
 
-public class Helper {
+public strictfp class Helper {
 
     // All possible directions
     public static final Direction[] directions = {
