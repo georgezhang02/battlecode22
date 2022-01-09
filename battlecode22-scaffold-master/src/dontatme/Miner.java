@@ -25,41 +25,35 @@ public strictfp class Miner {
         MapLocation me = rc.getLocation();
         int leadLocation = rc.readSharedArray(archonIndex);
 
-        // If there is lead left
-        if (leadLocation != 61) {
-
-            // Mine around if possible
-            for (int dx = -1; dx <= 1; dx++) {
-                for (int dy = -1; dy <= 1; dy++) {
-                    MapLocation mineLocation = new MapLocation(me.x + dx, me.y + dy);
-                    while (rc.canMineGold(mineLocation)) {
-                        rc.mineGold(mineLocation);
-                    }
-                    while (rc.canMineLead(mineLocation)) {
-                        rc.mineLead(mineLocation);
-                    }
+        // Mine around if possible
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                MapLocation mineLocation = new MapLocation(me.x + dx, me.y + dy);
+                while (rc.canMineGold(mineLocation)) {
+                    rc.mineGold(mineLocation);
+                }
+                while (rc.canMineLead(mineLocation)) {
+                    rc.mineLead(mineLocation);
                 }
             }
+        }
+        
+        // If there is lead left
+        if (leadLocation != 61) {
 
             // If not on lead
             if (rc.senseLead(me) == 0) {
 
                 // Move towards lead within miner vision if possible
-                boolean found = false;
-                MapLocation[] allLoc = rc.getAllLocationsWithinRadiusSquared(rc.getLocation(), 20);
-                for (MapLocation loc : allLoc) {
-                    if (rc.senseLead(loc) > 0) {
-                        Direction dir = Pathing.pathTo(rc, new MapLocation(loc.x, loc.y));
-                        if (rc.canMove(dir)) {
-                            rc.move(dir);
-                            found = true;
-                            break;
-                        }
+                MapLocation[] leads = rc.senseNearbyLocationsWithLead(20);
+                if (leads.length > 0) {
+                    Direction dir = Pathing.pathTo(rc, leads[0]);
+                    if (rc.canMove(dir)) {
+                        rc.move(dir);
                     }
-                }
-
+                } 
                 // Otherwise, move towards lead location given by archon
-                if (!found) {
+                else {
                     int leadX = leadLocation / 64;
                     int leadY = leadLocation % 64;
                     Direction dir = Pathing.pathTo(rc, new MapLocation(leadX, leadY));
