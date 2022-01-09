@@ -133,9 +133,13 @@ public strictfp class RobotPlayer {
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
      */
     static void runMiner(RobotController rc) throws GameActionException {
-        Direction dir = Pathing.pathTo(rc, new MapLocation(rc.getMapWidth()/2,rc.getMapHeight()/2));
+        Direction dir = Pathing.bfPathTo(rc, new MapLocation(rc.getMapWidth()/2,rc.getMapHeight()/2));
+        if(dir!= null) {
 
-        if(rc.canMove(dir)){
+        } else{
+
+        }
+        if(dir != null && rc.canMove(dir)){
             rc.move(dir);
         }
 
