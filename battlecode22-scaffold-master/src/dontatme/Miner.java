@@ -5,6 +5,7 @@ import battlecode.common.*;
 public strictfp class Miner {
 
     static int archonIndex = -1;
+    static int minerType = 0;
 
     /**
      * Run a single turn for a Miner.
@@ -16,14 +17,12 @@ public strictfp class Miner {
         if (archonIndex == -1) {
             for (RobotInfo info : rc.senseNearbyRobots()) {
                 if (info.getType() == RobotType.ARCHON) {
-                    archonIndex = (info.getID() - 2) / 2;
+                    archonIndex = info.getID() / 2;
                 }
             }
         }
 
-        // Find the given lead location
         MapLocation me = rc.getLocation();
-        int leadLocation = rc.readSharedArray(archonIndex);
 
         // Mine around if possible
         for (int dx = -1; dx <= 1; dx++) {
@@ -37,36 +36,68 @@ public strictfp class Miner {
                 }
             }
         }
+
+        int arrayVal = rc.readSharedArray(archonIndex);
+
+        // See if it is the base or exploration miner
+        if (minerType == 0) {
+            if (arrayVal / 4096 <= 2) {
+                minerType = 1;
+            } else {
+                minerType = 2;
+            }
+        }
         
-        // If there is lead left
-        if (leadLocation != 61) {
+        switch (minerType) {
+            case 1:
+                baseMiner(rc, me, arrayVal);
+                break;
+            case 2:
+                explorationMiner(rc);
+                break;
+            default:
+                break;
+        }
+    }
 
-            // If not on lead
-            if (rc.senseLead(me) == 0) {
+    static void baseMiner(RobotController rc, MapLocation me, int arrayVal) throws GameActionException {
 
-                // Move towards lead within miner vision if possible
-                MapLocation[] leads = rc.senseNearbyLocationsWithLead(20);
-                if (leads.length > 0) {
-                    Direction dir = Pathing.pathTo(rc, leads[0]);
-                    if (rc.canMove(dir)) {
-                        rc.move(dir);
-                    }
-                } 
-                // Otherwise, move towards lead location given by archon
-                else {
-                    int leadX = leadLocation / 64;
-                    int leadY = leadLocation % 64;
-                    Direction dir = Pathing.pathTo(rc, new MapLocation(leadX, leadY));
-                    if (rc.canMove(dir)) {
-                        rc.move(dir);
-                    }
+        MapLocation[] leads = rc.senseNearbyLocationsWithLead(20);
+        // If not on lead
+        if (rc.senseLead(me) == 0) {
+
+            // Move towards lead within miner vision if possible (and avoid other miners)
+            if (leads.length > 0) {
+                for (MapLocation lead : leads) {
+                    if (rc.senseRobotAtLocation(lead) == null) {
+                        Direction dir = Pathing.pathTo(rc, lead);
+                        if (rc.canMove(dir)) {
+                            rc.move(dir);
+                            break;
+                        }
+                    }  
                 }
+            } 
+
+            // Otherwise, move towards lead location given by archon
+            else if (arrayVal % 64 != 61) {
+                Direction dir = Pathing.pathTo(rc, new MapLocation(arrayVal / 64 % 64, arrayVal % 64));
+                rc.setIndicatorString("" + dir.dx + dir.dy);
+                if (rc.canMove(dir)) {
+                    rc.move(dir);
+                }
+            }
+
+            // If no more resources left, become exploration miner
+            else {
+                minerType = 2;
+                explorationMiner(rc);
             }
         }
 
-        // If there is no lead left around archon,
-        else {
+    }
 
-        }
+    static void explorationMiner(RobotController rc) {
+
     }
 }
