@@ -37,9 +37,8 @@ public class Pathing {
             return 0;
         }
         else {
-            System.out.println(target);
             Direction dir = cur.directionTo(target);
-            int cost = (rc.onTheMap(cur) || rc.isLocationOccupied(cur)) ? 2000: rc.senseRubble(cur) + 10;
+            int cost = (!rc.onTheMap(cur) || rc.isLocationOccupied(cur)) ? 2000: rc.senseRubble(cur) + 10;
             if(depth==0){
                 return cost;
             } else {

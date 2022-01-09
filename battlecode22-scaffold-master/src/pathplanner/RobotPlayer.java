@@ -121,7 +121,7 @@ public strictfp class RobotPlayer {
     static void runArchon(RobotController rc) throws GameActionException {
         // Pick a direction to build in.
 
-        Direction dir = Direction.NORTHEAST;
+        Direction dir = Direction.NORTH;
         if(rc.canBuildRobot(RobotType.MINER, dir)){
             rc.buildRobot(RobotType.MINER, dir);
         }
