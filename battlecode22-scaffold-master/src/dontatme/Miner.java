@@ -51,9 +51,11 @@ public strictfp class Miner {
         switch (minerType) {
             case 1:
                 baseMiner(rc, me, arrayVal);
+                rc.setIndicatorString("Base Miner");
                 break;
             case 2:
                 explorationMiner(rc);
+                rc.setIndicatorString("Exploration Miner");
                 break;
             default:
                 break;
@@ -61,7 +63,6 @@ public strictfp class Miner {
     }
 
     static void baseMiner(RobotController rc, MapLocation me, int arrayVal) throws GameActionException {
-
         MapLocation[] leads = rc.senseNearbyLocationsWithLead(20);
         // If not on lead
         if (rc.senseLead(me) == 0) {
@@ -73,6 +74,7 @@ public strictfp class Miner {
                         Direction dir = Pathing.pathTo(rc, lead);
                         if (rc.canMove(dir)) {
                             rc.move(dir);
+                            rc.setIndicatorLine(me.add(dir), lead, 0, 255, 0);
                             break;
                         }
                     }  
@@ -81,10 +83,11 @@ public strictfp class Miner {
 
             // Otherwise, move towards lead location given by archon
             else if (arrayVal % 64 != 61) {
-                Direction dir = Pathing.pathTo(rc, new MapLocation(arrayVal / 64 % 64, arrayVal % 64));
-                rc.setIndicatorString("" + dir.dx + dir.dy);
+                MapLocation archonLeadLocation = new MapLocation(arrayVal / 64 % 64, arrayVal % 64);
+                Direction dir = Pathing.pathTo(rc, archonLeadLocation);
                 if (rc.canMove(dir)) {
                     rc.move(dir);
+                    rc.setIndicatorLine(me.add(dir), archonLeadLocation, 255, 0, 0);
                 }
             }
 
