@@ -35,7 +35,7 @@ strictfp class BuilderStrategy {
         dir = RobotPlayer.directions[directionIndex];
         if (rc.canMove(dir)) {
             rc.move(dir);
-            System.out.println("I moved!");
+            //System.out.println("I moved!");
         }
         if(rc.getTeamLeadAmount(rc.getTeam()) > 7000 && turn % 100 == 0 && rc.canBuildRobot(RobotType.WATCHTOWER, dir)) {
             rc.buildRobot(RobotType.WATCHTOWER, dir);

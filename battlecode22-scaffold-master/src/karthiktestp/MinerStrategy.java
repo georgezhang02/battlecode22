@@ -52,6 +52,8 @@ strictfp class MinerStrategy {
         // if you see a target location with resources on it, move towards it
         if (targetLocation != null) {
             Direction toMove = Pathing.pathTo(rc, targetLocation);
+            //System.out.println(toMove.toString());
+            //System.out.println(targetLocation.toString());
             if (rc.canMove(toMove)) {
                 rc.move(toMove);
             }

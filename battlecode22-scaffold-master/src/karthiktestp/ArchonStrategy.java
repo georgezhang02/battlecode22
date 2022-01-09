@@ -7,12 +7,21 @@ import java.util.Arrays;
 public class ArchonStrategy {
 
     static int miners = 0, soldiers  = 0, builders = 0;
-
     /**
      * Run a single turn for an Archon.
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
      */
+    static boolean placedLocation = false;
     static void runArchon(RobotController rc) throws GameActionException {
+        //write the x-location of each archon
+        int index = 0;
+        while (!placedLocation && rc.readSharedArray(index) != 0)
+            index += 2;
+        if (!placedLocation) {
+            rc.writeSharedArray(index, rc.getLocation().x);
+            rc.writeSharedArray(index + 1, rc.getLocation().y);
+            placedLocation = true;
+        }
         if (miners < 5) {
             buildTowardsLowRubble(rc, RobotType.MINER);
         }

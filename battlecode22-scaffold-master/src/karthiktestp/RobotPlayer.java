@@ -72,7 +72,7 @@ public strictfp class RobotPlayer {
                 switch (rc.getType()) {
                     case ARCHON:     ArchonStrategy.runArchon(rc);  break;
                     case MINER:      MinerStrategy.runMiner(rc);   break;
-                    case SOLDIER:    runSoldier(rc); break;
+                    case SOLDIER:    SoldierStrategy.runSoldier(rc); break;
                     case LABORATORY: // Examplefuncsplayer doesn't use any of these robot types below.
                     case WATCHTOWER: WatchTowerStrategy.runWatchTower(rc); break;
                     case BUILDER:
@@ -100,30 +100,5 @@ public strictfp class RobotPlayer {
         }
 
         // Your code should never reach here (unless it's intentional)! Self-destruction imminent...
-    }
-
-
-    /**
-     * Run a single turn for a Soldier.
-     * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
-     */
-    static void runSoldier(RobotController rc) throws GameActionException {
-        // Try to attack someone
-        int radius = rc.getType().actionRadiusSquared;
-        Team opponent = rc.getTeam().opponent();
-        RobotInfo[] enemies = rc.senseNearbyRobots(radius, opponent);
-        if (enemies.length > 0) {
-            MapLocation toAttack = enemies[0].location;
-            if (rc.canAttack(toAttack)) {
-                rc.attack(toAttack);
-            }
-        }
-
-        // Also try to move randomly.
-        Direction dir = directions[rng.nextInt(directions.length)];
-        if (rc.canMove(dir)) {
-            rc.move(dir);
-            //System.out.println("I moved!");
-        }
     }
 }
