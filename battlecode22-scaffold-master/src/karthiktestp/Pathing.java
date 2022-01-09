@@ -7,6 +7,7 @@ import battlecode.common.RobotController;
 
 public class Pathing {
     static Direction pathTo(RobotController rc, MapLocation target)throws GameActionException {
+
         MapLocation ml;
         Direction dir1 = rc.getLocation().directionTo(target);
 
@@ -32,12 +33,13 @@ public class Pathing {
     }
 
     static int getCost(RobotController rc, MapLocation cur, MapLocation target, int depth) throws GameActionException{
+        if(!rc.onTheMap(target)) System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
         if(cur.equals(target)){
             return 0;
         }
         else {
             Direction dir = cur.directionTo(target);
-            int cost = (rc.isLocationOccupied(cur)) ? 2000: rc.senseRubble(cur) + 10;
+            int cost = (!rc.onTheMap(cur) || rc.isLocationOccupied(cur)) ? 2000: rc.senseRubble(cur) + 10;
             if(depth==0){
                 return cost;
             } else {
