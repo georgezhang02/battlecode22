@@ -17,8 +17,10 @@ public strictfp class Archon {
     static void run(RobotController rc) throws GameActionException {
 
         // Set the index where the archon will write the lead location if not yet done
+        // Also write the archon location
         if (archonIndex == -1) {
             archonIndex = rc.getID() / 2;
+            rc.writeSharedArray(archonIndex + 4, rc.getLocation().x*64+rc.getLocation().y);
         }
 
         // Read current array value
@@ -31,26 +33,31 @@ public strictfp class Archon {
             boolean found = false;
             for (MapLocation loc : allLoc) {
                 if (rc.senseLead(loc) > 0 && rc.senseRobotAtLocation(loc) == null) {
-                    comms = (comms / 4096) * 4096 + loc.x * 64 + loc.y;
+                    comms = miners * 4096 + loc.x * 64 + loc.y;
                     found = true;
                     break;
                 }
             }
             if (!found) {
-                comms = ((comms / 4096) * 4096) + 61;
+                comms = miners * 4096 + 61;
             }
         }
 
-        // If no lead locations left
-        else {
-            
+        
+        // If there are less than 4 miners per archon
+        // Build a miner in any direction (but take turns)
+        if (turn + 1 == archonIndex) {
+            if (miners < 4) {
+                if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
+                    buildTowardsLowRubble(rc, RobotType.MINER, turn);
+                }
+            } else {
+                if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
+                    buildTowardsLowRubble(rc, RobotType.SOLDIER, turn);
+                }
+            }
         }
 
-        // Build a miner in any direction
-        if (turn + 1 == archonIndex) {
-            buildTowardsLowRubble(rc, RobotType.MINER, turn);
-        }
-        rc.setIndicatorString(Integer.toString(comms));
         rc.writeSharedArray(archonIndex, comms);
     }
 
@@ -63,12 +70,13 @@ public strictfp class Archon {
                 switch(type) {
                     case MINER:
                         miners++;
-                        if (comms / 4096 < 16)
+                        if (comms / 4096 < 15)
                             comms += 4096;
                         rc.writeSharedArray(0, (turn + 1) % rc.getArchonCount());
                         break;
                     case SOLDIER:
                         soldiers++;
+                        rc.writeSharedArray(0, (turn + 1) % rc.getArchonCount());
                         break;
                     default:
                         break;

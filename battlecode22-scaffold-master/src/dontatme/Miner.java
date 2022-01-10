@@ -128,13 +128,14 @@ public strictfp class Miner {
                 if (tryMove(rc, me, lead)) {
                     return lead;
                 }
-            }  
+            }
         }
         return null;
     }
 
     static boolean tryMove(RobotController rc, MapLocation me, MapLocation loc) throws GameActionException {
-        Direction dir = Pathing.pathTo(rc, loc);
+        Pathfinder.target = loc; Pathfinder.rc = rc;
+        Direction dir = Pathfinder.pathToTarget();
         if (rc.canMove(dir)) {
             rc.move(dir);
             rc.setIndicatorLine(me.add(dir), loc, 0, 255, 0);
