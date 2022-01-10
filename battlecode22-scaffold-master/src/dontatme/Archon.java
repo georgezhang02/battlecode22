@@ -7,7 +7,7 @@ import battlecode.common.*;
 public strictfp class Archon {
 
     static int archonIndex = -1;
-    static int miners = 0, soldiers  = 0;
+    static int miners = 0, soldiers = 0;
     static int comms = 0;
 
     /**

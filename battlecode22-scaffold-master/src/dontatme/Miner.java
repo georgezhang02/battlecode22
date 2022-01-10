@@ -6,6 +6,7 @@ public strictfp class Miner {
 
     static int archonIndex = -1;
     static int minerType = 0;
+    static MapLocation heading = null;
 
     /**
      * Run a single turn for a Miner.
@@ -13,7 +14,7 @@ public strictfp class Miner {
      */
     static void run(RobotController rc) throws GameActionException {
 
-        // Save the index of the archon it spawned from
+        // Save the index of the archon the miner spawned from
         if (archonIndex == -1) {
             for (RobotInfo info : rc.senseNearbyRobots()) {
                 if (info.getType() == RobotType.ARCHON) {
@@ -23,8 +24,90 @@ public strictfp class Miner {
         }
 
         MapLocation me = rc.getLocation();
+        MapLocation[] leads = rc.senseNearbyLocationsWithLead(20);
+        int arrayVal = rc.readSharedArray(archonIndex);
 
         // Mine around if possible
+        mineAround(rc, me);
+
+        // See if it is the base or exploration miner
+        if (minerType == 0) {
+            if (arrayVal / 4096 <= 2) {
+                minerType = 1;
+            } else {
+                minerType = 2;
+            }
+        }
+        
+        // Run base or exploration code
+        switch (minerType) {
+            case 1:
+                baseMiner(rc, me, arrayVal, leads);
+                rc.setIndicatorString("Base Miner");
+                break;
+            case 2:
+                explorationMiner(rc, me, leads);
+                rc.setIndicatorString("Exploration Miner");
+                break;
+            default:
+                break;
+        }
+    }
+
+    static void baseMiner(RobotController rc, MapLocation me, int arrayVal, MapLocation[] leads) throws GameActionException {
+
+        // If not on lead
+        if (rc.senseLead(me) == 0) {
+
+            // If the current heading still has lead and no miners, go there
+            if (heading != null && rc.senseLead(heading) > 0 && rc.senseRobotAtLocation(heading) == null) {
+                tryMove(rc, me, heading);
+            }
+
+            // If no current heading, move towards lead within miner vision if possible (and avoid other miners)
+            else if (leads.length > 0) {
+                heading = goTowardsNearbyLead(rc, me, leads);
+            } 
+
+            // If no lead within vision, move towards lead location given by archon
+            else if (arrayVal % 64 != 61) {
+                MapLocation archonLeadLocation = new MapLocation(arrayVal / 64 % 64, arrayVal % 64);
+                tryMove(rc, me, archonLeadLocation);
+            }
+
+            // If no more resources left, become exploration miner
+            else {
+                minerType = 2;
+            }
+        }
+    }
+
+    static void explorationMiner(RobotController rc, MapLocation me, MapLocation[] leads) throws GameActionException{
+
+        // If not on lead
+        if (rc.senseLead(me) == 0) {
+
+            // If the current heading still has lead and no miners, go there
+            if (heading != null && rc.senseLead(heading) > 0 && rc.senseRobotAtLocation(heading) == null) {
+                tryMove(rc, me, heading);
+            }
+
+            else {
+                
+                // If no current heading, move towards lead within miner vision if possible (and avoid other miners)
+                heading = goTowardsNearbyLead(rc, me, leads);
+    
+                // Otherwise, move towards the center
+                if (heading == null) {
+                    MapLocation center = new MapLocation(rc.getMapWidth() / 2, rc.getMapHeight() / 2);
+                    tryMove(rc, me, center);
+                }
+
+            }
+        }
+    }
+
+    static void mineAround(RobotController rc, MapLocation me) throws GameActionException {
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
                 MapLocation mineLocation = new MapLocation(me.x + dx, me.y + dy);
@@ -37,70 +120,26 @@ public strictfp class Miner {
             }
         }
 
-        int arrayVal = rc.readSharedArray(archonIndex);
-
-        // See if it is the base or exploration miner
-        if (minerType == 0) {
-            if (arrayVal / 4096 <= 2) {
-                minerType = 1;
-            } else {
-                minerType = 2;
-            }
-        }
-        
-        switch (minerType) {
-            case 1:
-                baseMiner(rc, me, arrayVal);
-                rc.setIndicatorString("Base Miner");
-                break;
-            case 2:
-                explorationMiner(rc);
-                rc.setIndicatorString("Exploration Miner");
-                break;
-            default:
-                break;
-        }
     }
 
-    static void baseMiner(RobotController rc, MapLocation me, int arrayVal) throws GameActionException {
-        MapLocation[] leads = rc.senseNearbyLocationsWithLead(20);
-        // If not on lead
-        if (rc.senseLead(me) == 0) {
-
-            // Move towards lead within miner vision if possible (and avoid other miners)
-            if (leads.length > 0) {
-                for (MapLocation lead : leads) {
-                    if (rc.senseRobotAtLocation(lead) == null) {
-                        Direction dir = Pathing.pathTo(rc, lead);
-                        if (rc.canMove(dir)) {
-                            rc.move(dir);
-                            rc.setIndicatorLine(me.add(dir), lead, 0, 255, 0);
-                            break;
-                        }
-                    }  
+    static MapLocation goTowardsNearbyLead(RobotController rc, MapLocation me, MapLocation[] leads) throws GameActionException {
+        for (MapLocation lead : leads) {
+            if (rc.senseRobotAtLocation(lead) == null) {
+                if (tryMove(rc, me, lead)) {
+                    return lead;
                 }
-            } 
-
-            // Otherwise, move towards lead location given by archon
-            else if (arrayVal % 64 != 61) {
-                MapLocation archonLeadLocation = new MapLocation(arrayVal / 64 % 64, arrayVal % 64);
-                Direction dir = Pathing.pathTo(rc, archonLeadLocation);
-                if (rc.canMove(dir)) {
-                    rc.move(dir);
-                    rc.setIndicatorLine(me.add(dir), archonLeadLocation, 255, 0, 0);
-                }
-            }
-
-            // If no more resources left, become exploration miner
-            else {
-                minerType = 2;
-                explorationMiner(rc);
-            }
+            }  
         }
-
+        return null;
     }
 
-    static void explorationMiner(RobotController rc) {
-
+    static boolean tryMove(RobotController rc, MapLocation me, MapLocation loc) throws GameActionException {
+        Direction dir = Pathing.pathTo(rc, loc);
+        if (rc.canMove(dir)) {
+            rc.move(dir);
+            rc.setIndicatorLine(me.add(dir), loc, 0, 255, 0);
+            return true;
+        }
+        return false;
     }
 }
