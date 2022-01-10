@@ -5,6 +5,7 @@ import battlecode.common.*;
 public abstract class Pathfinder {
     static MapLocation target;
     static RobotController rc;
+    static int minDistToTarget = 0;
 
     static final Direction[] directions = {
             Direction.NORTH,
@@ -22,7 +23,11 @@ public abstract class Pathfinder {
         target = null;
     }
 
-    static Direction pathTo()
+    static boolean targetWithinRadius(){
+        return rc.getLocation().distanceSquaredTo(target) < minDistToTarget * minDistToTarget;
+    }
+
+    static Direction pathToTarget()
             throws GameActionException {
         MapLocation ml;
         Direction ans = null;
@@ -81,6 +86,5 @@ public abstract class Pathfinder {
 
         }
     }
-
-    abstract Direction bfPathTo() throws GameActionException;
+    abstract Direction bfPathToTarget() throws GameActionException;
 }

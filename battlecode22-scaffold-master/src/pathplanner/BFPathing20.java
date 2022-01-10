@@ -284,7 +284,7 @@ public class BFPathing20 extends Pathfinder {
         super(rc);
     }
 
-    Direction bfPathTo() throws GameActionException {
+    Direction bfPathToTarget() throws GameActionException {
 
         MapLocation ml0 = rc.getLocation();
 
