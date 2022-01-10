@@ -17,26 +17,30 @@ public class ArchonStrategy {
         int index = 0;
         while (!placedLocation && rc.readSharedArray(index) != 0)
             index += 2;
+        //write all the archon locations
+        rc.writeSharedArray(63, 0); //increment the shared array
         if (!placedLocation) {
             rc.writeSharedArray(index, rc.getLocation().x);
             rc.writeSharedArray(index + 1, rc.getLocation().y);
             placedLocation = true;
+            //update the number of archons
+            rc.writeSharedArray(63, rc.readSharedArray(63) + 1);
         }
         if (miners < 5) {
             buildTowardsLowRubble(rc, RobotType.MINER);
         }
-        else if (soldiers < 10) {
+        else if (soldiers < 30) {
             buildTowardsLowRubble(rc, RobotType.SOLDIER);
         }
-        else if (builders < 1) {
+        /*else if (builders < 1) {
             buildTowardsLowRubble(rc, RobotType.BUILDER);
-        }
+        }*/
         else if (miners < soldiers / 2 && rc.getTeamLeadAmount(rc.getTeam()) < 5000){
             buildTowardsLowRubble(rc, RobotType.MINER);
         }
-        else if (builders < soldiers / 10) {
+        /*else if (builders < soldiers / 10) {
             buildTowardsLowRubble(rc, RobotType.BUILDER);
-        }
+        }*/
         else {
             buildTowardsLowRubble(rc, RobotType.SOLDIER);
         }

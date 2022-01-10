@@ -4,7 +4,7 @@ import battlecode.common.*;
 
 import java.util.Map;
 
-strictfp class SoldierStrategy {
+strictfp class RushSoldierStrategy {
     /**
      * Run a single turn for a Soldier.
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
@@ -21,7 +21,14 @@ strictfp class SoldierStrategy {
                 rc.attack(toAttack);
             }
         }
-
+        MapLocation[] PossibleEnemyLocations = findAreasToAttack(rc);
+        Direction dir = Pathing.pathTo(rc, PossibleEnemyLocations[rc.getID() % 2]);
+        if (rc.canMove(dir)) {
+            rc.move(dir);
+            //System.out.println("I moved!");
+        }
+    }
+    static MapLocation [] findAreasToAttack(RobotController rc) throws GameActionException {
         //use decision-making to identify two potential areas of enemy archons
         int archonCount = rc.getArchonCount();
 
@@ -58,10 +65,6 @@ strictfp class SoldierStrategy {
         MapLocation [] PossibleEnemyLocations = new MapLocation[2];
         PossibleEnemyLocations[0] = new MapLocation(diagPointX, diagPointY);
         PossibleEnemyLocations[1] = new MapLocation(secondDiagPointX, secondDiagPointY);
-        Direction dir = Pathing.pathTo(rc, PossibleEnemyLocations[rc.getID() % 2]);
-        if (rc.canMove(dir)) {
-            rc.move(dir);
-            //System.out.println("I moved!");
-        }
+        return PossibleEnemyLocations;
     }
 }
