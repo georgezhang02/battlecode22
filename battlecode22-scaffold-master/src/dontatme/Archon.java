@@ -20,7 +20,7 @@ public strictfp class Archon {
         // Also write the archon location
         if (archonIndex == -1) {
             archonIndex = rc.getID() / 2;
-            rc.writeSharedArray(archonIndex + 4, rc.getLocation().x*64+rc.getLocation().y);
+            rc.writeSharedArray(archonIndex + rc.getArchonCount(), rc.getLocation().x*64+rc.getLocation().y);
         }
 
         // Read current array value
