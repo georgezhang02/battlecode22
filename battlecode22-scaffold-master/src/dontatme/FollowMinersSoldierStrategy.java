@@ -12,73 +12,92 @@ strictfp class FollowMinersSoldierStrategy {
     static int addY = 0;
     static void runSoldier(RobotController rc) throws GameActionException {
 
-        Pathfinder.rc = rc;
-
-        // Try to attack someone
-        int radius = rc.getType().actionRadiusSquared;
-        Team ally = rc.getTeam();
-        Team opponent = rc.getTeam().opponent();
-        RobotInfo[] enemies = rc.senseNearbyRobots(radius, opponent);
-        if (enemies.length > 0) {
-            MapLocation toAttack = enemies[0].location;
-            if (rc.canAttack(toAttack)) {
-                rc.attack(toAttack);
-            }
-        }
-
-        //set null variables so we can compare regular situations against them
+        boolean followMiners = true;
         Direction dir = null;
-        MapLocation TargetLocation = null;
 
-        //generate array of all nearby arrays
-        RobotInfo[] allies = rc.senseNearbyRobots(radius, ally);
-        ArrayList<Integer> MinerLocs = new ArrayList<Integer>(); //stores miner locations
-        int counter = 0;
-        //if there are allies near me
-        if (allies.length > 0) {
-            boolean isMiner = false;
-
-
-            while (counter < allies.length) {
-                if (allies[counter].getType().equals(RobotType.MINER))
-                    MinerLocs.add(counter);
-                counter += 1;
-            }
-            //check if minerlocs has values in it, this means that there are nearby miners
-
-            counter = 0; //iterator
+        for(int i = 5; i<= 8 && followMiners; i++){
+            int archonInfo = rc.readSharedArray(i);
+            if( archonInfo / 4096 == 1){
+                Pathfinder.target = new MapLocation(archonInfo / 64, archonInfo % 64);
+                followMiners = false;
+                dir = Pathfinder.pathToTarget();
+            } 
         }
-        boolean isGoodTarget = false;
-        if (!MinerLocs.isEmpty()) {
 
 
-            //a good target is a miner that is within the soldier's vision radius but not attack radius
-            while (counter < MinerLocs.size() && !isGoodTarget) {
-                MapLocation allyPos = allies[MinerLocs.get(counter)].getLocation();
-                if (rc.canSenseLocation(allyPos) &&
-                    !rc.getLocation().isWithinDistanceSquared(allyPos, 5)) {
-                    isGoodTarget = true;
-                }
-                else {
-                    counter++;
+        Pathfinder.rc = rc;
+        if(followMiners){
+            // Try to attack someone
+            int radius = rc.getType().actionRadiusSquared;
+            Team ally = rc.getTeam();
+            Team opponent = rc.getTeam().opponent();
+            RobotInfo[] enemies = rc.senseNearbyRobots(radius, opponent);
+            if (enemies.length > 0) {
+                MapLocation toAttack = enemies[0].location;
+                if (rc.canAttack(toAttack)) {
+                    rc.attack(toAttack);
                 }
             }
+
+            //set null variables so we can compare regular situations against them
+
+            RobotInfo[] allies = rc.senseNearbyRobots(radius, ally);
+            ArrayList<Integer> MinerLocs = new ArrayList<Integer>(); //stores miner locations
+            int counter = 0;
+            //if there are allies near me
+            if (allies.length > 0) {
+
+
+                while (counter < allies.length) {
+                    if (allies[counter].getType().equals(RobotType.MINER))
+                        MinerLocs.add(counter);
+                    counter += 1;
+                }
+                //check if minerlocs has values in it, this means that there are nearby miners
+
+                counter = 0; //iterator
+            }
+            boolean isGoodTarget = false;
+            if (!MinerLocs.isEmpty()) {
+
+
+                //a good target is a miner that is within the soldier's vision radius but not attack radius
+                while (counter < MinerLocs.size() && !isGoodTarget) {
+                    MapLocation allyPos = allies[MinerLocs.get(counter)].getLocation();
+                    if (!rc.getLocation().isWithinDistanceSquared(allyPos, 5)) {
+                        Pathfinder.target = allyPos;
+
+                        isGoodTarget = true;
+                    }
+                    else {
+                        counter++;
+                    }
+                }
 
                 //good target found
 
+            }
+
         }
-        if (isGoodTarget) {
-            int locX = allies[MinerLocs.get(counter)].getLocation().x;
-            int locY = allies[MinerLocs.get(counter)].getLocation().y;
-            Pathfinder.target = new MapLocation(locX, locY);
+
+        if(Pathfinder.target == null || dir == null){
+            MapLocation[] ml = RushSoldierStrategy.findAreasToAttack(rc);
+            Pathfinder.target = ml[rc.getID() % 2];
             dir = Pathfinder.pathToTarget();
         }
+
 
         if (rc.canMove(dir)) {
             rc.move(dir);
         }
 
     }
+
+
+
+
+
+
 
 
 
