@@ -99,7 +99,7 @@ public strictfp class RobotPlayer {
      */
     static void runMiner(RobotController rc) throws GameActionException {
         pathfinder.target = new MapLocation(rc.getMapWidth()/ 2, rc.getMapHeight()/2);
-        Direction dir = Pathing.bfPathTo(rc, pathfinder.target);
+        Direction dir = pathfinder.bfPathTo();
         if(dir!= null) {
 
         } else{
