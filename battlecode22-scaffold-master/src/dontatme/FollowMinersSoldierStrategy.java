@@ -51,8 +51,9 @@ strictfp class FollowMinersSoldierStrategy {
 
                 //a good target is a miner that is within the soldier's vision radius but not attack radius
                 while (counter < MinerLocs.size() && !isGoodTarget) {
-                    if (rc.canSenseLocation(allies[MinerLocs.get(counter)].getLocation()) &&
-                        !rc.canAttack(allies[MinerLocs.get(counter)].getLocation())) {
+                    MapLocation allyPos = allies[MinerLocs.get(counter)].getLocation();
+                    if (rc.canSenseLocation(allyPos) &&
+                        !rc.getLocation().isWithinDistanceSquared(allyPos, 10)) {
                         isGoodTarget = true;
                     }
                     else {

@@ -12,6 +12,11 @@ strictfp class FollowMinersSoldierStrategy {
     static int addY = 0;
     static void runSoldier(RobotController rc) throws GameActionException {
         // Try to attack someone
+
+
+
+
+
         int radius = rc.getType().actionRadiusSquared;
         Team ally = rc.getTeam();
         Team opponent = rc.getTeam().opponent();
