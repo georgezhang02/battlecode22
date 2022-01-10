@@ -15,13 +15,13 @@ strictfp class FollowMinersSoldierStrategy {
         boolean followMiners = true;
         Direction dir = null;
 
-        for(int i = 5; i<= 8 && followMiners; i++){
+        for(int i = 9; i<= 12 && followMiners; i++){
             int archonInfo = rc.readSharedArray(i);
             if( archonInfo / 4096 == 1){
                 Pathfinder.target = new MapLocation(archonInfo / 64, archonInfo % 64);
                 followMiners = false;
                 dir = Pathfinder.pathToTarget();
-            } 
+            }
         }
 
 
