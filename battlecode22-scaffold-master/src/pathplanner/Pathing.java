@@ -1812,6 +1812,34 @@ public class Pathing {
         double initDist = Math.sqrt(ml0.distanceSquaredTo(target));
         double maxGainPerCost = 0;
 
+        gain = (initDist - Math.sqrt(ml45.distanceSquaredTo(target))) / dist45;
+        if(gain > maxGainPerCost){
+            maxGainPerCost = gain;
+            ans = dir45;
+            rc.setIndicatorString(45+""+dist45);
+        }
+
+        gain = (initDist - Math.sqrt(ml46.distanceSquaredTo(target))) / dist46;
+        if(gain > maxGainPerCost){
+            maxGainPerCost = gain;
+            ans = dir46;
+            rc.setIndicatorString(46+""+dist46);
+        }
+
+        gain = (initDist - Math.sqrt(ml47.distanceSquaredTo(target))) / dist47;
+        if(gain > maxGainPerCost){
+            maxGainPerCost = gain;
+            ans = dir47;
+            rc.setIndicatorString(47+""+dist47);
+        }
+
+        gain = (initDist - Math.sqrt(ml48.distanceSquaredTo(target))) / dist48;
+        if(gain > maxGainPerCost){
+            maxGainPerCost = gain;
+            ans = dir48;
+            rc.setIndicatorString(48+""+dist48);
+        }
+
         gain = (initDist - Math.sqrt(ml49.distanceSquaredTo(target))) / dist49;
         if(gain > maxGainPerCost){
             maxGainPerCost = gain;
@@ -1866,7 +1894,6 @@ public class Pathing {
             maxGainPerCost = gain;
             ans = dir56;
             rc.setIndicatorString(56+""+dist56);
-            
         }
 
         gain = (initDist - Math.sqrt(ml57.distanceSquaredTo(target))) / dist57;
@@ -1953,25 +1980,11 @@ public class Pathing {
             rc.setIndicatorString(68+""+dist68);
         }
 
-        gain = (initDist - Math.sqrt(ml31.distanceSquaredTo(target))) / dist31;
+        gain = (initDist - Math.sqrt(ml44.distanceSquaredTo(target))) / dist44;
         if(gain > maxGainPerCost){
             maxGainPerCost = gain;
-            ans = dir31;
-            rc.setIndicatorString(31+""+dist31);
-        }
-
-        gain = (initDist - Math.sqrt(ml37.distanceSquaredTo(target))) / dist37;
-        if(gain > maxGainPerCost){
-            maxGainPerCost = gain;
-            ans = dir37;
-            rc.setIndicatorString(37+""+dist37);
-        }
-
-        gain = (initDist - Math.sqrt(ml43.distanceSquaredTo(target))) / dist43;
-        if(gain > maxGainPerCost){
-            maxGainPerCost = gain;
-            ans = dir43;
-            rc.setIndicatorString(43+""+dist43);
+            ans = dir44;
+            rc.setIndicatorString(44+""+dist44);
         }
 
         gain = (initDist - Math.sqrt(ml25.distanceSquaredTo(target))) / dist25;
@@ -1981,6 +1994,13 @@ public class Pathing {
             rc.setIndicatorString(25+""+dist25);
         }
 
+        gain = (initDist - Math.sqrt(ml29.distanceSquaredTo(target))) / dist29;
+        if(gain > maxGainPerCost){
+            maxGainPerCost = gain;
+            ans = dir29;
+            rc.setIndicatorString(29+""+dist29);
+        }
+
         gain = (initDist - Math.sqrt(ml30.distanceSquaredTo(target))) / dist30;
         if(gain > maxGainPerCost){
             maxGainPerCost = gain;
@@ -1988,54 +2008,35 @@ public class Pathing {
             rc.setIndicatorString(30+""+dist30);
         }
 
-        gain = (initDist - Math.sqrt(ml32.distanceSquaredTo(target))) / dist32;
+        gain = (initDist - Math.sqrt(ml34.distanceSquaredTo(target))) / dist34;
         if(gain > maxGainPerCost){
             maxGainPerCost = gain;
-            ans = dir32;
-            rc.setIndicatorString(32+""+dist32);
+            ans = dir34;
+            rc.setIndicatorString(34+""+dist34);
         }
 
-        gain = (initDist - Math.sqrt(ml36.distanceSquaredTo(target))) / dist36;
+        gain = (initDist - Math.sqrt(ml35.distanceSquaredTo(target))) / dist35;
         if(gain > maxGainPerCost){
             maxGainPerCost = gain;
-            ans = dir36;
-            rc.setIndicatorString(36+""+dist36);
+            ans = dir35;
+            rc.setIndicatorString(35+""+dist35);
         }
 
-        gain = (initDist - Math.sqrt(ml38.distanceSquaredTo(target))) / dist38;
+        gain = (initDist - Math.sqrt(ml39.distanceSquaredTo(target))) / dist39;
         if(gain > maxGainPerCost){
             maxGainPerCost = gain;
-            ans = dir38;
-            rc.setIndicatorString(38+""+dist38);
+            ans = dir39;
+            rc.setIndicatorString(39+""+dist39);
         }
 
-        gain = (initDist - Math.sqrt(ml42.distanceSquaredTo(target))) / dist42;
+        gain = (initDist - Math.sqrt(ml40.distanceSquaredTo(target))) / dist40;
         if(gain > maxGainPerCost){
             maxGainPerCost = gain;
-            ans = dir42;
-            rc.setIndicatorString(42+""+dist42);
+            ans = dir40;
+            rc.setIndicatorString(40+""+dist40);
         }
 
-        gain = (initDist - Math.sqrt(ml44.distanceSquaredTo(target))) / dist44;
-        if(gain > maxGainPerCost){
-            maxGainPerCost = gain;
-            ans = dir44;
-            rc.setIndicatorString(44+""+dist44);
-        }
 
-        gain = (initDist - Math.sqrt(ml48.distanceSquaredTo(target))) / dist48;
-        if(gain > maxGainPerCost){
-            maxGainPerCost = gain;
-            ans = dir48;
-            rc.setIndicatorString(48+""+dist48);
-        }
-
-        gain = (initDist - Math.sqrt(ml26.distanceSquaredTo(target))) / dist26;
-        if(gain > maxGainPerCost){
-            maxGainPerCost = gain;
-            ans = dir26;
-            rc.setIndicatorString(26+""+dist26);
-        }
 
 
 
