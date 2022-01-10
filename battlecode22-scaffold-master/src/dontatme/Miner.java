@@ -52,6 +52,9 @@ public strictfp class Miner {
             default:
                 break;
         }
+
+        // Sense for enemy archon
+        EnemyArchonSensing.UpdateEnemyLocation(rc);
     }
 
     static void baseMiner(RobotController rc, MapLocation me, int arrayVal, MapLocation[] leads) throws GameActionException {

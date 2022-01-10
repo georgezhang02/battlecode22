@@ -2,10 +2,10 @@ package dontatme;
 
 import battlecode.common.*;
 
-public class ArchonSensing {
+public class EnemyArchonSensing {
 
     // Updates enemy archon location (should be called each turn)
-    public static void UpdateArchonLocation(RobotController rc) throws GameActionException {
+    public static void UpdateEnemyLocation(RobotController rc) throws GameActionException {
         RobotInfo[] robotsDetected = rc.senseNearbyRobots();
         for (RobotInfo robot : robotsDetected){
             // if found enemy archon

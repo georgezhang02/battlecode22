@@ -91,6 +91,8 @@ strictfp class FollowMinersSoldierStrategy {
             rc.move(dir);
         }
 
+        // Sense for enemy archon
+        EnemyArchonSensing.UpdateEnemyLocation(rc);
     }
 
 
