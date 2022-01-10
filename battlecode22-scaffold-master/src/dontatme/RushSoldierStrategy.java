@@ -42,7 +42,7 @@ strictfp class RushSoldierStrategy {
 
         //check if that point is a current archon location
         boolean foundPoint = false;
-        for (int i = 5; i < 5 + archonCount; i++) {
+        for (int i = archonCount + 1; i < 2 * archonCount + 1; i++) {
             int xVal = rc.readSharedArray(i) / 64;
             int yVal = rc.readSharedArray(i) % 64;
             if (diagPointX == xVal && diagPointY == yVal) {
