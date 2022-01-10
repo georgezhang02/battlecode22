@@ -32,13 +32,14 @@ strictfp class FollowMinersSoldierStrategy {
 
         //generate array of all nearby arrays
         RobotInfo[] allies = rc.senseNearbyRobots(radius, ally);
-
+        ArrayList<Integer> MinerLocs = new ArrayList<Integer>(); //stores miner locations
+        int counter = 0;
         //if there are allies near me
         if (allies.length > 0) {
             boolean isMiner = false;
-            int counter = 0;
-            ArrayList <Integer> MinerLocs = new ArrayList<Integer>(); //stores miner locations
-            while(counter < allies.length) {
+
+
+            while (counter < allies.length) {
                 if (allies[counter].getType().equals(RobotType.MINER))
                     MinerLocs.add(counter);
                 counter += 1;
@@ -46,71 +47,52 @@ strictfp class FollowMinersSoldierStrategy {
             //check if minerlocs has values in it, this means that there are nearby miners
 
             counter = 0; //iterator
-            if (!MinerLocs.isEmpty()) {
-                boolean isGoodTarget = false;
+        }
+        boolean isGoodTarget = false;
+        if (!MinerLocs.isEmpty()) {
 
-                //a good target is a miner that is within the soldier's vision radius but not attack radius
-                while (counter < MinerLocs.size() && !isGoodTarget) {
-                    MapLocation allyPos = allies[MinerLocs.get(counter)].getLocation();
-                    if (rc.canSenseLocation(allyPos) &&
-                        !rc.getLocation().isWithinDistanceSquared(allyPos, 10)) {
-                        isGoodTarget = true;
-                    }
-                    else {
-                        counter++;
-                    }
+
+            //a good target is a miner that is within the soldier's vision radius but not attack radius
+            while (counter < MinerLocs.size() && !isGoodTarget) {
+                MapLocation allyPos = allies[MinerLocs.get(counter)].getLocation();
+                if (rc.canSenseLocation(allyPos) &&
+                    !rc.getLocation().isWithinDistanceSquared(allyPos, 5)) {
+                    isGoodTarget = true;
                 }
+                else {
+                    counter++;
+                }
+            }
 
                 //good target found
-                if (isGoodTarget) {
-                    int locX = allies[MinerLocs.get(counter)].getLocation().x;
-                    int locY = allies[MinerLocs.get(counter)].getLocation().y;
-                    TargetLocation = new MapLocation(locX, locY);
-                }
 
-                //do ordinary routing now
-                else {
-                    /*We trigger a soldier rush here, as generally that will path soldiers to the middle,
-                    * and also to a more forward position*/
-                    MapLocation[] PossibleEnemyLocations = RushSoldierStrategy.findAreasToAttack(rc);
-                    Pathfinder.target = PossibleEnemyLocations[rc.getID() % 2];
-                    dir = Pathfinder.pathToTarget();
-                }
-            }
-            else {
-                //similar rationale as above
-                MapLocation[] PossibleEnemyLocations = RushSoldierStrategy.findAreasToAttack(rc);
-                Pathfinder.target = PossibleEnemyLocations[rc.getID() % 2];
-                dir = Pathfinder.pathToTarget();
-            }
-            if (TargetLocation != null)
-                //this is the case that a useful miner was found
-                Pathfinder.target = TargetLocation;
-                dir = Pathfinder.pathToTarget();
         }
+        if (isGoodTarget) {
+            int locX = allies[MinerLocs.get(counter)].getLocation().x;
+            int locY = allies[MinerLocs.get(counter)].getLocation().y;
+            Pathfinder.target = new MapLocation(locX, locY);
+            dir = Pathfinder.pathToTarget();
+        }
+
+        //do ordinary routing now
         else {
-            //soldier rush trigger
+            /*We trigger a soldier rush here, as generally that will path soldiers to the middle,
+             * and also to a more forward position*/
             MapLocation[] PossibleEnemyLocations = RushSoldierStrategy.findAreasToAttack(rc);
             Pathfinder.target = PossibleEnemyLocations[rc.getID() % 2];
             dir = Pathfinder.pathToTarget();
         }
+
+
 
         if (rc.canMove(dir)) {
             rc.move(dir);
         }
 
-        /*soldiers generally, should move, so if a target location was found, and soldiers didn't move
-        * , then this triggers the soldier to pursue the center instead*/
-        else if (TargetLocation != null){
-            MapLocation[] PossibleEnemyLocations = RushSoldierStrategy.findAreasToAttack(rc);
-            Pathfinder.target = PossibleEnemyLocations[rc.getID() % 2];
-            dir = Pathfinder.pathToTarget();
-            if (rc.canMove(dir)) {
-                rc.move(dir);
-                //System.out.println("I moved!");
-            }
-        }
     }
+
+
+
     static MapLocation getClosestArchon(MapLocation [] array) {
         /*In-progress, intended to route soldiers away from archons*/
         return null;
