@@ -74,17 +74,6 @@ strictfp class FollowMinersSoldierStrategy {
             dir = Pathfinder.pathToTarget();
         }
 
-        //do ordinary routing now
-        else {
-            /*We trigger a soldier rush here, as generally that will path soldiers to the middle,
-             * and also to a more forward position*/
-            MapLocation[] PossibleEnemyLocations = RushSoldierStrategy.findAreasToAttack(rc);
-            Pathfinder.target = PossibleEnemyLocations[rc.getID() % 2];
-            dir = Pathfinder.pathToTarget();
-        }
-
-
-
         if (rc.canMove(dir)) {
             rc.move(dir);
         }
