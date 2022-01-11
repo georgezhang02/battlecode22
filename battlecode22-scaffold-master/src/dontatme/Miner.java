@@ -7,12 +7,16 @@ public strictfp class Miner {
     static int archonIndex = -1;
     static int minerType = 0;
     static MapLocation heading = null;
+    static int stuckCounter = 0;
+    static Direction selectedDirection = Direction.CENTER;
 
     /**
      * Run a single turn for a Miner.
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
      */
     static void run(RobotController rc) throws GameActionException {
+
+        Pathfinder.rc = rc;
 
         // Save the index of the archon the miner spawned from
         if (archonIndex == -1) {
@@ -30,7 +34,7 @@ public strictfp class Miner {
         // Mine around if possible
         mineAround(rc, me);
 
-        // See if it is the base or exploration miner
+        // See if it is the base or center miner
         if (minerType == 0) {
             if (arrayVal / 4096 <= 2) {
                 minerType = 1;
@@ -39,22 +43,22 @@ public strictfp class Miner {
             }
         }
         
-        // Run base or exploration code
+        // Run base or center or expand code
         switch (minerType) {
             case 1:
                 baseMiner(rc, me, arrayVal, leads);
                 rc.setIndicatorString("Base Miner");
                 break;
             case 2:
-                explorationMiner(rc, me, leads);
-                rc.setIndicatorString("Exploration Miner");
+                centerMiner(rc, me, leads);
+                rc.setIndicatorString("Center Miner");
                 break;
+            case 3:
+                expandMiner(rc, me, leads);
+                rc.setIndicatorString("Expand Miner");
             default:
                 break;
         }
-
-        // Sense for enemy archon
-        EnemyArchonSensing.UpdateEnemyLocation(rc);
     }
 
     static void baseMiner(RobotController rc, MapLocation me, int arrayVal, MapLocation[] leads) throws GameActionException {
@@ -85,7 +89,7 @@ public strictfp class Miner {
         }
     }
 
-    static void explorationMiner(RobotController rc, MapLocation me, MapLocation[] leads) throws GameActionException{
+    static void centerMiner(RobotController rc, MapLocation me, MapLocation[] leads) throws GameActionException{
 
         // If not on lead
         if (rc.senseLead(me) == 0) {
@@ -101,11 +105,67 @@ public strictfp class Miner {
                 heading = goTowardsNearbyLead(rc, me, leads);
     
                 // Otherwise, move towards the center
+                MapLocation center = new MapLocation(rc.getMapWidth() / 2, rc.getMapHeight() / 2);
                 if (heading == null) {
-                    MapLocation center = new MapLocation(rc.getMapWidth() / 2, rc.getMapHeight() / 2);
-                    tryMove(rc, me, center);
+                    Pathfinder.target = center;
+                    Direction dir = Pathfinder.pathToTarget();
+                    if (rc.canMove(dir)) {
+                        rc.move(dir);
+                        stuckCounter = 0;
+                    } else {
+                        // rc.getMovementCooldownTurns() == 0 &&
+                        if (rc.senseRobotAtLocation(me.add(dir)) != null) {
+                            stuckCounter++;
+                            rc.setIndicatorString(Integer.toString(stuckCounter));
+                        }
+                    }
                 }
 
+                if ((me.x == center.x && me.y == center.y) || stuckCounter >= 2) {
+                    minerType = 3;
+                    int arrayVal = rc.readSharedArray(archonIndex + 4);
+                    MapLocation archonLocation = new MapLocation(arrayVal / 64 % 64, arrayVal % 64);
+                    Direction forwards = me.directionTo(archonLocation).opposite();
+                    Direction[] possibleDirections = new Direction[5];
+                    possibleDirections[0] = forwards;
+                    possibleDirections[1] = forwards.rotateLeft().rotateLeft();
+                    possibleDirections[2] = forwards.rotateRight().rotateRight();
+                    possibleDirections[3] = forwards.rotateLeft();
+                    possibleDirections[4] = forwards.rotateRight();
+                    int turn = arrayVal / 4096;
+                    selectedDirection = possibleDirections[turn];
+                    rc.writeSharedArray(archonIndex + 4, ((turn + 1) % 5) * 4096 + arrayVal);
+                }
+            }
+        }
+    }
+
+    static void expandMiner(RobotController rc, MapLocation me, MapLocation[] leads) throws GameActionException{
+
+        // If not on lead
+        if (rc.senseLead(me) == 0) {
+
+            // If the current heading still has lead and no miners, go there
+            if (heading != null && rc.senseLead(heading) > 0 && rc.senseRobotAtLocation(heading) == null) {
+                tryMove(rc, me, heading);
+            }
+
+            else {
+                
+                // If no current heading, move towards lead within miner vision if possible (and avoid other miners)
+                heading = goTowardsNearbyLead(rc, me, leads);
+    
+                // Otherwise, move towards selected direction
+                if (heading == null) {
+                    if (rc.canMove(selectedDirection)) {
+                        rc.move(selectedDirection);
+                    } else {
+                        Direction dir = Helper.directions[Helper.rng.nextInt(Helper.directions.length)];
+                        if (rc.canMove(dir)) {
+                            rc.move(dir);
+                        } 
+                    }
+                }
             }
         }
     }
@@ -137,7 +197,7 @@ public strictfp class Miner {
     }
 
     static boolean tryMove(RobotController rc, MapLocation me, MapLocation loc) throws GameActionException {
-        Pathfinder.target = loc; Pathfinder.rc = rc;
+        Pathfinder.target = loc;
         Direction dir = Pathfinder.pathToTarget();
         if (rc.canMove(dir)) {
             rc.move(dir);
