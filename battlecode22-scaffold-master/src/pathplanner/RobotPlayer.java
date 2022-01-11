@@ -98,8 +98,23 @@ public strictfp class RobotPlayer {
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
      */
     static void runMiner(RobotController rc) throws GameActionException {
-        pathfinder.target = new MapLocation(rc.getMapWidth()/ 2, rc.getMapHeight()/2);
-        Direction dir = pathfinder.bfPathToTarget();
+
+        Direction dir = null;
+        RobotInfo[] enemyML= rc.senseNearbyRobots(20, rc.getTeam().opponent());
+        MapLocation[] enemyPos = new MapLocation[enemyML.length];
+        if(enemyML.length > 0){
+            for(int i = 0; i< enemyPos.length; i++){
+                enemyPos[i] = enemyML[i].getLocation();
+            }
+
+            dir =  pathfinder.pathAwayFrom(enemyPos);
+        }else {
+            pathfinder.target = new MapLocation(rc.getMapWidth()/ 2, rc.getMapHeight()/2);
+            dir = pathfinder.bfPathToTarget();
+
+        }
+
+
         if(dir!= null) {
 
         } else{

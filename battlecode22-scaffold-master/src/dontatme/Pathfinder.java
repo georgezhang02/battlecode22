@@ -2,6 +2,8 @@ package dontatme;
 
 import battlecode.common.*;
 
+import java.util.Map;
+
 public abstract class Pathfinder {
     static MapLocation target;
     static RobotController rc;
@@ -25,6 +27,22 @@ public abstract class Pathfinder {
 
     static boolean targetWithinRadius(){
         return rc.getLocation().distanceSquaredTo(target) < minDistToTarget * minDistToTarget;
+    }
+
+    static Direction pathAwayFrom(MapLocation[]mapLocations) throws GameActionException {
+        MapLocation curPos = rc.getLocation();
+        int x = curPos.x;
+        int y = curPos.y;
+        for(MapLocation ml : mapLocations){
+            double vect = 4.5/Math.sqrt(curPos.distanceSquaredTo(ml));
+            int xdiff = curPos.x - ml.x;
+            int ydiff = curPos.y - ml.y;
+
+            x += (int)(xdiff * vect);
+            y += (int)(ydiff * vect);
+        }
+        target = new MapLocation(x, y);
+        return pathToTarget();
     }
 
     static Direction pathToTarget()
