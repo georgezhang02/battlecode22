@@ -263,42 +263,6 @@ public class BFPathing20 extends Pathfinder {
     static MapLocation ml67;
     static MapLocation ml68;
 
-    static boolean onMap9;
-    static boolean onMap10;
-    static boolean onMap11;
-    static boolean onMap12;
-    static boolean onMap13;
-    static boolean onMap14;
-    static boolean onMap15;
-    static boolean onMap16;
-    static boolean onMap17;
-    static boolean onMap18;
-    static boolean onMap19;
-    static boolean onMap20;
-    static boolean onMap21;
-    static boolean onMap22;
-    static boolean onMap23;
-    static boolean onMap24;
-    static boolean onMap25;
-    static boolean onMap26;
-    static boolean onMap27;
-    static boolean onMap28;
-    static boolean onMap29;
-    static boolean onMap30;
-    static boolean onMap31;
-    static boolean onMap32;
-    static boolean onMap33;
-    static boolean onMap34;
-    static boolean onMap35;
-    static boolean onMap36;
-    static boolean onMap37;
-    static boolean onMap38;
-    static boolean onMap39;
-    static boolean onMap40;
-    static boolean onMap41;
-    static boolean onMap42;
-    static boolean onMap43;
-    static boolean onMap44;
 
     static Direction dir1 = Direction.SOUTH;
     static Direction dir2 = Direction.SOUTHEAST;
@@ -320,74 +284,74 @@ public class BFPathing20 extends Pathfinder {
         if(ml0.equals(target)) return null;
 
 
-        dist1 = 7200000;
-        dist2 = 7200000;
-        dist3 = 7200000;
-        dist4 = 7200000;
-        dist5 = 7200000;
-        dist6 = 7200000;
-        dist7 = 7200000;
-        dist8 = 7200000;
-        dist9 = 7200000;
-        dist10 = 7200000;
-        dist11 = 7200000;
-        dist12 = 7200000;
-        dist13 = 7200000;
-        dist14 = 7200000;
-        dist15 = 7200000;
-        dist16 = 7200000;
-        dist17 = 7200000;
-        dist18 = 7200000;
-        dist19 = 7200000;
-        dist20 = 7200000;
-        dist21 = 7200000;
-        dist22 = 7200000;
-        dist23 = 7200000;
-        dist24 = 7200000;
-        dist25 = 7200000;
-        dist26 = 7200000;
-        dist27 = 7200000;
-        dist28 = 7200000;
-        dist29 = 7200000;
-        dist30 = 7200000;
-        dist31 = 7200000;
-        dist32 = 7200000;
-        dist33 = 7200000;
-        dist34 = 7200000;
-        dist35 = 7200000;
-        dist36 = 7200000;
-        dist37 = 7200000;
-        dist38 = 7200000;
-        dist39 = 7200000;
-        dist40 = 7200000;
-        dist41 = 7200000;
-        dist42 = 7200000;
-        dist43 = 7200000;
-        dist44 = 7200000;
-        dist45 = 7200000;
-        dist46 = 7200000;
-        dist47 = 7200000;
-        dist48 = 7200000;
-        dist49 = 7200000;
-        dist50 = 7200000;
-        dist51 = 7200000;
-        dist52 = 7200000;
-        dist53 = 7200000;
-        dist54 = 7200000;
-        dist55 = 7200000;
-        dist56 = 7200000;
-        dist57 = 7200000;
-        dist58 = 7200000;
-        dist59 = 7200000;
-        dist60 = 7200000;
-        dist61 = 7200000;
-        dist62 = 7200000;
-        dist63 = 7200000;
-        dist64 = 7200000;
-        dist65 = 7200000;
-        dist66 = 7200000;
-        dist67 = 7200000;
-        dist68 = 7200000;
+        dist1 = 10000;
+        dist2 = 10000;
+        dist3 = 10000;
+        dist4 = 10000;
+        dist5 = 10000;
+        dist6 = 10000;
+        dist7 = 10000;
+        dist8 = 10000;
+        dist9 = 10000;
+        dist10 = 10000;
+        dist11 = 10000;
+        dist12 = 10000;
+        dist13 = 10000;
+        dist14 = 10000;
+        dist15 = 10000;
+        dist16 = 10000;
+        dist17 = 10000;
+        dist18 = 10000;
+        dist19 = 10000;
+        dist20 = 10000;
+        dist21 = 10000;
+        dist22 = 10000;
+        dist23 = 10000;
+        dist24 = 10000;
+        dist25 = 10000;
+        dist26 = 10000;
+        dist27 = 10000;
+        dist28 = 10000;
+        dist29 = 10000;
+        dist30 = 10000;
+        dist31 = 10000;
+        dist32 = 10000;
+        dist33 = 10000;
+        dist34 = 10000;
+        dist35 = 10000;
+        dist36 = 10000;
+        dist37 = 10000;
+        dist38 = 10000;
+        dist39 = 10000;
+        dist40 = 10000;
+        dist41 = 10000;
+        dist42 = 10000;
+        dist43 = 10000;
+        dist44 = 10000;
+        dist45 = 10000;
+        dist46 = 10000;
+        dist47 = 10000;
+        dist48 = 10000;
+        dist49 = 10000;
+        dist50 = 10000;
+        dist51 = 10000;
+        dist52 = 10000;
+        dist53 = 10000;
+        dist54 = 10000;
+        dist55 = 10000;
+        dist56 = 10000;
+        dist57 = 10000;
+        dist58 = 10000;
+        dist59 = 10000;
+        dist60 = 10000;
+        dist61 = 10000;
+        dist62 = 10000;
+        dist63 = 10000;
+        dist64 = 10000;
+        dist65 = 10000;
+        dist66 = 10000;
+        dist67 = 10000;
+        dist68 = 10000;
 
         ml1 = ml0.add(Direction.SOUTH);
         ml2 = ml1.add(Direction.EAST);
@@ -502,9 +466,7 @@ public class BFPathing20 extends Pathfinder {
                 dist8 = rc.senseRubble(ml8) + 10;
             }
         }
-        int time2 = Clock.getBytecodesLeft();
-
-        if(onMap9 = rc.onTheMap(ml9)){
+        if(rc.onTheMap(ml9)){
             cost9 = rc.senseRubble(ml9) + 10;
 
             if(cost9 + dist8 < dist9){
@@ -518,7 +480,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(onMap10 = rc.onTheMap(ml10)){
+        if(rc.onTheMap(ml10)){
             cost10 = rc.senseRubble(ml10) + 10;
 
             if(cost10 + dist8 < dist10){
@@ -537,13 +499,8 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(onMap11 = rc.onTheMap(ml11)){
+        if(rc.onTheMap(ml11)){
             cost11 = rc.senseRubble(ml11) + 10;
-
-            if(cost11 + dist10 < dist11){
-                dist11 = cost11 + dist10;
-                dir11 = dir10;
-            }
 
             if(cost11 + dist1 < dist11){
                 dist11 = cost11 + dist1;
@@ -556,13 +513,8 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(onMap12 = rc.onTheMap(ml12)){
+        if(rc.onTheMap(ml12)){
             cost12 = rc.senseRubble(ml12) + 10;
-
-            if(cost12 + dist11 < dist12){
-                dist12 = cost12 + dist11;
-                dir12 = dir11;
-            }
 
             if(cost12 + dist2 < dist12){
                 dist12 = cost12 + dist2;
@@ -570,7 +522,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(onMap13 = rc.onTheMap(ml13)){
+        if(rc.onTheMap(ml13)){
             cost13 = rc.senseRubble(ml13) + 10;
 
             if(cost13 + dist2 < dist13){
@@ -584,7 +536,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(onMap14 = rc.onTheMap(ml14)){
+        if(rc.onTheMap(ml14)){
             cost14 = rc.senseRubble(ml14) + 10;
 
             if(cost14 + dist2 < dist14){
@@ -603,7 +555,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(onMap15 = rc.onTheMap(ml15)){
+        if(rc.onTheMap(ml15)){
             cost15 = rc.senseRubble(ml15) + 10;
 
             if(cost15 + dist3 < dist15){
@@ -615,28 +567,18 @@ public class BFPathing20 extends Pathfinder {
                 dist15 = cost15 + dist4;
                 dir15 = dir4;
             }
-
-            if(cost15 + dist14 < dist15){
-                dist15 = cost15 + dist14;
-                dir15 = dir14;
-            }
         }
 
-        if(onMap16 = rc.onTheMap(ml16)){
+        if(rc.onTheMap(ml16)){
             cost16 = rc.senseRubble(ml16) + 10;
 
             if(cost16 + dist4 < dist16){
                 dist16 = cost16 + dist4;
                 dir16 = dir4;
             }
-
-            if(cost16 + dist15 < dist16){
-                dist16 = cost16 + dist15;
-                dir16 = dir15;
-            }
         }
 
-        if(onMap17 = rc.onTheMap(ml17)){
+        if(rc.onTheMap(ml17)){
             cost17 = rc.senseRubble(ml17) + 10;
 
             if(cost17 + dist5 < dist17){
@@ -650,7 +592,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(onMap18 = rc.onTheMap(ml18)){
+        if(rc.onTheMap(ml18)){
             cost18 = rc.senseRubble(ml18) + 10;
 
             if(cost18 + dist6 < dist18){
@@ -669,7 +611,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(onMap19 = rc.onTheMap(ml19)){
+        if(rc.onTheMap(ml19)){
             cost19 = rc.senseRubble(ml19) + 10;
 
             if(cost19 + dist6 < dist19){
@@ -681,28 +623,18 @@ public class BFPathing20 extends Pathfinder {
                 dist19 = cost19 + dist5;
                 dir19 = dir5;
             }
-
-            if(cost19 + dist18 < dist19){
-                dist19 = cost19 + dist18;
-                dir19 = dir18;
-            }
         }
 
-        if(onMap20 = rc.onTheMap(ml20)){
+        if(rc.onTheMap(ml20)){
             cost20 = rc.senseRubble(ml20) + 10;
 
             if(cost20 + dist6 < dist20){
                 dist20 = cost20 + dist6;
                 dir20 = dir6;
             }
-
-            if(cost20 + dist19 < dist20){
-                dist20 = cost20 + dist19;
-                dir20 = dir19;
-            }
         }
 
-        if(onMap21 = rc.onTheMap(ml21)){
+        if(rc.onTheMap(ml21)){
             cost21 = rc.senseRubble(ml21) + 10;
 
             if(cost21 + dist7 < dist21){
@@ -716,7 +648,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(onMap22 = rc.onTheMap(ml22)){
+        if(rc.onTheMap(ml22)){
             cost22 = rc.senseRubble(ml22) + 10;
 
             if(cost22 + dist8 < dist22){
@@ -735,13 +667,8 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(onMap23 = rc.onTheMap(ml23)){
+        if(rc.onTheMap(ml23)){
             cost23 = rc.senseRubble(ml23) + 10;
-
-            if(cost23 + dist22 < dist23){
-                dist23 = cost23 + dist22;
-                dir23 = dir22;
-            }
 
             if(cost23 + dist8 < dist23){
                 dist23 = cost23 + dist8;
@@ -754,8 +681,119 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(onMap24 = rc.onTheMap(ml24)){
+        if(rc.onTheMap(ml24)){
             cost24 = rc.senseRubble(ml24) + 10;
+
+            if(cost24 + dist8 < dist24){
+                dist24 = cost24 + dist8;
+                dir24 = dir8;
+            }
+        }
+
+        if(dist9 < 10000){
+
+            if(cost9 + dist10 < dist9){
+                dist9 = cost9 + dist10;
+                dir9 = dir10;
+            }
+        }
+
+        if(dist11 < 10000){
+
+            if(cost11 + dist10 < dist11){
+                dist11 = cost11 + dist10;
+                dir11 = dir10;
+            }
+        }
+
+        if(dist12 < 10000){
+
+            if(cost12 + dist11 < dist12){
+                dist12 = cost12 + dist11;
+                dir12 = dir11;
+            }
+
+            if(cost12 + dist13 < dist12){
+                dist12 = cost12 + dist13;
+                dir12 = dir13;
+            }
+        }
+
+        if(dist13 < 10000){
+
+            if(cost13 + dist14 < dist13){
+                dist13 = cost13 + dist14;
+                dir13 = dir14;
+            }
+        }
+
+        if(dist15 < 10000){
+
+            if(cost15 + dist14 < dist15){
+                dist15 = cost15 + dist14;
+                dir15 = dir14;
+            }
+        }
+
+        if(dist16 < 10000){
+
+            if(cost16 + dist17 < dist16){
+                dist16 = cost16 + dist17;
+                dir16 = dir17;
+            }
+
+            if(cost16 + dist15 < dist16){
+                dist16 = cost16 + dist15;
+                dir16 = dir15;
+            }
+        }
+
+        if(dist17 < 10000){
+
+            if(cost17 + dist18 < dist17){
+                dist17 = cost17 + dist18;
+                dir17 = dir18;
+            }
+        }
+
+        if(dist19 < 10000){
+
+            if(cost19 + dist18 < dist19){
+                dist19 = cost19 + dist18;
+                dir19 = dir18;
+            }
+        }
+
+        if(dist20 < 10000){
+
+            if(cost20 + dist21 < dist20){
+                dist20 = cost20 + dist21;
+                dir20 = dir21;
+            }
+
+            if(cost20 + dist19 < dist20){
+                dist20 = cost20 + dist19;
+                dir20 = dir19;
+            }
+        }
+
+        if(dist21 < 10000){
+
+            if(cost21 + dist22 < dist21){
+                dist21 = cost21 + dist22;
+                dir21 = dir22;
+            }
+        }
+
+        if(dist23 < 10000){
+
+            if(cost23 + dist22 < dist23){
+                dist23 = cost23 + dist22;
+                dir23 = dir22;
+            }
+        }
+
+        if(dist24 < 10000){
 
             if(cost24 + dist23 < dist24){
                 dist24 = cost24 + dist23;
@@ -766,74 +804,9 @@ public class BFPathing20 extends Pathfinder {
                 dist24 = cost24 + dist9;
                 dir24 = dir9;
             }
-
-            if(cost24 + dist8 < dist24){
-                dist24 = cost24 + dist8;
-                dir24 = dir8;
-            }
         }
 
-        int time3 = Clock.getBytecodesLeft();
-
-        if(onMap9){
-
-            if(cost9 + dist10 < dist9){
-                dist9 = cost9 + dist10;
-                dir9 = dir10;
-            }
-        }
-
-        if(onMap12){
-
-            if(cost12 + dist13 < dist12){
-                dist12 = cost12 + dist13;
-                dir12 = dir13;
-            }
-        }
-
-        if(onMap13){
-
-            if(cost13 + dist14 < dist13){
-                dist13 = cost13 + dist14;
-                dir13 = dir14;
-            }
-        }
-
-        if(onMap16){
-
-            if(cost16 + dist17 < dist16){
-                dist16 = cost16 + dist17;
-                dir16 = dir17;
-            }
-        }
-
-        if(onMap17){
-
-            if(cost17 + dist18 < dist17){
-                dist17 = cost17 + dist18;
-                dir17 = dir18;
-            }
-        }
-
-        if(onMap20){
-
-            if(cost20 + dist21 < dist20){
-                dist20 = cost20 + dist21;
-                dir20 = dir21;
-            }
-        }
-
-        if(onMap21){
-
-            if(cost21 + dist22 < dist21){
-                dist21 = cost21 + dist22;
-                dir21 = dir22;
-            }
-        }
-
-        int time4 = Clock.getBytecodesLeft();
-
-        if(onMap25 = rc.onTheMap(ml25)){
+        if(rc.onTheMap(ml25)){
             cost25 = rc.senseRubble(ml25) + 10;
 
             if(cost25 + dist24 < dist25){
@@ -847,7 +820,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(onMap26 = rc.onTheMap(ml26)){
+        if(rc.onTheMap(ml26)){
             cost26 = rc.senseRubble(ml26) + 10;
 
             if(cost26 + dist24 < dist26){
@@ -866,7 +839,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(onMap27 = rc.onTheMap(ml27)){
+        if(rc.onTheMap(ml27)){
             cost27 = rc.senseRubble(ml27) + 10;
 
             if(cost27 + dist9 < dist27){
@@ -885,13 +858,8 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(onMap28 = rc.onTheMap(ml28)){
+        if(rc.onTheMap(ml28)){
             cost28 = rc.senseRubble(ml28) + 10;
-
-            if(cost28 + dist27 < dist28){
-                dist28 = cost28 + dist27;
-                dir28 = dir27;
-            }
 
             if(cost28 + dist10 < dist28){
                 dist28 = cost28 + dist10;
@@ -909,13 +877,8 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(onMap29 = rc.onTheMap(ml29)){
+        if(rc.onTheMap(ml29)){
             cost29 = rc.senseRubble(ml29) + 10;
-
-            if(cost29 + dist28 < dist29){
-                dist29 = cost29 + dist28;
-                dir29 = dir28;
-            }
 
             if(cost29 + dist11 < dist29){
                 dist29 = cost29 + dist11;
@@ -928,7 +891,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(onMap30 = rc.onTheMap(ml30)){
+        if(rc.onTheMap(ml30)){
             cost30 = rc.senseRubble(ml30) + 10;
 
             if(cost30 + dist12 < dist30){
@@ -942,7 +905,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(onMap31 = rc.onTheMap(ml31)){
+        if(rc.onTheMap(ml31)){
             cost31 = rc.senseRubble(ml31) + 10;
 
             if(cost31 + dist12 < dist31){
@@ -961,7 +924,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(onMap32 = rc.onTheMap(ml32)){
+        if(rc.onTheMap(ml32)){
             cost32 = rc.senseRubble(ml32) + 10;
 
             if(cost32 + dist13 < dist32){
@@ -980,7 +943,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(onMap33 = rc.onTheMap(ml33)){
+        if(rc.onTheMap(ml33)){
             cost33 = rc.senseRubble(ml33) + 10;
 
             if(cost33 + dist14 < dist33){
@@ -997,14 +960,9 @@ public class BFPathing20 extends Pathfinder {
                 dist33 = cost33 + dist16;
                 dir33 = dir16;
             }
-
-            if(cost33 + dist32 < dist33){
-                dist33 = cost33 + dist32;
-                dir33 = dir32;
-            }
         }
 
-        if(onMap34 = rc.onTheMap(ml34)){
+        if(rc.onTheMap(ml34)){
             cost34 = rc.senseRubble(ml34) + 10;
 
             if(cost34 + dist15 < dist34){
@@ -1016,14 +974,9 @@ public class BFPathing20 extends Pathfinder {
                 dist34 = cost34 + dist16;
                 dir34 = dir16;
             }
-
-            if(cost34 + dist33 < dist34){
-                dist34 = cost34 + dist33;
-                dir34 = dir33;
-            }
         }
 
-        if(onMap35 = rc.onTheMap(ml35)){
+        if(rc.onTheMap(ml35)){
             cost35 = rc.senseRubble(ml35) + 10;
 
             if(cost35 + dist17 < dist35){
@@ -1037,7 +990,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(onMap36 = rc.onTheMap(ml36)){
+        if(rc.onTheMap(ml36)){
             cost36 = rc.senseRubble(ml36) + 10;
 
             if(cost36 + dist18 < dist36){
@@ -1056,7 +1009,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(onMap37 = rc.onTheMap(ml37)){
+        if(rc.onTheMap(ml37)){
             cost37 = rc.senseRubble(ml37) + 10;
 
             if(cost37 + dist19 < dist37){
@@ -1075,7 +1028,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(onMap38 = rc.onTheMap(ml38)){
+        if(rc.onTheMap(ml38)){
             cost38 = rc.senseRubble(ml38) + 10;
 
             if(cost38 + dist20 < dist38){
@@ -1092,14 +1045,9 @@ public class BFPathing20 extends Pathfinder {
                 dist38 = cost38 + dist18;
                 dir38 = dir18;
             }
-
-            if(cost38 + dist37 < dist38){
-                dist38 = cost38 + dist37;
-                dir38 = dir37;
-            }
         }
 
-        if(onMap39 = rc.onTheMap(ml39)){
+        if(rc.onTheMap(ml39)){
             cost39 = rc.senseRubble(ml39) + 10;
 
             if(cost39 + dist20 < dist39){
@@ -1111,14 +1059,9 @@ public class BFPathing20 extends Pathfinder {
                 dist39 = cost39 + dist19;
                 dir39 = dir19;
             }
-
-            if(cost39 + dist38 < dist39){
-                dist39 = cost39 + dist38;
-                dir39 = dir38;
-            }
         }
 
-        if(onMap40 = rc.onTheMap(ml40)){
+        if(rc.onTheMap(ml40)){
             cost40 = rc.senseRubble(ml40) + 10;
 
             if(cost40 + dist21 < dist40){
@@ -1132,7 +1075,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(onMap41 = rc.onTheMap(ml41)){
+        if(rc.onTheMap(ml41)){
             cost41 = rc.senseRubble(ml41) + 10;
 
             if(cost41 + dist22 < dist41){
@@ -1151,7 +1094,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(onMap42 = rc.onTheMap(ml42)){
+        if(rc.onTheMap(ml42)){
             cost42 = rc.senseRubble(ml42) + 10;
 
             if(cost42 + dist23 < dist42){
@@ -1170,13 +1113,8 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(onMap43 = rc.onTheMap(ml43)){
+        if(rc.onTheMap(ml43)){
             cost43 = rc.senseRubble(ml43) + 10;
-
-            if(cost43 + dist42 < dist43){
-                dist43 = cost43 + dist42;
-                dir43 = dir42;
-            }
 
             if(cost43 + dist24 < dist43){
                 dist43 = cost43 + dist24;
@@ -1194,13 +1132,8 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(onMap44 = rc.onTheMap(ml44)){
+        if(rc.onTheMap(ml44)){
             cost44 = rc.senseRubble(ml44) + 10;
-
-            if(cost44 + dist43 < dist44){
-                dist44 = cost44 + dist43;
-                dir44 = dir43;
-            }
 
             if(cost44 + dist24 < dist44){
                 dist44 = cost44 + dist24;
@@ -1216,6 +1149,142 @@ public class BFPathing20 extends Pathfinder {
         if(rc.onTheMap(ml45)){
             cost45 = rc.senseRubble(ml45) + 10;
 
+            if(cost45 + dist24 < dist45){
+                dist45 = cost45 + dist24;
+                dir45 = dir24;
+            }
+        }
+
+        if(dist25 < 10000){
+
+            if(cost25 + dist26 < dist25){
+                dist25 = cost25 + dist26;
+                dir25 = dir26;
+            }
+        }
+
+        if(dist26 < 10000){
+
+            if(cost26 + dist27 < dist26){
+                dist26 = cost26 + dist27;
+                dir26 = dir27;
+            }
+        }
+
+        if(dist28 < 10000){
+
+            if(cost28 + dist27 < dist28){
+                dist28 = cost28 + dist27;
+                dir28 = dir27;
+            }
+        }
+
+        if(dist29 < 10000){
+
+            if(cost29 + dist28 < dist29){
+                dist29 = cost29 + dist28;
+                dir29 = dir28;
+            }
+        }
+
+        if(dist30 < 10000){
+
+            if(cost30 + dist31 < dist30){
+                dist30 = cost30 + dist31;
+                dir30 = dir31;
+            }
+        }
+
+        if(dist31 < 10000){
+
+            if(cost31 + dist32 < dist31){
+                dist31 = cost31 + dist32;
+                dir31 = dir32;
+            }
+        }
+
+        if(dist33 < 10000){
+
+            if(cost33 + dist32 < dist33){
+                dist33 = cost33 + dist32;
+                dir33 = dir32;
+            }
+        }
+
+        if(dist34 < 10000){
+
+            if(cost34 + dist33 < dist34){
+                dist34 = cost34 + dist33;
+                dir34 = dir33;
+            }
+        }
+
+        if(dist35 < 10000){
+
+            if(cost35 + dist36 < dist35){
+                dist35 = cost35 + dist36;
+                dir35 = dir36;
+            }
+        }
+
+        if(dist36 < 10000){
+
+            if(cost36 + dist37 < dist36){
+                dist36 = cost36 + dist37;
+                dir36 = dir37;
+            }
+        }
+
+        if(dist38 < 10000){
+
+            if(cost38 + dist37 < dist38){
+                dist38 = cost38 + dist37;
+                dir38 = dir37;
+            }
+        }
+
+        if(dist39 < 10000){
+
+            if(cost39 + dist38 < dist39){
+                dist39 = cost39 + dist38;
+                dir39 = dir38;
+            }
+        }
+
+        if(dist40 < 10000){
+
+            if(cost40 + dist41 < dist40){
+                dist40 = cost40 + dist41;
+                dir40 = dir41;
+            }
+        }
+
+        if(dist41 < 10000){
+
+            if(cost41 + dist42 < dist41){
+                dist41 = cost41 + dist42;
+                dir41 = dir42;
+            }
+        }
+
+        if(dist43 < 10000){
+
+            if(cost43 + dist42 < dist43){
+                dist43 = cost43 + dist42;
+                dir43 = dir42;
+            }
+        }
+
+        if(dist44 < 10000){
+
+            if(cost44 + dist43 < dist44){
+                dist44 = cost44 + dist43;
+                dir44 = dir43;
+            }
+        }
+
+        if(dist45 < 10000){
+
             if(cost45 + dist44 < dist45){
                 dist45 = cost45 + dist44;
                 dir45 = dir44;
@@ -1225,81 +1294,7 @@ public class BFPathing20 extends Pathfinder {
                 dist45 = cost45 + dist25;
                 dir45 = dir25;
             }
-
-            if(cost45 + dist24 < dist45){
-                dist45 = cost45 + dist24;
-                dir45 = dir24;
-            }
         }
-        int time5 = Clock.getBytecodesLeft();
-
-        if(onMap25){
-
-            if(cost25 + dist26 < dist25){
-                dist25 = cost25 + dist26;
-                dir25 = dir26;
-            }
-        }
-
-        if(onMap26){
-
-            if(cost26 + dist27 < dist26){
-                dist26 = cost26 + dist27;
-                dir26 = dir27;
-            }
-        }
-
-        if(onMap30){
-
-            if(cost30 + dist31 < dist30){
-                dist30 = cost30 + dist31;
-                dir30 = dir31;
-            }
-        }
-
-        if(onMap31){
-
-            if(cost31 + dist32 < dist31){
-                dist31 = cost31 + dist32;
-                dir31 = dir32;
-            }
-        }
-
-        if(onMap35){
-
-            if(cost35 + dist36 < dist35){
-                dist35 = cost35 + dist36;
-                dir35 = dir36;
-            }
-        }
-
-        if(onMap36){
-
-            if(cost36 + dist37 < dist36){
-                dist36 = cost36 + dist37;
-                dir36 = dir37;
-            }
-        }
-
-
-
-        if(onMap40){
-
-            if(cost40 + dist41 < dist40){
-                dist40 = cost40 + dist41;
-                dir40 = dir41;
-            }
-        }
-
-        if(onMap41){
-
-            if(cost41 + dist42 < dist41){
-                dist41 = cost41 + dist42;
-                dir41 = dir42;
-            }
-        }
-
-        int time6 = Clock.getBytecodesLeft();
 
         if(rc.onTheMap(ml46)){
             cost46 = rc.senseRubble(ml46) + 10;
@@ -1707,12 +1702,7 @@ public class BFPathing20 extends Pathfinder {
                 dir68 = dir43;
             }
         }
-
-        int time7 = Clock.getBytecodesLeft();
-
-
-
-        rc.setIndicatorString(time1+" "+time2+" "+time3+" "+time4+" "+time5+" "+time6+" "+time7+" ");
+        rc.setIndicatorString(time1+" ");
 
 
         int xDiff = target.x - ml0.x;
@@ -2092,7 +2082,7 @@ public class BFPathing20 extends Pathfinder {
 
         int time8 = Clock.getBytecodesLeft();
 
-        rc.setIndicatorString(time1+" "+time2+" "+time3+" "+time4+" "+time5+" "+time6+" "+time7+" "+time8);
+        rc.setIndicatorString(time1+" "+time8);
 
         return ans;
 
