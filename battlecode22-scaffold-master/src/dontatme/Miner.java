@@ -57,7 +57,7 @@ public strictfp class Miner {
         if (rc.senseLead(me) == 0) {
 
             // If the current heading still has lead and no miners, go there
-            if (heading != null && rc.senseLead(heading) > 0 && !rc.isLocationOccupied(heading)) {
+            if (heading != null && rc.canSenseLocation(heading) && rc.senseLead(heading) > 0 && !rc.isLocationOccupied(heading)) {
                 tryMove(rc, me, heading);
             }
 
