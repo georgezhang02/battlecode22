@@ -1702,7 +1702,7 @@ public class BFPathing20 extends Pathfinder {
                 dir68 = dir43;
             }
         }
-        rc.setIndicatorString(time1+" ");
+        //rc.setIndicatorString(time1+" ");
 
 
         int xDiff = target.x - ml0.x;
@@ -2082,7 +2082,7 @@ public class BFPathing20 extends Pathfinder {
 
         int time8 = Clock.getBytecodesLeft();
 
-        rc.setIndicatorString(time1+" "+time8);
+        //rc.setIndicatorString(time1+" "+time8);
 
         return ans;
 

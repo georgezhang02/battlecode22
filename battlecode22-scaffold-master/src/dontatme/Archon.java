@@ -70,7 +70,7 @@ public strictfp class Archon {
                 switch(type) {
                     case MINER:
                         if (miners < 15) {
-                            Communications.incrementMinerCount(rc, id);
+                            Communications.incrementArchonMinerCount(rc, id);
                         }
                         miners++;
                         Communications.incrementArchonTurn(rc);

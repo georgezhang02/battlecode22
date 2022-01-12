@@ -61,7 +61,7 @@ public abstract class Pathfinder {
                 if(Math.sqrt(ml.distanceSquaredTo(target)) < initDist){
 
                     int cost = getCost(ml, 1);
-                    rc.setIndicatorString(cost+"");
+                    //rc.setIndicatorString(cost+"");
                     if(cost < minCost){
                         minCost = cost;
                         ans = dir;

@@ -16,14 +16,23 @@ public class Communications {
      * @throws GameActionException
      */
     public static int getArchonTurn(RobotController rc) throws GameActionException {
-        return rc.readSharedArray(ARCHON_TURN);
+        return rc.readSharedArray(ARCHON_TURN) % 64;
     }
 
     public static void incrementArchonTurn(RobotController rc) throws GameActionException {
-        rc.writeSharedArray(ARCHON_TURN, (getArchonTurn(rc) + 1) % rc.getArchonCount());
+        int arrayValue = rc.readSharedArray(ARCHON_TURN);
+        rc.writeSharedArray(ARCHON_TURN, (arrayValue % 64 + 1) % rc.getArchonCount() + arrayValue / 64 * 64);
     }
 
 
+    public static int getMinerTurn(RobotController rc) throws GameActionException {
+        return rc.readSharedArray(ARCHON_TURN) / 64;
+    }
+
+    public static void incrementMinerTurn(RobotController rc, int size) throws GameActionException {
+        int arrayValue = rc.readSharedArray(ARCHON_TURN);
+        rc.writeSharedArray(ARCHON_TURN, ((arrayValue / 64 + 1) % size) * 64 + arrayValue % 64);
+    }
 
 
     /**
@@ -59,7 +68,7 @@ public class Communications {
         rc.writeSharedArray(archonID / 2, (minerCount * 4096) + (arrayValue % 4096));
     }
 
-    public static void incrementMinerCount(RobotController rc, int archonID) throws GameActionException {
+    public static void incrementArchonMinerCount(RobotController rc, int archonID) throws GameActionException {
         int arrayValue = rc.readSharedArray(archonID / 2); 
         int currentMinerCount = arrayValue / 4096;
         rc.writeSharedArray(archonID / 2, (currentMinerCount + 1) * 4096 + (arrayValue % 4096));
@@ -75,7 +84,7 @@ public class Communications {
      */
     public static MapLocation getTeamArchonLocation(RobotController rc, int archonID) throws GameActionException {
         int arrayValue = rc.readSharedArray(archonID / 2 + FRIENDLY_ARCHON_OFFSET);
-        MapLocation archonLocation = new MapLocation(arrayValue % 64, arrayValue / 64);
+        MapLocation archonLocation = new MapLocation(arrayValue / 64, arrayValue % 64);
         return archonLocation;
     }
 
@@ -86,11 +95,11 @@ public class Communications {
      * @throws GameActionException
      */
     public static MapLocation getTeamArchonLocationByIndex(RobotController rc, int index) throws GameActionException {
-        if (!(index > 0 && index < rc.getArchonCount())) {
+        if (!(index > 0 && index <= rc.getArchonCount())) {
             throw new IllegalArgumentException();
         }
         int arrayValue = rc.readSharedArray(index + FRIENDLY_ARCHON_OFFSET);
-        MapLocation archonLocation = new MapLocation(arrayValue % 64, arrayValue / 64);
+        MapLocation archonLocation = new MapLocation(arrayValue / 64, arrayValue % 64);
         return archonLocation;
     }
 

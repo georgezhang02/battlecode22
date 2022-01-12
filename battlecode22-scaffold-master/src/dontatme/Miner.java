@@ -1,5 +1,8 @@
 package dontatme;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import battlecode.common.*;
 
 public strictfp class Miner {
@@ -10,7 +13,7 @@ public strictfp class Miner {
     static MapLocation heading = null;
 
     static int stuckCounter = 0;
-    static Direction selectedDirection = Direction.CENTER;
+    static Direction selectedDirection = null;
 
     /**
      * Run a single turn for a Miner.
@@ -22,7 +25,6 @@ public strictfp class Miner {
         if (BFPathing20.rc == null) {
             BFPathing20.rc = rc;
         }
-        
 
         // Save the index of the archon the miner spawned from
         if (archonID == -1) {
@@ -51,7 +53,7 @@ public strictfp class Miner {
         if (rc.senseLead(me) == 0) {
 
             // If the current heading still has lead and no miners, go there
-            if (heading != null && rc.senseLead(heading) > 0 && rc.senseRobotAtLocation(heading) == null) {
+            if (heading != null && rc.senseLead(heading) > 0 && !rc.isLocationOccupied(heading)) {
                 tryMove(rc, me, heading);
             }
 
@@ -62,16 +64,16 @@ public strictfp class Miner {
             if (heading == null) {
                 switch (minerType) {
                     case 1:
-                        baseMiner(rc, me);
                         rc.setIndicatorString("Base Miner");
+                        baseMiner(rc, me);
                         break;
                     case 2:
-                        centerMiner(rc, me);
                         rc.setIndicatorString("Center Miner");
+                        centerMiner(rc, me);
                         break;
                     case 3:
-                        expandMiner(rc, me);
                         rc.setIndicatorString("Expand Miner");
+                        expandMiner(rc, me);
                     default:
                         break;
                 }
@@ -96,52 +98,45 @@ public strictfp class Miner {
     static void centerMiner(RobotController rc, MapLocation me) throws GameActionException{
 
         // Move towards the center
-        BFPathing20.target = new MapLocation(rc.getMapWidth() / 2, rc.getMapHeight() / 2);
+        MapLocation center = new MapLocation(rc.getMapWidth() / 2, rc.getMapHeight() / 2);
+        BFPathing20.target = center;
         Direction dir = BFPathing20.pathToTarget();
         if (rc.canMove(dir)) {
             rc.move(dir);
-            //stuckCounter = 0;
+            stuckCounter = 0;
         }
-        
-        /*
         else {
-            // rc.getMovementCooldownTurns() == 0 &&
-            if (rc.senseRobotAtLocation(me.add(dir)) != null) {
+            if (rc.isMovementReady() && rc.senseRobotAtLocation(me.add(dir)) != null) {
                 stuckCounter++;
-                rc.setIndicatorString(Integer.toString(stuckCounter));
             }
         }
 
+        // If at the center, expand in a direction not towards a friendly archon
         if ((me.x == center.x && me.y == center.y) || stuckCounter >= 2) {
+            List<Direction> archonDirections = new ArrayList<Direction>();
+            for (Direction d : Helper.directions) {
+                archonDirections.add(d);
+            }
+            for (int i = 1; i <= rc.getArchonCount(); i++) {
+                MapLocation archonLocation = Communications.getTeamArchonLocationByIndex(rc, i);
+                archonDirections.remove(center.directionTo(archonLocation));
+            }
+            selectedDirection = archonDirections.get(Communications.getMinerTurn(rc));
+            Communications.incrementMinerTurn(rc, archonDirections.size());
             minerType = 3;
-            int arrayVal = rc.readSharedArray(archonIndex + 4);
-            MapLocation archonLocation = new MapLocation(arrayVal / 64 % 64, arrayVal % 64);
-            Direction forwards = me.directionTo(archonLocation).opposite();
-            Direction[] possibleDirections = new Direction[5];
-            possibleDirections[0] = forwards;
-            possibleDirections[1] = forwards.rotateLeft().rotateLeft();
-            possibleDirections[2] = forwards.rotateRight().rotateRight();
-            possibleDirections[3] = forwards.rotateLeft();
-            possibleDirections[4] = forwards.rotateRight();
-            int turn = arrayVal / 4096;
-            selectedDirection = possibleDirections[turn];
-            rc.writeSharedArray(archonIndex + 4, ((turn + 1) % 5) * 4096 + arrayVal);
         }
-        */
     }
 
     static void expandMiner(RobotController rc, MapLocation me) throws GameActionException{
 
-        // Otherwise, move towards selected direction
-        if (heading == null) {
-            if (rc.canMove(selectedDirection)) {
-                rc.move(selectedDirection);
-            } else {
-                Direction dir = Helper.directions[Helper.rng.nextInt(Helper.directions.length)];
-                if (rc.canMove(dir)) {
-                    rc.move(dir);
-                } 
-            }
+        // Move towards selected direction (random direction if stuck)
+        if (rc.canMove(selectedDirection)) {
+            rc.move(selectedDirection);
+        } else {
+            Direction dir = Helper.directions[Helper.rng.nextInt(Helper.directions.length)];
+            if (rc.canMove(dir)) {
+                rc.move(dir);
+            } 
         }
 
     }
@@ -163,7 +158,7 @@ public strictfp class Miner {
 
     static MapLocation goTowardsNearbyLead(RobotController rc, MapLocation me, MapLocation[] leads) throws GameActionException {
         for (MapLocation lead : leads) {
-            if (rc.senseRobotAtLocation(lead) == null) {
+            if (!rc.isLocationOccupied(lead)) {
                 if (tryMove(rc, me, lead)) {
                     return lead;
                 }
