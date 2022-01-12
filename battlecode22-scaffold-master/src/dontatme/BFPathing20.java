@@ -281,7 +281,7 @@ public class BFPathing20 extends Pathfinder {
 
         MapLocation ml0 = rc.getLocation();
 
-        if(ml0.equals(target)) return null;
+        if(ml0.equals(target)) return Direction.CENTER;
 
 
         dist1 = 10000;
