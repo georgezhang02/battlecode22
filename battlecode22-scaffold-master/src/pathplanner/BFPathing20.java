@@ -281,7 +281,7 @@ public class BFPathing20 extends Pathfinder {
 
         MapLocation ml0 = rc.getLocation();
 
-        if(ml0.equals(target)) return null;
+        if(ml0.equals(target)) return Direction.CENTER;
 
 
         dist1 = 10000;
@@ -560,6 +560,10 @@ public class BFPathing20 extends Pathfinder {
 
             if(cost15 + dist3 < dist15){
                 dist15 = cost15 + dist3;
+
+
+
+
                 dir15 = dir3;
             }
 
@@ -1702,7 +1706,7 @@ public class BFPathing20 extends Pathfinder {
                 dir68 = dir43;
             }
         }
-        rc.setIndicatorString(time1+" ");
+        //rc.setIndicatorString(time1+" ");
 
 
         int xDiff = target.x - ml0.x;
@@ -1884,7 +1888,7 @@ public class BFPathing20 extends Pathfinder {
         }
         double gain;
 
-        Direction ans = null;
+        Direction ans = Direction.CENTER;
         double initDist = Math.sqrt(ml0.distanceSquaredTo(target));
         double maxGainPerCost = 0;
 
@@ -2082,7 +2086,7 @@ public class BFPathing20 extends Pathfinder {
 
         int time8 = Clock.getBytecodesLeft();
 
-        rc.setIndicatorString(time1+" "+time8);
+        //rc.setIndicatorString(time1+" "+time8);
 
         return ans;
 

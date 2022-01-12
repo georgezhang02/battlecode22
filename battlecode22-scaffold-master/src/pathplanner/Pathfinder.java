@@ -1,38 +1,39 @@
 package pathplanner;
 
-import battlecode.common.*;
+import battlecode.common.Direction;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
+import battlecode.common.RobotController;
 
-import java.util.Map;
 
 public abstract class Pathfinder {
     static MapLocation target;
     static RobotController rc;
     static int minDistToTarget = 0;
-    static boolean exploring;
 
-    static final Direction[] directions = {
-            Direction.NORTH,
-            Direction.NORTHEAST,
-            Direction.EAST,
-            Direction.SOUTHEAST,
-            Direction.SOUTH,
-            Direction.SOUTHWEST,
-            Direction.WEST,
-            Direction.NORTHWEST,
-    };
+    static MapLocation lastPos;
+
+    static Explorer explorer;
 
     public Pathfinder(RobotController rc) throws GameActionException{
         this.rc = rc;
-        target = null;
+        this.explorer = new Explorer(rc);
     }
 
-    static boolean targetWithinRadius(){
+    boolean targetWithinRadius(){
         return rc.getLocation().distanceSquaredTo(target) < minDistToTarget * minDistToTarget;
     }
 
+    Direction pathToExplore() throws GameActionException{
+        if(explorer == null){
+            explorer = new Explorer(rc);
+        }
+        
+        return null;
+    }
 
-
-    static Direction pathAwayFrom(MapLocation[]mapLocations) throws GameActionException {
+    Direction pathAwayFrom(MapLocation[]mapLocations) throws GameActionException {
+        explorer.initialized = false;
         MapLocation curPos = rc.getLocation();
         int x = curPos.x;
         int y = curPos.y;
@@ -44,17 +45,49 @@ public abstract class Pathfinder {
             x += (int)(xdiff * vect);
             y += (int)(ydiff * vect);
         }
-
-
-
         target = new MapLocation(x, y);
-        return pathToTarget();
+        return pathToTargetGreedy();
     }
 
-    static Direction pathToTarget()
+    Direction pathToTarget(boolean useGreedy) throws GameActionException {
+        explorer.initialized = false;
+        if(rc.isMovementReady()){
+            if(useGreedy){
+                lastPos = rc.getLocation();
+                return pathToTargetGreedy();
+
+            } else{
+                Direction dir = bfPathToTarget();
+                if(lastPos!= null){
+                    MapLocation move = rc.getLocation().add(dir);
+                    rc.setIndicatorString(lastPos.x+" "+lastPos.y+" "+move.x+" "+move.y);
+                }
+                if(lastPos != null && rc.getLocation().add(dir).equals(lastPos)) {
+
+                    dir = pathToTargetGreedy(0);
+                }
+
+                lastPos = rc.getLocation();
+                return dir;
+
+
+            }
+        }
+        return Direction.CENTER;
+
+    }
+
+    Direction pathToTargetGreedy()
             throws GameActionException {
+        return pathToTargetGreedy(1);
+
+    }
+
+    Direction pathToTargetGreedy(int depth)
+            throws GameActionException {
+        explorer.initialized = false;
         MapLocation ml;
-        Direction ans = null;
+        Direction ans = Direction.CENTER;
 
         double initDist = Math.sqrt(rc.getLocation().distanceSquaredTo(target));
         int minCost = 720000;
@@ -66,8 +99,8 @@ public abstract class Pathfinder {
 
                 if(Math.sqrt(ml.distanceSquaredTo(target)) < initDist){
 
-                    int cost = getCost(ml, 1);
-                    rc.setIndicatorString(cost+"");
+                    int cost = getCost(ml, depth);
+                    //rc.setIndicatorString(cost+"");
                     if(cost < minCost){
                         minCost = cost;
                         ans = dir;
@@ -81,7 +114,7 @@ public abstract class Pathfinder {
 
     }
 
-    static int getCost( MapLocation cur, int depth) throws GameActionException{
+    int getCost( MapLocation cur, int depth) throws GameActionException{
         if(cur.equals(target)){
             return 0;
         }
@@ -110,5 +143,6 @@ public abstract class Pathfinder {
 
         }
     }
+
     abstract Direction bfPathToTarget() throws GameActionException;
 }
