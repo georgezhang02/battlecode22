@@ -6,7 +6,7 @@ import battlecode.common.*;
 public class Communications {
 
     // Indices
-    private static final int ARCHON_TURN = 2;
+    private static final int ARCHON_TURN = 0;
     private static final int FRIENDLY_ARCHON_OFFSET = 4;
     private static final int ENEMY_ARCHON_OFFSET = 8;
 
@@ -19,8 +19,8 @@ public class Communications {
         return rc.readSharedArray(ARCHON_TURN);
     }
 
-    public static void setArchonTurn(RobotController rc, int value) throws GameActionException {
-        rc.writeSharedArray(ARCHON_TURN, value);
+    public static void incrementArchonTurn(RobotController rc) throws GameActionException {
+        rc.writeSharedArray(ARCHON_TURN, (getArchonTurn(rc) + 1) % rc.getArchonCount());
     }
 
 
@@ -32,7 +32,7 @@ public class Communications {
      */
     public static MapLocation getArchonVisionLead(RobotController rc, int archonID) throws GameActionException {
         int arrayValue = rc.readSharedArray(archonID / 2);
-        MapLocation leadLocation = new MapLocation(arrayValue % 64, (arrayValue / 64) % 64);
+        MapLocation leadLocation = new MapLocation((arrayValue / 64) % 64, arrayValue % 64);
         return leadLocation;
     }
 
@@ -41,8 +41,10 @@ public class Communications {
         rc.writeSharedArray(archonID / 2, (leadLocation.x * 64 + leadLocation.y) + (arrayValue / 4096 * 4096));
     }
 
-
-
+    public static void setArchonVisionNoLead(RobotController rc, int archonID) throws GameActionException {
+        int arrayValue = rc.readSharedArray(archonID / 2);
+        rc.writeSharedArray(archonID / 2, 61 + (arrayValue / 4096 * 4096));
+    }
 
     /**
      * @return number of miners associated with the archon
@@ -60,7 +62,7 @@ public class Communications {
     public static void incrementMinerCount(RobotController rc, int archonID) throws GameActionException {
         int arrayValue = rc.readSharedArray(archonID / 2); 
         int currentMinerCount = arrayValue / 4096;
-        rc.writeSharedArray(archonID / 2, (currentMinerCount + 1 * 4096) + (arrayValue % 4096));
+        rc.writeSharedArray(archonID / 2, (currentMinerCount + 1) * 4096 + (arrayValue % 4096));
     }
     
 
