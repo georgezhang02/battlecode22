@@ -3,9 +3,7 @@ package dontatme;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import battlecode.common.*;
-import dontatme.Pathfinder;
 
 public strictfp class Miner {
 
@@ -61,24 +59,26 @@ public strictfp class Miner {
             }
 
             // If no current heading, move towards lead within miner vision if possible (and avoid other miners)
-            heading = goTowardsNearbyLead(rc, me, rc.senseNearbyLocationsWithLead(20));
+            else {
+                heading = goTowardsNearbyLead(rc, me, rc.senseNearbyLocationsWithLead(20));
 
-            // If no lead within vision, run code based on miner type
-            if (heading == null) {
-                switch (minerType) {
-                    case 1:
-                        rc.setIndicatorString("Base Miner");
-                        baseMiner(rc, me);
-                        break;
-                    case 2:
-                        rc.setIndicatorString("Center Miner");
-                        centerMiner(rc, me);
-                        break;
-                    case 3:
-                        rc.setIndicatorString("Expand Miner");
-                        expandMiner(rc, me);
-                    default:
-                        break;
+                // If no lead within vision, run code based on miner type
+                if (heading == null) {
+                    switch (minerType) {
+                        case 1:
+                            rc.setIndicatorString("Base Miner");
+                            baseMiner(rc, me);
+                            break;
+                        case 2:
+                            rc.setIndicatorString("Center Miner");
+                            centerMiner(rc, me);
+                            break;
+                        case 3:
+                            rc.setIndicatorString("Expand Miner");
+                            expandMiner(rc, me);
+                        default:
+                            break;
+                    }
                 }
             }
         }
@@ -103,7 +103,7 @@ public strictfp class Miner {
         // Move towards the center
         MapLocation center = new MapLocation(rc.getMapWidth() / 2, rc.getMapHeight() / 2);
         pathfinder.target = center;
-        Direction dir = pathfinder.pathToTarget();
+        Direction dir = pathfinder.bfPathToTarget();
         if (rc.canMove(dir)) {
             rc.move(dir);
             stuckCounter = 0;
@@ -162,21 +162,19 @@ public strictfp class Miner {
     static MapLocation goTowardsNearbyLead(RobotController rc, MapLocation me, MapLocation[] leads) throws GameActionException {
         for (MapLocation lead : leads) {
             if (!rc.isLocationOccupied(lead)) {
-
+                tryMove(rc, me, lead);
                 return lead;
             }
         }
         return null;
     }
 
-    static boolean tryMove(RobotController rc, MapLocation me, MapLocation loc) throws GameActionException {
+    static void tryMove(RobotController rc, MapLocation me, MapLocation loc) throws GameActionException {
         pathfinder.target = loc;
-        Direction dir = pathfinder.pathToTarget();
+        Direction dir = pathfinder.bfPathToTarget();
         if (rc.canMove(dir)) {
             rc.move(dir);
             rc.setIndicatorLine(me.add(dir), loc, 0, 255, 0);
-            return true;
         }
-        return false;
     }
 }
