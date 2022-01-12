@@ -8,9 +8,12 @@ strictfp class RushSoldierStrategy {
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
      */
     static int addY = 0;
+    static Pathfinder pathfinder;
     static void runSoldier(RobotController rc) throws GameActionException {
 
-        Pathfinder.rc = rc;
+        if(pathfinder == null){
+            pathfinder = new BFPathing20(rc);
+        }
 
         // Try to attack someone
         int radius = rc.getType().actionRadiusSquared;
@@ -23,8 +26,8 @@ strictfp class RushSoldierStrategy {
             }
         }
         MapLocation[] PossibleEnemyLocations = findAreasToAttack(rc);
-        Pathfinder.target = PossibleEnemyLocations[rc.getID() % 2];
-        Direction dir = Pathfinder.pathToTarget();
+        pathfinder.target = PossibleEnemyLocations[rc.getID() % 2];
+        Direction dir = pathfinder.pathToTarget(true);
         if (rc.canMove(dir)) {
             rc.move(dir);
             //System.out.println("I moved!");

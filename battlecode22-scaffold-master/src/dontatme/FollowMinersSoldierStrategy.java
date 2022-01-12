@@ -10,22 +10,26 @@ strictfp class FollowMinersSoldierStrategy {
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
      */
     static int addY = 0;
+    static Pathfinder pathfinder;
     static void runSoldier(RobotController rc) throws GameActionException {
 
         boolean followMiners = true;
-        Direction dir = null;
+        Direction dir = Direction.CENTER;
 
-        for(int i = 9; i<= 12 && followMiners; i++){
-            int archonInfo = rc.readSharedArray(i);
-            if( archonInfo / 4096 == 1){
-                Pathfinder.target = new MapLocation(archonInfo / 64, archonInfo % 64);
-                followMiners = false;
-                dir = Pathfinder.pathToTarget();
-            }
+        if(pathfinder == null){
+            pathfinder = new BFPathing20(rc);
         }
+            for (int i = 9; i <= 12 && followMiners; i++) {
+                int archonInfo = rc.readSharedArray(i);
+                if (archonInfo / 4096 == 1) {
+                    pathfinder.target = new MapLocation(archonInfo / 64, archonInfo % 64);
+                    followMiners = false;
+                    dir = pathfinder.pathToTarget(true);
+                }
+            }
 
 
-        Pathfinder.rc = rc;
+        pathfinder.rc = rc;
         if(followMiners){
             // Try to attack someone
             int radius = rc.getType().actionRadiusSquared;
@@ -65,7 +69,7 @@ strictfp class FollowMinersSoldierStrategy {
                 while (counter < MinerLocs.size() && !isGoodTarget) {
                     MapLocation allyPos = allies[MinerLocs.get(counter)].getLocation();
                     if (!rc.getLocation().isWithinDistanceSquared(allyPos, 5)) {
-                        Pathfinder.target = allyPos;
+                        pathfinder.target = allyPos;
 
                         isGoodTarget = true;
                     }
@@ -80,11 +84,15 @@ strictfp class FollowMinersSoldierStrategy {
 
         }
 
-        if(Pathfinder.target == null || dir == null){
-            MapLocation[] ml = RushSoldierStrategy.findAreasToAttack(rc);
-            Pathfinder.target = ml[rc.getID() % 2];
-            dir = Pathfinder.pathToTarget();
-        }
+            if(pathfinder.target == null || dir.equals(Direction.CENTER)){
+                MapLocation[] ml = RushSoldierStrategy.findAreasToAttack(rc);
+                pathfinder.target = ml[rc.getID() % 2];
+
+                    dir = pathfinder.pathToTarget(true);
+
+            }
+
+
 
 
         if (rc.canMove(dir)) {
