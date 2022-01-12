@@ -13,13 +13,11 @@ public class EnemyArchonSensing {
                 // get id and location
                 int enemyArchonId = robot.ID;
                 MapLocation enemyArchonLocation = robot.location;
-
-                int currentEnemyLocation = rc.readSharedArray(enemyArchonId / 2 + 8);
-                MapLocation currentEnemyMapLocation= new MapLocation(currentEnemyLocation / 64, currentEnemyLocation % 64);
+                MapLocation currentEnemyLocation = Communications.getEnemyArchonLocation(rc, enemyArchonId);
 
                 // if new location found update array
-                if (!enemyArchonLocation.equals(currentEnemyMapLocation)) {
-                    rc.writeSharedArray(robot.ID / 2 + 8, enemyArchonLocation.x * 64 + enemyArchonLocation.y);
+                if (!enemyArchonLocation.equals(currentEnemyLocation)) {
+                    Communications.setEnemyArchonLocation(rc, enemyArchonId, enemyArchonLocation);
                 }
             }
         }
