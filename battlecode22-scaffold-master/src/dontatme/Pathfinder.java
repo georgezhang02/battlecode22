@@ -48,7 +48,7 @@ public abstract class Pathfinder {
     static Direction pathToTarget()
             throws GameActionException {
         MapLocation ml;
-        Direction ans = null;
+        Direction ans = Direction.CENTER;
 
         double initDist = Math.sqrt(rc.getLocation().distanceSquaredTo(target));
         int minCost = 720000;

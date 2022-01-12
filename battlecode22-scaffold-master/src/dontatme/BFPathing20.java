@@ -560,6 +560,10 @@ public class BFPathing20 extends Pathfinder {
 
             if(cost15 + dist3 < dist15){
                 dist15 = cost15 + dist3;
+
+
+
+
                 dir15 = dir3;
             }
 
@@ -1884,7 +1888,7 @@ public class BFPathing20 extends Pathfinder {
         }
         double gain;
 
-        Direction ans = null;
+        Direction ans = Direction.CENTER;
         double initDist = Math.sqrt(ml0.distanceSquaredTo(target));
         double maxGainPerCost = 0;
 
