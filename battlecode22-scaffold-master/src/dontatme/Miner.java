@@ -8,7 +8,7 @@ import battlecode.common.*;
 public strictfp class Miner {
 
     static int archonID = -1;
-    static int minerType = 0;
+    static MinerType minerType = MinerType.None;
 
     static MapLocation heading = null;
 
@@ -17,6 +17,9 @@ public strictfp class Miner {
 
     static Pathfinder pathfinder;
 
+    private static enum MinerType {
+        None, BaseMiner, CenterMiner, ExpandMiner
+    }
     /**
      * Run a single turn for a Miner.
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
@@ -42,11 +45,11 @@ public strictfp class Miner {
         mineAround(rc, me);
 
         // If just spawned, see if miner is the base or center miner
-        if (minerType == 0) {
+        if (minerType == MinerType.None) {
             if (Communications.getArchonMinerCount(rc, archonID) <= 2) {
-                minerType = 1;
+                minerType = MinerType.BaseMiner;
             } else {
-                minerType = 2;
+                minerType = MinerType.CenterMiner;
             }
         }
         
@@ -65,15 +68,15 @@ public strictfp class Miner {
                 // If no lead within vision, run code based on miner type
                 if (heading == null) {
                     switch (minerType) {
-                        case 1:
+                        case BaseMiner:
                             rc.setIndicatorString("Base Miner");
                             baseMiner(rc, me);
                             break;
-                        case 2:
+                        case CenterMiner:
                             rc.setIndicatorString("Center Miner");
                             centerMiner(rc, me);
                             break;
-                        case 3:
+                        case ExpandMiner:
                             rc.setIndicatorString("Expand Miner");
                             expandMiner(rc, me);
                         default:
@@ -94,7 +97,7 @@ public strictfp class Miner {
 
         // If no more resources left, become center miner
         else {
-            minerType = 2;
+            minerType = MinerType.CenterMiner;
         }
     }
 
@@ -126,7 +129,7 @@ public strictfp class Miner {
             }
             selectedDirection = archonDirections.get(Communications.getMinerTurn(rc));
             Communications.incrementMinerTurn(rc, archonDirections.size());
-            minerType = 3;
+            minerType = MinerType.ExpandMiner;
         }
     }
 
