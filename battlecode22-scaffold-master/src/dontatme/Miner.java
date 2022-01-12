@@ -3,7 +3,9 @@ package dontatme;
 import java.util.ArrayList;
 import java.util.List;
 
+
 import battlecode.common.*;
+import dontatme.Pathfinder;
 
 public strictfp class Miner {
 
@@ -15,15 +17,16 @@ public strictfp class Miner {
     static int stuckCounter = 0;
     static Direction selectedDirection = null;
 
+    static Pathfinder pathfinder;
+
     /**
      * Run a single turn for a Miner.
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
      */
     static void run(RobotController rc) throws GameActionException {
 
-        // Set up pathfinding if needed
-        if (BFPathing20.rc == null) {
-            BFPathing20.rc = rc;
+        if(pathfinder == null){
+            pathfinder = new BFPathing20(rc);
         }
 
         // Save the index of the archon the miner spawned from
@@ -99,8 +102,8 @@ public strictfp class Miner {
 
         // Move towards the center
         MapLocation center = new MapLocation(rc.getMapWidth() / 2, rc.getMapHeight() / 2);
-        BFPathing20.target = center;
-        Direction dir = BFPathing20.pathToTarget();
+        pathfinder.target = center;
+        Direction dir = pathfinder.pathToTarget();
         if (rc.canMove(dir)) {
             rc.move(dir);
             stuckCounter = 0;
@@ -159,17 +162,16 @@ public strictfp class Miner {
     static MapLocation goTowardsNearbyLead(RobotController rc, MapLocation me, MapLocation[] leads) throws GameActionException {
         for (MapLocation lead : leads) {
             if (!rc.isLocationOccupied(lead)) {
-                if (tryMove(rc, me, lead)) {
-                    return lead;
-                }
+
+                return lead;
             }
         }
         return null;
     }
 
     static boolean tryMove(RobotController rc, MapLocation me, MapLocation loc) throws GameActionException {
-        BFPathing20.target = loc;
-        Direction dir = BFPathing20.pathToTarget();
+        pathfinder.target = loc;
+        Direction dir = pathfinder.pathToTarget();
         if (rc.canMove(dir)) {
             rc.move(dir);
             rc.setIndicatorLine(me.add(dir), loc, 0, 255, 0);

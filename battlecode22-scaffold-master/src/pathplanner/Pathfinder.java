@@ -8,6 +8,7 @@ public abstract class Pathfinder {
     static MapLocation target;
     static RobotController rc;
     static int minDistToTarget = 0;
+    static boolean exploring;
 
     static final Direction[] directions = {
             Direction.NORTH,
@@ -28,6 +29,8 @@ public abstract class Pathfinder {
     static boolean targetWithinRadius(){
         return rc.getLocation().distanceSquaredTo(target) < minDistToTarget * minDistToTarget;
     }
+
+
 
     static Direction pathAwayFrom(MapLocation[]mapLocations) throws GameActionException {
         MapLocation curPos = rc.getLocation();
