@@ -79,6 +79,7 @@ public strictfp class Miner {
                         case ExpandMiner:
                             rc.setIndicatorString("Expand Miner");
                             expandMiner(rc, me);
+                            break;
                         default:
                             break;
                     }
@@ -111,10 +112,8 @@ public strictfp class Miner {
             rc.move(dir);
             stuckCounter = 0;
         }
-        else {
-            if (rc.isMovementReady() && rc.senseRobotAtLocation(me.add(dir)) != null) {
-                stuckCounter++;
-            }
+        else if (rc.isMovementReady() && rc.senseRobotAtLocation(me.add(dir)) != null) {
+            stuckCounter++;
         }
 
         // If at the center, expand in a direction not towards a friendly archon
