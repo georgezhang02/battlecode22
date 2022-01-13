@@ -29,6 +29,7 @@ strictfp class FollowMinersSoldierStrategy {
             }
 
 
+        pathfinder.rc = rc;
         MapLocation target = null;
         if(followMiners){
             // Try to attack someone
@@ -84,9 +85,10 @@ strictfp class FollowMinersSoldierStrategy {
 
         }
 
-            if(target == null || dir.equals(Direction.CENTER)){
+            if(target== null || dir.equals(Direction.CENTER)){
                 MapLocation[] ml = RushSoldierStrategy.findAreasToAttack(rc);
-                dir = pathfinder.pathToTarget(target,true);
+
+                    dir = pathfinder.pathToTarget(ml[rc.getID() % 2],true);
 
             }
 
