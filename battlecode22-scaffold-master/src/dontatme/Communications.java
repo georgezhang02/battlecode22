@@ -89,7 +89,7 @@ public class Communications {
     }
 
     /**
-     * Can be used for randomizing
+     * Easier to index and randomize
      * 
      * @return MapLocation of Team Archon through Index 
      * @throws GameActionException
@@ -112,19 +112,19 @@ public class Communications {
 
 
     /**
-     * @return MapLocation of Enemy Archon
+     * @return MapLocation of Enemy Archon (returns (-1, -1) if archon has not been found)
      * @throws GameActionException
      */
     public static MapLocation getEnemyArchonLocation(RobotController rc, int archonID) throws GameActionException {
         int arrayValue = rc.readSharedArray(archonID / 2 + ENEMY_ARCHON_OFFSET);
-        MapLocation archonLocation = new MapLocation(arrayValue % 64, arrayValue / 64);
+        MapLocation archonLocation = new MapLocation((arrayValue % 64 - 1), (arrayValue / 64 - 1));
         return archonLocation;
     }
 
     /**
-     * Can be used for randomizing
+     * Easier to index and randomize
      * 
-     * @return MapLocation of Enemy Archon through Index 
+     * @return MapLocation of Enemy Archon through Index (returns (-1, -1) if archon has not been found)
      * @throws GameActionException
      */
     public static MapLocation getEnemyArchonLocationByIndex(RobotController rc, int index) throws GameActionException {
@@ -132,12 +132,12 @@ public class Communications {
             throw new IllegalArgumentException();
         }
         int arrayValue = rc.readSharedArray(index + ENEMY_ARCHON_OFFSET);
-        MapLocation archonLocation = new MapLocation(arrayValue % 64, arrayValue / 64);
+        MapLocation archonLocation = new MapLocation((arrayValue % 64 - 1), (arrayValue / 64 - 1));
         return archonLocation;
     }
 
     public static void setEnemyArchonLocation(RobotController rc, int archonID, MapLocation archonLocation) throws GameActionException {
-        int writeValue = archonLocation.x * 64 + archonLocation.y;
+        int writeValue = (archonLocation.x + 1) * 64 + (archonLocation.y + 1);
         rc.writeSharedArray(archonID / 2 + ENEMY_ARCHON_OFFSET, writeValue);
     }
 }
