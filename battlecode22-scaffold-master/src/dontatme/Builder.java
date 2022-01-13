@@ -2,6 +2,8 @@ package dontatme;
 
 import battlecode.common.*;
 
+import java.awt.*;
+
 public strictfp class Builder {
     /**
      * Run a single turn for a Builder.
@@ -12,6 +14,19 @@ public strictfp class Builder {
     static boolean movedTowardsCenter = false;
     static boolean hasBuiltTower = false;
     public static void run(RobotController rc) throws GameActionException {
+        //part 1: see if there are any nearby buildings that are in prototype mode
+        RobotInfo [] buildings = getNearbyTowers(rc);
+        RobotInfo [] protoBuildings = findPrototypeTowers(rc, buildings);
+
+        //that means that there are prototype buildings
+        if (protoBuildings != null) {
+            int counter = 0;
+            while (counter < protoBuildings.length && protoBuildings[counter] != null
+                    && rc.canRepair(protoBuildings[counter].getLocation())) {
+                rc.repair(protoBuildings[counter].getLocation());
+                counter++;
+            }
+        }
         //Basic goal:
         //2 states: attack, defend
         //state 1: attack
@@ -19,8 +34,6 @@ public strictfp class Builder {
 
     }
     static void advance(RobotController rc) throws GameActionException {
-        //part 1: see if there are any buildings in prototype form to upgrade them
-
 
         //part 2:
         //attack state
@@ -73,5 +86,44 @@ public strictfp class Builder {
         int radius = rc.getType().actionRadiusSquared;
         RobotInfo [] enemyBots = rc.senseNearbyRobots(radius, opponent);
         return enemyBots.length;
+    }
+    static RobotInfo [] getAllies(RobotController rc) throws GameActionException {
+        Team ally = rc.getTeam();
+        int radius = rc.getType().actionRadiusSquared;
+        return rc.senseNearbyRobots(radius, ally);
+    }
+    static RobotInfo [] getNearbyTowers(RobotController rc) throws GameActionException {
+        RobotInfo [] allies = getAllies(rc);
+
+        //an ArrayList could be used here, but I believe it will use much more Bytecode
+        RobotInfo [] buildings = new RobotInfo [allies.length];
+        int buildingCounter = 0;
+
+        for (int i = 0; i < allies.length; i++) {
+            if (allies[i].getType().isBuilding()) {
+                buildings[buildingCounter] = allies[i];
+                buildingCounter++;
+            }
+        }
+        return buildings;
+    }
+    static RobotInfo [] findPrototypeTowers(RobotController rc, RobotInfo [] buildings)
+            throws GameActionException {
+
+        RobotInfo [] protoBuildings = new RobotInfo[buildings.length];
+        if (buildings == null)
+            return null;
+        else {
+            int counter = 0;
+            int protoCounter = 0;
+            while (buildings[counter] != null && counter < buildings.length) {
+                if (buildings[counter].getMode() == RobotMode.PROTOTYPE) {
+                    protoBuildings[protoCounter] = buildings[counter];
+                    protoCounter++;
+                }
+                counter++;
+            }
+        }
+        return protoBuildings;
     }
 }
