@@ -7,6 +7,7 @@ public strictfp class Watchtower {
      * Run a single turn for a Watchtower.
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
      */
+    static int killCount = 0;
     public static void run(RobotController rc) throws GameActionException {
         int radius = rc.getType().actionRadiusSquared;
         Team opponent = rc.getTeam().opponent();
