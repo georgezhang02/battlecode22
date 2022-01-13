@@ -128,7 +128,7 @@ public class Communications {
      * @throws GameActionException
      */
     public static MapLocation getEnemyArchonLocationByIndex(RobotController rc, int index) throws GameActionException {
-        if (!(index > 0 && index < GameConstants.MAX_STARTING_ARCHONS)) {
+        if (!(index >= 0 && index < GameConstants.MAX_STARTING_ARCHONS)) {
             throw new IllegalArgumentException();
         }
         int arrayValue = rc.readSharedArray(index + ENEMY_ARCHON_OFFSET);
