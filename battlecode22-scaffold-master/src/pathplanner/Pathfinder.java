@@ -14,10 +14,12 @@ public abstract class Pathfinder {
     static MapLocation lastPos;
 
     static Explorer explorer;
+    boolean exploring;
 
     public Pathfinder(RobotController rc) throws GameActionException{
         this.rc = rc;
         this.explorer = new Explorer(rc);
+        lastPos = rc.getLocation();
     }
 
     boolean targetWithinRadius(){
@@ -25,15 +27,15 @@ public abstract class Pathfinder {
     }
 
     Direction pathToExplore() throws GameActionException{
-        if(explorer == null){
-            explorer = new Explorer(rc);
+        if(!exploring){
+
         }
-        
+
         return null;
     }
 
     Direction pathAwayFrom(MapLocation[]mapLocations) throws GameActionException {
-        explorer.initialized = false;
+        exploring = false;
         MapLocation curPos = rc.getLocation();
         int x = curPos.x;
         int y = curPos.y;
@@ -50,7 +52,7 @@ public abstract class Pathfinder {
     }
 
     Direction pathToTarget(boolean useGreedy) throws GameActionException {
-        explorer.initialized = false;
+        exploring = false;
         if(rc.isMovementReady()){
             if(useGreedy){
                 lastPos = rc.getLocation();
@@ -85,7 +87,7 @@ public abstract class Pathfinder {
 
     Direction pathToTargetGreedy(int depth)
             throws GameActionException {
-        explorer.initialized = false;
+        exploring = false;
         MapLocation ml;
         Direction ans = Direction.CENTER;
 

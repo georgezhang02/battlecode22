@@ -284,6 +284,7 @@ public class BFPathing20 extends Pathfinder {
         if(ml0.equals(target)) return Direction.CENTER;
 
 
+
         dist1 = 10000;
         dist2 = 10000;
         dist3 = 10000;
