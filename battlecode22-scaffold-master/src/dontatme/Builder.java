@@ -60,11 +60,11 @@ public strictfp class Builder {
     }
 
     static Direction findPlaceToBuildTower(RobotController rc) {
-        Direction dir = RobotPlayer.directions[0];
+        Direction dir = Helper.directions[0];
         int counter = 1;
         boolean canBuildTower = rc.canBuildRobot(RobotType.WATCHTOWER, dir);
-        while (!canBuildTower && counter < RobotPlayer.directions.length) {
-            dir = RobotPlayer.directions[counter];
+        while (!canBuildTower && counter < Helper.directions.length) {
+            dir = Helper.directions[counter];
             canBuildTower = rc.canBuildRobot(RobotType.WATCHTOWER, dir);
             counter++;
         }
