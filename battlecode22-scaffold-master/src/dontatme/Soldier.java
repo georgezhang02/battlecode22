@@ -7,7 +7,13 @@ public strictfp class Soldier {
      * Run a single turn for a Soldier.
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
      */
+
+    static Pathfinder pathfinder;
+
+    static int state;
     public static void run(RobotController rc) throws GameActionException {
+        pathfinder = new BFPathing20(rc);
+
         // Try to attack someone
         int radius = rc.getType().actionRadiusSquared;
         Team opponent = rc.getTeam().opponent();
@@ -25,5 +31,17 @@ public strictfp class Soldier {
             rc.move(dir);
             System.out.println("I moved!");
         }
-    } 
+    }
+
+    void attack(int attackType){
+
+    }
+
+    void defend(){
+
+    }
+
+    void explore(){
+
+    }
 }

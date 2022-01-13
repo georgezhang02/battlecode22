@@ -5,6 +5,8 @@ import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 
+import java.util.Map;
+
 public class Explorer {
     static RobotController rc;
 
@@ -12,26 +14,31 @@ public class Explorer {
 
     static Direction[]  vision = {Direction.SOUTH, Direction.EAST, Direction.NORTH, Direction.NORTH, Direction.WEST, Direction.WEST, Direction.SOUTH, Direction.SOUTH, Direction.SOUTH, Direction.EAST, Direction.EAST, Direction.EAST, Direction.NORTH, Direction.NORTH, Direction.NORTH, Direction.NORTH, Direction.WEST, Direction.WEST, Direction.WEST, Direction.WEST, Direction.SOUTH, Direction.SOUTH, Direction.SOUTH, Direction.SOUTH, Direction.SOUTH, Direction.EAST, Direction.EAST, Direction.EAST, Direction.EAST, Direction.NORTHEAST, Direction.NORTH, Direction.NORTH, Direction.NORTH, Direction.NORTH, Direction.NORTHWEST, Direction.WEST, Direction.WEST, Direction.WEST, Direction.WEST, Direction.SOUTHWEST, Direction.SOUTH, Direction.SOUTH, Direction.SOUTH, Direction.SOUTH, Direction.SOUTH, Direction.SOUTHEAST, Direction.EAST, Direction.EAST, Direction.EAST, Direction.EAST, Direction.NORTHEAST, Direction.NORTHEAST, Direction.NORTH, Direction.NORTH, Direction.NORTH, Direction.NORTH, Direction.NORTHWEST, Direction.NORTHWEST, Direction.WEST, Direction.WEST, Direction.WEST, Direction.WEST, Direction.SOUTHWEST, Direction.SOUTHWEST, Direction.SOUTH, Direction.SOUTH, Direction.SOUTH, Direction.SOUTH};
 
+    static MapLocation target;
+
+
     public Explorer(RobotController rc){
         this.rc = rc;
         visited = new boolean[rc.getMapWidth()][rc.getMapHeight()];
     }
 
-    public MapLocation getExploreTarget(int tries, int mapWidth, int mapHeight){
+    public void getExploreTarget(int tries, int mapWidth, int mapHeight){
         int count = tries;
         MapLocation ml = null;
         while(ml == null && count > 0) {
             int x = (int) (mapWidth * Math.random());
             int y = (int) (mapHeight * Math.random());
             if(!visited[x][y]){
-                return new MapLocation(x, y);
+                target = new MapLocation(x, y);
             }
             count--;
         }
-        return null;
+        if(ml == null){
+            getExploreTargetRandom(mapWidth, mapHeight);
+        }
     }
 
-    public MapLocation getExploreTargetRandom(int mapWidth, int mapHeight){
+    public void getExploreTargetRandom(int mapWidth, int mapHeight){
         MapLocation curPos = rc.getLocation();
 
         boolean closeLeft = curPos.x < mapWidth;
@@ -58,7 +65,6 @@ public class Explorer {
         int x = Math.max(Math.min((int) (maxDim/2 * Math.cos(angle)), mapWidth), 0);
         int y = Math.max(Math.min((int) (maxDim/2 * Math.sin(angle)), mapHeight), 0);
 
-        return new MapLocation(x, y);
     }
 
 

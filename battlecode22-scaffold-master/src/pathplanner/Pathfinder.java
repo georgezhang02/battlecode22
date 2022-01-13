@@ -7,7 +7,6 @@ import battlecode.common.RobotController;
 
 
 public abstract class Pathfinder {
-    static MapLocation target;
     static RobotController rc;
     static int minDistToTarget = 0;
 
@@ -22,19 +21,17 @@ public abstract class Pathfinder {
         lastPos = rc.getLocation();
     }
 
-    boolean targetWithinRadius(){
+    boolean targetWithinRadius(MapLocation target){
         return rc.getLocation().distanceSquaredTo(target) < minDistToTarget * minDistToTarget;
     }
 
     Direction pathToExplore() throws GameActionException{
-        if(!exploring || rc.getLocation().equals(target)){
+        if(!exploring || rc.getLocation().equals(explorer.target)){
             int width = rc.getMapWidth();
             int height =rc.getMapHeight();
-            if((target = explorer.getExploreTarget(10, width, height)) == null){
-                target = explorer.getExploreTargetRandom(width, height);
-            }
+            explorer.getExploreTarget(10, width, height);
         }
-        Direction dir = pathToTarget(true);
+        Direction dir = pathToTarget(explorer.target, true);
         exploring = true;
         return dir;
 
@@ -55,16 +52,16 @@ public abstract class Pathfinder {
             x += (int)(xdiff * vect);
             y += (int)(ydiff * vect);
         }
-        target = new MapLocation(x, y);
-        return pathToTargetGreedy();
+        MapLocation target = new MapLocation(x, y);
+        return pathToTargetGreedy(target);
     }
 
-    Direction pathToTarget(boolean useGreedy) throws GameActionException {
+    Direction pathToTarget(MapLocation target, boolean useGreedy) throws GameActionException {
         exploring = false;
         if(rc.isMovementReady()){
             if(useGreedy){
                 lastPos = rc.getLocation();
-                return pathToTargetGreedy();
+                return pathToTargetGreedy(target);
 
             } else{
                 Direction dir = bfPathToTarget();
@@ -74,7 +71,7 @@ public abstract class Pathfinder {
                 }
                 if(lastPos != null && rc.getLocation().add(dir).equals(lastPos)) {
 
-                    dir = pathToTargetGreedy(0);
+                    dir = pathToTargetGreedy(target, 0);
                 }
 
                 lastPos = rc.getLocation();
@@ -87,13 +84,13 @@ public abstract class Pathfinder {
 
     }
 
-    Direction pathToTargetGreedy()
+    Direction pathToTargetGreedy(MapLocation target)
             throws GameActionException {
-        return pathToTargetGreedy(1);
+        return pathToTargetGreedy(target);
 
     }
 
-    Direction pathToTargetGreedy(int depth)
+    Direction pathToTargetGreedy(MapLocation target, int depth)
             throws GameActionException {
         exploring = false;
         MapLocation ml;
@@ -109,7 +106,7 @@ public abstract class Pathfinder {
 
                 if(Math.sqrt(ml.distanceSquaredTo(target)) < initDist){
 
-                    int cost = getCost(ml, depth);
+                    int cost = getCost(target, ml, depth);
                     //rc.setIndicatorString(cost+"");
                     if(cost < minCost){
                         minCost = cost;
@@ -124,7 +121,7 @@ public abstract class Pathfinder {
 
     }
 
-    int getCost( MapLocation cur, int depth) throws GameActionException{
+    int getCost( MapLocation target, MapLocation cur, int depth) throws GameActionException{
         if(cur.equals(target)){
             return 0;
         }
@@ -142,7 +139,7 @@ public abstract class Pathfinder {
                 do{
                     if(rc.onTheMap(ml = cur.add(dir))){
                         if(Math.sqrt(ml.distanceSquaredTo(target)) < initDist){
-                            int cost = getCost(ml,depth-1);
+                            int cost = getCost(target, ml,depth-1);
                             minCost = Math.min(cost, minCost);
                         }
                     }

@@ -106,8 +106,7 @@ public strictfp class Miner {
 
         // Move towards the center
         MapLocation center = new MapLocation(rc.getMapWidth() / 2, rc.getMapHeight() / 2);
-        pathfinder.target = center;
-        Direction dir = pathfinder.pathToTarget(false);
+        Direction dir = pathfinder.pathToTarget(center, false);
         if (rc.canMove(dir)) {
             rc.move(dir);
             stuckCounter = 0;
@@ -172,8 +171,7 @@ public strictfp class Miner {
     }
 
     static void tryMove(RobotController rc, MapLocation me, MapLocation loc) throws GameActionException {
-        pathfinder.target = loc;
-        Direction dir = pathfinder.pathToTarget(false);
+        Direction dir = pathfinder.pathToTarget(loc,false);
         if (rc.canMove(dir)) {
             rc.move(dir);
             rc.setIndicatorLine(me.add(dir), loc, 0, 255, 0);
