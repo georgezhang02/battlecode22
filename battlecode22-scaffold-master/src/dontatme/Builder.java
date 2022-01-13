@@ -18,21 +18,31 @@ public strictfp class Builder {
         RobotInfo [] buildings = getNearbyTowers(rc);
         RobotInfo [] protoBuildings = findPrototypeTowers(rc, buildings);
 
-        //that means that there are prototype buildings
+        //that means that there are prototype buildings, and see if we can prototype
         if (protoBuildings != null) {
             int counter = 0;
-            while (counter < protoBuildings.length && protoBuildings[counter] != null
-                    && rc.canRepair(protoBuildings[counter].getLocation())) {
-                rc.repair(protoBuildings[counter].getLocation());
-                counter++;
-            }
+            repairBuild(rc, protoBuildings);
         }
-        //Basic goal:
-        //2 states: attack, defend
-        //state 1: attack
-        //state 2: defend
+        //means that there is a nearby building
+        //check if it can be repaired
+        if (buildings[0] != null) {
+            repairBuild(rc, buildings);
+        }
+
+        //now just explore
+
 
     }
+    static void repairBuild(RobotController rc, RobotInfo [] buildings) throws GameActionException{
+        int counter = 0;
+        while (counter < buildings.length && buildings[counter] != null) {
+            if (rc.canRepair(buildings[counter].getLocation())) {
+                rc.repair(buildings[counter].getLocation());
+            }
+            counter++;
+        }
+    }
+
     static void advance(RobotController rc) throws GameActionException {
 
         //part 2:
