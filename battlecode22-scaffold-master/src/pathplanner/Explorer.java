@@ -1,6 +1,7 @@
 package pathplanner;
 
 import battlecode.common.Direction;
+import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 
@@ -54,19 +55,25 @@ public class Explorer {
             }
         }
 
-        int x = Math.max(Math.min((int) Math.cos(angle), mapWidth), 0);
-        int y = Math.max(Math.min((int) Math.sin(angle), mapHeight), 0);
+        int maxDim = Math.max(mapWidth, mapHeight);
+
+        int x = Math.max(Math.min((int) (maxDim/2 * Math.cos(angle)), mapWidth), 0);
+        int y = Math.max(Math.min((int) (maxDim/2 * Math.sin(angle)), mapHeight), 0);
 
         return new MapLocation(x, y);
     }
 
 
-    public void updateVisited(){
+    public void updateVisited() throws GameActionException {
         MapLocation cur = rc.getLocation();
         visited[cur.x][cur.y] = true;
         for(int i = 0; i< vision.length; i++){
             cur = cur.add(vision[i]);
-            visited[cur.x][cur.y] = true;
+            if(rc.onTheMap(cur)){
+                visited[cur.x][cur.y] = true;
+            }
+
+
         }
     }
 

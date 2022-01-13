@@ -14,7 +14,7 @@ public abstract class Pathfinder {
     static MapLocation lastPos;
 
     static Explorer explorer;
-    boolean exploring;
+    static boolean exploring;
 
     public Pathfinder(RobotController rc) throws GameActionException{
         this.rc = rc;
@@ -27,12 +27,20 @@ public abstract class Pathfinder {
     }
 
     Direction pathToExplore() throws GameActionException{
-        if(!exploring){
-
+        if(!exploring || rc.getLocation().equals(target)){
+            int width = rc.getMapWidth();
+            int height =rc.getMapHeight();
+            if((target = explorer.getExploreTarget(10, width, height)) == null){
+                target = explorer.getExploreTargetRandom(width, height);
+            }
         }
+        Direction dir = pathToTarget(true);
+        exploring = true;
+        return dir;
 
-        return null;
     }
+
+
 
     Direction pathAwayFrom(MapLocation[]mapLocations) throws GameActionException {
         exploring = false;

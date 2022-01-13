@@ -99,29 +99,11 @@ public strictfp class RobotPlayer {
      */
     static void runMiner(RobotController rc) throws GameActionException {
 
-        Direction dir = null;
-        RobotInfo[] enemyML= rc.senseNearbyRobots(20, rc.getTeam().opponent());
-        MapLocation[] enemyPos = new MapLocation[enemyML.length];
-        if(enemyML.length > 0){
-            for(int i = 0; i< enemyPos.length; i++){
-                enemyPos[i] = enemyML[i].getLocation();
-            }
+        Direction dir = pathfinder.pathToExplore();
 
-            dir =  pathfinder.pathAwayFrom(enemyPos);
-        }else {
-            pathfinder.target = new MapLocation(rc.getMapWidth()/ 2, rc.getMapHeight()/2);
-            dir = pathfinder.bfPathToTarget();
-
-        }
-
-
-        if(dir!= null) {
-
-        } else{
-
-        }
         if(dir != null && rc.canMove(dir)){
             rc.move(dir);
+            pathfinder.explorer.updateVisited();
         }
 
 
