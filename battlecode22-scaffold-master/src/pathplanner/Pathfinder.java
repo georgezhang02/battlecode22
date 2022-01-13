@@ -8,7 +8,6 @@ import battlecode.common.RobotController;
 
 public abstract class Pathfinder {
     static RobotController rc;
-    static int minDistToTarget = 0;
 
     static MapLocation lastPos;
 
@@ -21,7 +20,9 @@ public abstract class Pathfinder {
         lastPos = rc.getLocation();
     }
 
-    boolean targetWithinRadius(MapLocation target){
+
+
+    boolean targetWithinRadius(MapLocation target, int minDistToTarget){
         return rc.getLocation().distanceSquaredTo(target) < minDistToTarget * minDistToTarget;
     }
 
@@ -36,8 +37,6 @@ public abstract class Pathfinder {
         return dir;
 
     }
-
-
 
     Direction pathAwayFrom(MapLocation[]mapLocations) throws GameActionException {
         exploring = false;
@@ -55,7 +54,6 @@ public abstract class Pathfinder {
         MapLocation target = new MapLocation(x, y);
         return pathToTargetGreedy(target);
     }
-
     Direction pathToTarget(MapLocation target, boolean useGreedy) throws GameActionException {
         exploring = false;
         if(rc.isMovementReady()){
@@ -64,7 +62,7 @@ public abstract class Pathfinder {
                 return pathToTargetGreedy(target);
 
             } else{
-                Direction dir = bfPathToTarget();
+                Direction dir = bfPathToTarget(target);
                 if(lastPos!= null){
                     MapLocation move = rc.getLocation().add(dir);
                     rc.setIndicatorString(lastPos.x+" "+lastPos.y+" "+move.x+" "+move.y);
@@ -90,7 +88,7 @@ public abstract class Pathfinder {
 
     Direction pathToTargetGreedy(MapLocation target)
             throws GameActionException {
-        return pathToTargetGreedy(target);
+        return pathToTargetGreedy(target, 1);
 
     }
 
@@ -155,5 +153,5 @@ public abstract class Pathfinder {
         }
     }
 
-    abstract Direction bfPathToTarget() throws GameActionException;
+    abstract Direction bfPathToTarget(MapLocation target) throws GameActionException;
 }

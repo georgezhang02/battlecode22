@@ -26,8 +26,7 @@ strictfp class RushSoldierStrategy {
             }
         }
         MapLocation[] PossibleEnemyLocations = findAreasToAttack(rc);
-        pathfinder.target = PossibleEnemyLocations[rc.getID() % 2];
-        Direction dir = pathfinder.pathToTarget(true);
+        Direction dir = pathfinder.pathToTarget(PossibleEnemyLocations[rc.getID() % 2], true);
         if (rc.canMove(dir)) {
             rc.move(dir);
             //System.out.println("I moved!");

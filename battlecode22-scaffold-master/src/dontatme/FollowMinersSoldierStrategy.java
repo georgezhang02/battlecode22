@@ -22,14 +22,14 @@ strictfp class FollowMinersSoldierStrategy {
             for (int i = 9; i <= 12 && followMiners; i++) {
                 int archonInfo = rc.readSharedArray(i);
                 if (archonInfo / 4096 == 1) {
-                    pathfinder.target = new MapLocation(archonInfo / 64, archonInfo % 64);
+
                     followMiners = false;
-                    dir = pathfinder.pathToTarget(true);
+                    dir = pathfinder.pathToTarget(new MapLocation(archonInfo / 64, archonInfo % 64), true);
                 }
             }
 
 
-        pathfinder.rc = rc;
+        MapLocation target = null;
         if(followMiners){
             // Try to attack someone
             int radius = rc.getType().actionRadiusSquared;
@@ -69,7 +69,7 @@ strictfp class FollowMinersSoldierStrategy {
                 while (counter < MinerLocs.size() && !isGoodTarget) {
                     MapLocation allyPos = allies[MinerLocs.get(counter)].getLocation();
                     if (!rc.getLocation().isWithinDistanceSquared(allyPos, 5)) {
-                        pathfinder.target = allyPos;
+                        target = allyPos;
 
                         isGoodTarget = true;
                     }
@@ -84,11 +84,9 @@ strictfp class FollowMinersSoldierStrategy {
 
         }
 
-            if(pathfinder.target == null || dir.equals(Direction.CENTER)){
+            if(target == null || dir.equals(Direction.CENTER)){
                 MapLocation[] ml = RushSoldierStrategy.findAreasToAttack(rc);
-                pathfinder.target = ml[rc.getID() % 2];
-
-                    dir = pathfinder.pathToTarget(true);
+                dir = pathfinder.pathToTarget(target,true);
 
             }
 

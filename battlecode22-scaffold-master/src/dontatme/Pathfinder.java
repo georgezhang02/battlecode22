@@ -8,7 +8,6 @@ import battlecode.common.RobotController;
 
 public abstract class Pathfinder {
     static RobotController rc;
-    static int minDistToTarget = 0;
 
     static MapLocation lastPos;
 
@@ -21,7 +20,9 @@ public abstract class Pathfinder {
         lastPos = rc.getLocation();
     }
 
-    boolean targetWithinRadius(MapLocation target){
+
+
+    boolean targetWithinRadius(MapLocation target, int minDistToTarget){
         return rc.getLocation().distanceSquaredTo(target) < minDistToTarget * minDistToTarget;
     }
 
@@ -36,8 +37,6 @@ public abstract class Pathfinder {
         return dir;
 
     }
-
-
 
     Direction pathAwayFrom(MapLocation[]mapLocations) throws GameActionException {
         exploring = false;
@@ -89,7 +88,7 @@ public abstract class Pathfinder {
 
     Direction pathToTargetGreedy(MapLocation target)
             throws GameActionException {
-        return pathToTargetGreedy(target);
+        return pathToTargetGreedy(target, 1);
 
     }
 
@@ -130,7 +129,7 @@ public abstract class Pathfinder {
         }
         else {
             int curCost = (!rc.onTheMap(cur) || rc.isLocationOccupied(cur)) ? 2000: rc.senseRubble(cur) + 10;
-            if(depth==0){
+            if(depth<=0){
                 return curCost;
             } else {
                 MapLocation ml;

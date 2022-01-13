@@ -2,6 +2,7 @@ package pathplanner;
 
 import battlecode.common.*;
 
+
 public class BFPathing20 extends Pathfinder {
     static Direction dir9;
     static Direction dir10;
@@ -277,12 +278,11 @@ public class BFPathing20 extends Pathfinder {
         super(rc);
     }
 
-    Direction bfPathToTarget() throws GameActionException {
+    Direction bfPathToTarget(MapLocation target) throws GameActionException {
 
         MapLocation ml0 = rc.getLocation();
 
         if(ml0.equals(target)) return Direction.CENTER;
-
 
 
         dist1 = 10000;
