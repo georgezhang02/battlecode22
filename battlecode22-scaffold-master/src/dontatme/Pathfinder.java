@@ -55,26 +55,29 @@ public abstract class Pathfinder {
         MapLocation target = new MapLocation(x, y);
         return pathToTargetGreedy(target);
     }
-
     Direction pathToTarget(MapLocation target, boolean useGreedy) throws GameActionException {
         exploring = false;
         if(rc.isMovementReady()){
             if(useGreedy){
-                lastPos = rc.getLocation();
+                lastPos = null;
                 return pathToTargetGreedy(target);
 
             } else{
-                Direction dir = bfPathToTarget();
+                Direction dir = bfPathToTarget(target);
                 if(lastPos!= null){
                     MapLocation move = rc.getLocation().add(dir);
                     rc.setIndicatorString(lastPos.x+" "+lastPos.y+" "+move.x+" "+move.y);
+
                 }
+                lastPos = rc.getLocation();
                 if(lastPos != null && rc.getLocation().add(dir).equals(lastPos)) {
 
                     dir = pathToTargetGreedy(target, 0);
+                    lastPos = null;
                 }
 
-                lastPos = rc.getLocation();
+
+
                 return dir;
 
 
@@ -151,5 +154,5 @@ public abstract class Pathfinder {
         }
     }
 
-    abstract Direction bfPathToTarget() throws GameActionException;
+    abstract Direction bfPathToTarget(MapLocation target) throws GameActionException;
 }

@@ -60,7 +60,7 @@ public abstract class Pathfinder {
         exploring = false;
         if(rc.isMovementReady()){
             if(useGreedy){
-                lastPos = rc.getLocation();
+                lastPos = null;
                 return pathToTargetGreedy(target);
 
             } else{
@@ -68,13 +68,17 @@ public abstract class Pathfinder {
                 if(lastPos!= null){
                     MapLocation move = rc.getLocation().add(dir);
                     rc.setIndicatorString(lastPos.x+" "+lastPos.y+" "+move.x+" "+move.y);
+
                 }
+                lastPos = rc.getLocation();
                 if(lastPos != null && rc.getLocation().add(dir).equals(lastPos)) {
 
                     dir = pathToTargetGreedy(target, 0);
+                    lastPos = null;
                 }
 
-                lastPos = rc.getLocation();
+
+
                 return dir;
 
 
