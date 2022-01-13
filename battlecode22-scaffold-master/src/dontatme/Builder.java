@@ -29,6 +29,8 @@ public strictfp class Builder {
             repairBuild(rc, buildings);
         }
 
+        //need to implement mutations
+
         //now just explore
 
 
@@ -44,13 +46,7 @@ public strictfp class Builder {
     }
 
     static void advance(RobotController rc) throws GameActionException {
-
-        //part 2:
-        //attack state
-        //find nearest archon
-        //path away from that archon
-        //if it encounters a certain number of enemy troops, build a watchtower
-
+        //nub -> in development
         MapLocation nearestArchon = findNearestArchon(rc);
         int activationNumber = 4; //number of nearby enemies to trigger tower building
         int numberNearbyEnemies = getNumberOfNearbyEnemies(rc);
