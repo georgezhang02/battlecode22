@@ -1,6 +1,9 @@
-package dontatme;
+package pathplanner;
 
-import battlecode.common.*;
+import battlecode.common.Direction;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
+import battlecode.common.RobotController;
 
 
 public abstract class Pathfinder {
@@ -10,15 +13,37 @@ public abstract class Pathfinder {
 
     static MapLocation lastPos;
 
+    static Explorer explorer;
+    static boolean exploring;
+
     public Pathfinder(RobotController rc) throws GameActionException{
         this.rc = rc;
+        this.explorer = new Explorer(rc);
+        lastPos = rc.getLocation();
     }
 
     boolean targetWithinRadius(){
         return rc.getLocation().distanceSquaredTo(target) < minDistToTarget * minDistToTarget;
     }
 
+    Direction pathToExplore() throws GameActionException{
+        if(!exploring || rc.getLocation().equals(target)){
+            int width = rc.getMapWidth();
+            int height =rc.getMapHeight();
+            if((target = explorer.getExploreTarget(10, width, height)) == null){
+                target = explorer.getExploreTargetRandom(width, height);
+            }
+        }
+        Direction dir = pathToTarget(true);
+        exploring = true;
+        return dir;
+
+    }
+
+
+
     Direction pathAwayFrom(MapLocation[]mapLocations) throws GameActionException {
+        exploring = false;
         MapLocation curPos = rc.getLocation();
         int x = curPos.x;
         int y = curPos.y;
@@ -35,6 +60,7 @@ public abstract class Pathfinder {
     }
 
     Direction pathToTarget(boolean useGreedy) throws GameActionException {
+        exploring = false;
         if(rc.isMovementReady()){
             if(useGreedy){
                 lastPos = rc.getLocation();
@@ -63,36 +89,13 @@ public abstract class Pathfinder {
 
     Direction pathToTargetGreedy()
             throws GameActionException {
-        MapLocation ml;
-        Direction ans = Direction.CENTER;
-
-        double initDist = Math.sqrt(rc.getLocation().distanceSquaredTo(target));
-        int minCost = 720000;
-        Direction baseDir = rc.getLocation().directionTo(target);
-        Direction dir = rc.getLocation().directionTo(target);
-
-        do {
-            if(rc.onTheMap(ml = rc.getLocation().add(dir))){
-
-                if(Math.sqrt(ml.distanceSquaredTo(target)) < initDist){
-
-                    int cost = getCost(ml, 1);
-                    //rc.setIndicatorString(cost+"");
-                    if(cost < minCost){
-                        minCost = cost;
-                        ans = dir;
-                    }
-                }
-            }
-            dir = dir.rotateLeft();
-        } while(!dir.equals(baseDir));
-
-        return ans;
+        return pathToTargetGreedy(1);
 
     }
 
     Direction pathToTargetGreedy(int depth)
             throws GameActionException {
+        exploring = false;
         MapLocation ml;
         Direction ans = Direction.CENTER;
 
