@@ -1,4 +1,4 @@
-package pathplanner;
+package dontatme;
 
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
