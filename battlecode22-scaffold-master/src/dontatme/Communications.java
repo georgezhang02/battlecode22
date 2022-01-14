@@ -7,31 +7,34 @@ public class Communications {
 
     // Indices
     private static final int ARCHON_TURN = 0;
-    private static final int FRIENDLY_ARCHON_OFFSET = 4;
-    private static final int ENEMY_ARCHON_OFFSET = 8;
 
+    // TODO: Fix archon ID bug
+    private static final int ARCHON_IDS = 1;
+
+    private static final int FRIENDLY_ARCHON_OFFSET = 5;
+    private static final int ENEMY_ARCHON_OFFSET = 9;
 
     /**
      * @return the archon that should be active in the alternating turn system
      * @throws GameActionException
      */
     public static int getArchonTurn(RobotController rc) throws GameActionException {
-        return rc.readSharedArray(ARCHON_TURN) % 64;
+        return decode(rc.readSharedArray(ARCHON_TURN), 0);
     }
 
     public static void incrementArchonTurn(RobotController rc) throws GameActionException {
         int arrayValue = rc.readSharedArray(ARCHON_TURN);
-        rc.writeSharedArray(ARCHON_TURN, (arrayValue % 64 + 1) % rc.getArchonCount() + arrayValue / 64 * 64);
+        rc.writeSharedArray(ARCHON_TURN, encode(decode(arrayValue, 0) + 1, decode(arrayValue, 1)));
     }
 
 
     public static int getMinerTurn(RobotController rc) throws GameActionException {
-        return rc.readSharedArray(ARCHON_TURN) / 64;
+        return decode(rc.readSharedArray(ARCHON_TURN), 1);
     }
 
     public static void incrementMinerTurn(RobotController rc, int size) throws GameActionException {
         int arrayValue = rc.readSharedArray(ARCHON_TURN);
-        rc.writeSharedArray(ARCHON_TURN, ((arrayValue / 64 + 1) % size) * 64 + arrayValue % 64);
+        rc.writeSharedArray(ARCHON_TURN, encode(decode(arrayValue, 0), (decode(arrayValue, 1) + 1) % size));
     }
 
 
@@ -41,18 +44,18 @@ public class Communications {
      */
     public static MapLocation getArchonVisionLead(RobotController rc, int archonID) throws GameActionException {
         int arrayValue = rc.readSharedArray(archonID / 2);
-        MapLocation leadLocation = new MapLocation((arrayValue / 64) % 64, arrayValue % 64);
+        MapLocation leadLocation = new MapLocation(decode(arrayValue, 1), decode(arrayValue, 0));
         return leadLocation;
     }
 
     public static void setArchonVisionLead(RobotController rc, int archonID, MapLocation leadLocation) throws GameActionException {
         int arrayValue = rc.readSharedArray(archonID / 2);
-        rc.writeSharedArray(archonID / 2, (leadLocation.x * 64 + leadLocation.y) + (arrayValue / 4096 * 4096));
+        rc.writeSharedArray(archonID / 2, encode(leadLocation.x, leadLocation.y, decode(arrayValue, 2)));
     }
 
     public static void setArchonVisionNoLead(RobotController rc, int archonID) throws GameActionException {
         int arrayValue = rc.readSharedArray(archonID / 2);
-        rc.writeSharedArray(archonID / 2, 61 + (arrayValue / 4096 * 4096));
+        rc.writeSharedArray(archonID / 2, encode(61, 61, decode(arrayValue, 2)));
     }
 
     /**
@@ -60,18 +63,18 @@ public class Communications {
      * @throws GameActionException
      */
     public static int getArchonMinerCount(RobotController rc, int archonID) throws GameActionException {
-        return rc.readSharedArray(archonID / 2) / 4096;
+        return decode(rc.readSharedArray(archonID / 2), 2);
     }
 
     public static void setArchonMinerCount(RobotController rc, int archonID, int minerCount) throws GameActionException {
         int arrayValue = rc.readSharedArray(archonID / 2); 
-        rc.writeSharedArray(archonID / 2, (minerCount * 4096) + (arrayValue % 4096));
+        rc.writeSharedArray(archonID / 2, encode(decode(arrayValue, 0), decode(arrayValue, 1), minerCount));
     }
 
     public static void incrementArchonMinerCount(RobotController rc, int archonID) throws GameActionException {
         int arrayValue = rc.readSharedArray(archonID / 2); 
-        int currentMinerCount = arrayValue / 4096;
-        rc.writeSharedArray(archonID / 2, (currentMinerCount + 1) * 4096 + (arrayValue % 4096));
+        int currentMinerCount = decode(arrayValue, 2);
+        rc.writeSharedArray(archonID / 2, encode(decode(arrayValue, 0), decode(arrayValue, 1), currentMinerCount + 1));
     }
     
 
@@ -84,7 +87,7 @@ public class Communications {
      */
     public static MapLocation getTeamArchonLocation(RobotController rc, int archonID) throws GameActionException {
         int arrayValue = rc.readSharedArray(archonID / 2 + FRIENDLY_ARCHON_OFFSET);
-        MapLocation archonLocation = new MapLocation(arrayValue / 64, arrayValue % 64);
+        MapLocation archonLocation = new MapLocation(decode(arrayValue, 1), decode(arrayValue, 0));
         return archonLocation;
     }
 
@@ -99,12 +102,12 @@ public class Communications {
             throw new IllegalArgumentException();
         }
         int arrayValue = rc.readSharedArray(index + FRIENDLY_ARCHON_OFFSET);
-        MapLocation archonLocation = new MapLocation(arrayValue / 64, arrayValue % 64);
+        MapLocation archonLocation = new MapLocation(decode(arrayValue, 1), decode(arrayValue, 0));
         return archonLocation;
     }
 
     public static void setTeamArchonLocation(RobotController rc, int archonID, MapLocation archonLocation) throws GameActionException {
-        int writeValue = archonLocation.x * 64 + archonLocation.y;
+        int writeValue = encode(archonLocation.x, archonLocation.y);
         rc.writeSharedArray(archonID / 2 + FRIENDLY_ARCHON_OFFSET, writeValue);
     }
 
@@ -117,7 +120,7 @@ public class Communications {
      */
     public static MapLocation getEnemyArchonLocation(RobotController rc, int archonID) throws GameActionException {
         int arrayValue = rc.readSharedArray(archonID / 2 + ENEMY_ARCHON_OFFSET);
-        MapLocation archonLocation = new MapLocation((arrayValue % 64 - 1), (arrayValue / 64 - 1));
+        MapLocation archonLocation = new MapLocation(decode(arrayValue, 1) - 1, decode(arrayValue, 0) - 1);
         return archonLocation;
     }
 
@@ -129,15 +132,45 @@ public class Communications {
      */
     public static MapLocation getEnemyArchonLocationByIndex(RobotController rc, int index) throws GameActionException {
         if (!(index >= 0 && index < GameConstants.MAX_STARTING_ARCHONS)) {
-            throw new IllegalArgumentException();
+                throw new IllegalArgumentException();
         }
         int arrayValue = rc.readSharedArray(index + ENEMY_ARCHON_OFFSET);
-        MapLocation archonLocation = new MapLocation((arrayValue % 64 - 1), (arrayValue / 64 - 1));
+        MapLocation archonLocation = new MapLocation(decode(arrayValue, 1) - 1, decode(arrayValue, 0) - 1);
         return archonLocation;
     }
 
     public static void setEnemyArchonLocation(RobotController rc, int archonID, MapLocation archonLocation) throws GameActionException {
-        int writeValue = (archonLocation.x + 1) * 64 + (archonLocation.y + 1);
+        int writeValue = encode(archonLocation.x + 1, archonLocation.y + 1);
         rc.writeSharedArray(archonID / 2 + ENEMY_ARCHON_OFFSET, writeValue);
+    }
+
+    /**
+     * Decodes array value into suedo bytes
+     * 
+     * could be hardcoded to save slight bytecode
+     * 
+     * index 0:
+     *      number % 64 / 1
+     * index 1:
+     *      number % 64^2 / 64
+     * ...
+     */
+    private static int decode(int number, int index) {
+        if (index < 0) {
+            throw new IllegalArgumentException();
+        } else {
+            return (number % (int)Math.pow(64, index + 1) / (int)Math.pow(64, index));
+        }
+    }
+
+    /**
+     * Encodes a variable number of values into a single array value ready to be written
+     */
+    private static int encode(int ...fields) {
+        int result = 0;
+        for (int i = 0; i < fields.length; i++) {
+            result += fields[i] * Math.pow(64, i);
+        }
+        return result;
     }
 }
