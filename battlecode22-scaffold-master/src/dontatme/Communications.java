@@ -9,9 +9,9 @@ public class Communications {
     private static final int TURN_INFO = 0;
 
     // TODO: Fix archon ID bug
-    private static final int LEAD_OFFSET = 1;
-    private static final int FRIENDLY_ARCHON_OFFSET = 5;
-    private static final int ENEMY_ARCHON_OFFSET = 9;
+    private static final int FRIENDLY_ARCHON_OFFSET = 1;
+    private static final int ENEMY_ARCHON_OFFSET = 5;
+    private static final int LEAD_OFFSET = 9;
     private static final int ATTACK_OFFSET = 13;
     private static final int DEFENSE_OFFSET = 23;
     private static final int BUILD_OFFSET = 33;
