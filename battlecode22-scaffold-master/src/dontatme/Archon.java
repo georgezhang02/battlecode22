@@ -25,8 +25,10 @@ public strictfp class Archon {
         // Write archon location if needed
         if (me == null || !rc.getLocation().equals(me)) {
             me = rc.getLocation();
-            Communications.setTeamArchonLocation(rc, rc.getID(), me);
+            Communications.setTeamArchonLocation(rc, id, me);
+
         }
+
         
         // If there is lead left, save the first open lead location in the shared array
         MapLocation leadLoc = Communications.getArchonVisionLead(rc, id);
@@ -48,7 +50,11 @@ public strictfp class Archon {
         // If there are less than 4 miners per archon
         // Build a miner in any direction (but take turns)
         int turn = Communications.getArchonTurn(rc);
-        if (turn + 1 == id / 2) {
+        rc.setIndicatorString(turn+" ");
+
+
+        if (turn  == Communications.getTeamArchonIndexFromID(rc, id) ) {
+
             if (miners < 4) {
                 if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
                     buildTowardsLowRubble(rc, RobotType.MINER, turn);

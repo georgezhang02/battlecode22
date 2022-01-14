@@ -52,7 +52,8 @@ public strictfp class Miner {
                 minerType = MinerType.CenterMiner;
             }
         }
-        
+
+        rc.setIndicatorString(Communications.getTeamArchonIndexFromID(rc, archonID)+" ");
         // If not on lead
         if (rc.senseLead(me) == 0) {
 
@@ -69,15 +70,15 @@ public strictfp class Miner {
                 if (heading == null) {
                     switch (minerType) {
                         case BaseMiner:
-                            rc.setIndicatorString("Base Miner");
+                            //rc.setIndicatorString("Base Miner");
                             baseMiner(rc, me);
                             break;
                         case CenterMiner:
-                            rc.setIndicatorString("Center Miner");
+                            //rc.setIndicatorString("Center Miner");
                             centerMiner(rc, me);
                             break;
                         case ExpandMiner:
-                            rc.setIndicatorString("Expand Miner");
+                            //rc.setIndicatorString("Expand Miner");
                             expandMiner(rc, me);
                             break;
                         default:
