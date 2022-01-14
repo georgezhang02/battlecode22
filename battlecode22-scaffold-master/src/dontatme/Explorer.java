@@ -22,7 +22,10 @@ public class Explorer {
         visited = new boolean[rc.getMapWidth()][rc.getMapHeight()];
     }
 
+    // Choose random unvisited location through visited array, if can't find in tries moves
+    //chooses random on radius
     public void getExploreTarget(int tries, int mapWidth, int mapHeight){
+
         int count = tries;
         MapLocation ml = null;
         while(ml == null && count > 0) {
@@ -38,6 +41,7 @@ public class Explorer {
         }
     }
 
+    // returns random target towards the edges a larger distance away
     public void getExploreTargetRandom(int mapWidth, int mapHeight){
         MapLocation curPos = rc.getLocation();
 

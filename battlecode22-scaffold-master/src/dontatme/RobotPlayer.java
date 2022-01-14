@@ -24,9 +24,14 @@ public strictfp class RobotPlayer {
      *            information on its current status. Essentially your portal to interacting with the world.
      **/
     @SuppressWarnings("unused")
+
+    static Soldier soldier;
     public static void run(RobotController rc) throws GameActionException {
         // You can also use indicators to save debug notes in replays.
         while (true) {
+            if(soldier == null && rc.getType().equals(RobotType.SOLDIER)){
+                soldier = new Soldier(rc);
+            }
             // This code runs during the entire lifespan of the robot, which is why it is in an infinite
             // loop. If we ever leave this loop and return from run(), the robot dies! At the end of the
             // loop, we call Clock.yield(), signifying that we've done everything we want to do.
@@ -42,7 +47,7 @@ public strictfp class RobotPlayer {
                 switch (rc.getType()) {
                     case ARCHON:     Archon.run(rc);  break;
                     case MINER:      Miner.run(rc);   break;
-                    case SOLDIER:    FollowMinersSoldierStrategy.runSoldier(rc); break;
+                    case SOLDIER:    soldier.run(); break;
                     case LABORATORY: Laboratory.run(rc); break;
                     case WATCHTOWER: Watchtower.run(rc); break;
                     case BUILDER:    Builder.run(rc); break;
