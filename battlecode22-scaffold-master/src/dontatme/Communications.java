@@ -110,7 +110,7 @@ public class Communications {
      * @throws GameActionException
      */
     public static MapLocation getTeamArchonLocationByIndex(RobotController rc, int index) throws GameActionException {
-        if (!(index >= 0 && index <= rc.getArchonCount())) {
+        if (!(index >= 0 && index < rc.getArchonCount())) {
             throw new IllegalArgumentException();
         }
         int arrayValue = rc.readSharedArray(index + FRIENDLY_ARCHON_OFFSET);
