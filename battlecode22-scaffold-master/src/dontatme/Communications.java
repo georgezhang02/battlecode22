@@ -48,7 +48,7 @@ public class Communications {
     public static MapLocation getArchonVisionLead(RobotController rc, int archonID) throws GameActionException {
         int archonIndex = getTeamArchonIndexFromID(rc, archonID);
         int arrayValue = rc.readSharedArray(archonIndex + LEAD_OFFSET);
-        MapLocation leadLocation = new MapLocation(decode(arrayValue, 1), decode(arrayValue, 0));
+        MapLocation leadLocation = new MapLocation(decode(arrayValue, 0), decode(arrayValue, 1));
         return leadLocation;
     }
 
@@ -99,7 +99,7 @@ public class Communications {
     public static MapLocation getTeamArchonLocation(RobotController rc, int archonID) throws GameActionException {
         int archonIndex = getTeamArchonIndexFromID(rc, archonID);
         int arrayValue = rc.readSharedArray(archonIndex + FRIENDLY_ARCHON_OFFSET);
-        MapLocation archonLocation = new MapLocation(decode(arrayValue, 1), decode(arrayValue, 0));
+        MapLocation archonLocation = new MapLocation(decode(arrayValue, 0), decode(arrayValue, 1));
         return archonLocation;
     }
 
@@ -110,11 +110,11 @@ public class Communications {
      * @throws GameActionException
      */
     public static MapLocation getTeamArchonLocationByIndex(RobotController rc, int index) throws GameActionException {
-        if (!(index >= 0 && index < rc.getArchonCount())) {
+        if (!(index >= 0 && index < GameConstants.MAX_STARTING_ARCHONS)) {
             throw new IllegalArgumentException();
         }
         int arrayValue = rc.readSharedArray(index + FRIENDLY_ARCHON_OFFSET);
-        MapLocation archonLocation = new MapLocation(decode(arrayValue, 1), decode(arrayValue, 0));
+        MapLocation archonLocation = new MapLocation(decode(arrayValue, 0), decode(arrayValue, 1));
         return archonLocation;
     }
 
@@ -152,7 +152,7 @@ public class Communications {
     public static MapLocation getEnemyArchonLocation(RobotController rc, int archonID) throws GameActionException {
         int archonIndex = getEnemyArchonIndexFromID(rc, archonID);
         int arrayValue = rc.readSharedArray(archonIndex+ ENEMY_ARCHON_OFFSET);
-        MapLocation archonLocation = new MapLocation(decode(arrayValue, 1) - 1, decode(arrayValue, 0) - 1);
+        MapLocation archonLocation = new MapLocation(decode(arrayValue, 0) - 1, decode(arrayValue, 1) - 1);
         return archonLocation;
     }
 
@@ -167,12 +167,12 @@ public class Communications {
                 throw new IllegalArgumentException();
         }
         int arrayValue = rc.readSharedArray(index + ENEMY_ARCHON_OFFSET);
-        MapLocation archonLocation = new MapLocation(decode(arrayValue, 1) - 1, decode(arrayValue, 0) - 1);
+        MapLocation archonLocation = new MapLocation(decode(arrayValue, 0) - 1, decode(arrayValue, 1) - 1);
         return archonLocation;
     }
 
     public static void setEnemyArchonLocation(RobotController rc, int archonID, MapLocation archonLocation) throws GameActionException {
-        int writeValue = encode(archonLocation.y, archonLocation.x, archonID);
+        int writeValue = encode(archonLocation.x, archonLocation.y, archonID);
 
         for(int i = 0; i< GameConstants.MAX_STARTING_ARCHONS; i++){
             int arrayValue = rc.readSharedArray(i + ENEMY_ARCHON_OFFSET);
