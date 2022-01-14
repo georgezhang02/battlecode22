@@ -28,7 +28,7 @@ public abstract class Pathfinder {
 
     //randomly choose unvisited locations to path to
     Direction pathToExplore() throws GameActionException{
-        if(!exploring || rc.getLocation().distanceSquaredTo(explorer.target) < 4){
+        if(!exploring || rc.getLocation().distanceSquaredTo(explorer.target) <= 4){
             rc.setIndicatorString(exploring+" ");
             int width = rc.getMapWidth();
             int height =rc.getMapHeight();

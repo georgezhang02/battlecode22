@@ -11,20 +11,71 @@ public strictfp class Watchtower {
      */
 
     //number of droids killed by watchtower
+    static RobotController rc;
     static int attackCount = 0;
+    static RobotInfo[] enemies;
 
-    public static void run(RobotController rc) throws GameActionException {
-        int radius = rc.getType().actionRadiusSquared;
+    public static void run(RobotController robotController) throws GameActionException {
+        if(rc == null) rc = robotController;
         Team opponent = rc.getTeam().opponent();
-        RobotInfo[] enemies = rc.senseNearbyRobots(radius, opponent);
+        enemies = rc.senseNearbyRobots(34, opponent);
 
         //attack
-        int position = 0;
-        if (rc.isActionReady() && enemies.length > 0) {
-            if (rc.canAttack(enemies[position].getLocation())) {
+        if (rc.isActionReady()) {
+            RobotInfo ri= getAttack(3, 1, 0, 2);
+            if (ri != null) {
                 attackCount++;
-                rc.attack(enemies[position].getLocation());
+                rc.attack(ri.location);
             }
         }
+    }
+
+    static RobotInfo getAttack(int prio1, int prio2, int prio3, int prio4) throws GameActionException {
+        RobotInfo[] ml = new RobotInfo[4];
+        int[] minHealth = {2000,2000,2000,2000};
+
+        for(RobotInfo robot : enemies){
+            RobotType type = robot.getType();
+            int id = robot.getHealth();
+            if(rc.getLocation().distanceSquaredTo(robot.location) <= 20){
+                if(type.isBuilding()){
+                    if(type.equals(RobotType.ARCHON)){
+                        if(id < minHealth[0]){
+                            ml[0] = robot;
+                            minHealth[0] = id;
+                        }
+                    } else{
+                        if(id < minHealth[1]){
+                            ml[1] = robot;
+                            minHealth[1] = id;
+                        }
+                    }
+                } else{
+                    if(type.equals(RobotType.MINER)){
+                        if(id < minHealth[2]){
+                            ml[2] = robot;
+                            minHealth[2] = id;
+                        }
+                    } else {
+                        if(id < minHealth[3]){
+                            ml[3] = robot;
+                            minHealth[3] = id;
+                        }
+                    }
+                }
+            }
+
+        }
+
+        if(ml[prio1] != null){
+            return ml[prio1];
+        }
+        if(ml[prio2] != null){
+            return ml[prio2];
+        }
+        if(ml[prio3] != null){
+            return ml[prio3];
+        }
+        return ml[prio4];
     }
 }

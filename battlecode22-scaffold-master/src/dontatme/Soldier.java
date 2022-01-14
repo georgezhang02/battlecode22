@@ -2,9 +2,6 @@ package dontatme;
 
 import battlecode.common.*;
 
-import java.awt.*;
-import java.util.Map;
-
 public strictfp class Soldier {
     /**
      * Run a single turn for a Soldier.
@@ -14,7 +11,7 @@ public strictfp class Soldier {
     static Pathfinder pathfinder;
 
     static int state;
-    static RobotInfo[] sensedInfo;
+    static RobotInfo[] enemies;
 
     static MapLocation curTarget;
 
@@ -30,7 +27,8 @@ public strictfp class Soldier {
 
     public void run() throws GameActionException {
         //readComms();
-        sensedInfo = rc.senseNearbyRobots();
+        Team opponent = rc.getTeam().opponent();
+        enemies = rc.senseNearbyRobots(20, opponent);
 
         switch (state){
             case 0: // Attacking
@@ -73,7 +71,7 @@ public strictfp class Soldier {
     }
 
     static void writeComms(RobotInfo ri) throws GameActionException {
-        if(ri.getType().equals(RobotType.ARCHON) && ri.getTeam().equals(rc.getTeam().opponent())){
+        if(ri.getType().equals(RobotType.ARCHON) ){
             Communications.setEnemyArchonLocation(rc, ri.getID(), ri.getLocation());
         }
     }
@@ -162,11 +160,10 @@ public strictfp class Soldier {
         RobotInfo[] ml = new RobotInfo[4];
         int[] minHealth = {2000,2000,2000,2000};
 
-        for(RobotInfo robot : sensedInfo){
-            writeComms(robot);
+        for(RobotInfo robot : enemies){
             RobotType type = robot.getType();
             int id = robot.getHealth();
-            if(rc.canAttack(robot.getLocation())){
+            if(rc.getLocation().distanceSquaredTo(robot.location) <= 13){
                 if(type.isBuilding()){
                     if(type.equals(RobotType.ARCHON)){
                         if(id < minHealth[0]){
