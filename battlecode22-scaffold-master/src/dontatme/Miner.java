@@ -13,7 +13,7 @@ public strictfp class Miner {
     static MapLocation heading = null;
 
     static int stuckCounter = 0;
-    static Direction selectedDirection = null;
+    static MapLocation selectedLocation = null;
 
     static Pathfinder pathfinder;
 
@@ -122,11 +122,12 @@ public strictfp class Miner {
             for (Direction d : Helper.directions) {
                 archonDirections.add(d);
             }
-            for (int i = 1; i <= rc.getArchonCount(); i++) {
+            for (int i = 0; i < rc.getArchonCount(); i++) {
                 MapLocation archonLocation = Communications.getTeamArchonLocationByIndex(rc, i);
                 archonDirections.remove(center.directionTo(archonLocation));
             }
-            selectedDirection = archonDirections.get(Communications.getMinerTurn(rc));
+            Direction selectedDirection = archonDirections.get(Communications.getMinerTurn(rc));
+            selectedLocation = toEdge(rc, me, selectedDirection);
             Communications.incrementMinerTurn(rc, archonDirections.size());
             minerType = MinerType.ExpandMiner;
         }
@@ -134,15 +135,8 @@ public strictfp class Miner {
 
     static void expandMiner(RobotController rc, MapLocation me) throws GameActionException{
 
-        // Move towards selected direction (random direction if stuck)
-        if (rc.canMove(selectedDirection)) {
-            rc.move(selectedDirection);
-        } else {
-            Direction dir = Helper.directions[Helper.rng.nextInt(Helper.directions.length)];
-            if (rc.canMove(dir)) {
-                rc.move(dir);
-            } 
-        }
+        // Move towards selected location
+        tryMove(rc, me, selectedLocation);
 
     }
 
@@ -177,5 +171,16 @@ public strictfp class Miner {
             rc.move(dir);
             rc.setIndicatorLine(me.add(dir), loc, 0, 255, 0);
         }
+    }
+
+    static MapLocation toEdge(RobotController rc, MapLocation loc, Direction dir) {
+        while (!atEdge(rc, loc)) {
+            loc = loc.add(dir);
+        }
+        return loc;
+    }
+
+    static boolean atEdge(RobotController rc, MapLocation loc) {
+        return loc.x == 0 || loc.x == rc.getMapWidth() - 1 || loc.y == 0 || loc.y == rc.getMapHeight() - 1;
     }
 }
