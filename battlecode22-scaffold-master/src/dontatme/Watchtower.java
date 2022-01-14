@@ -13,6 +13,7 @@ public strictfp class Watchtower {
     //number of droids killed by watchtower
     static RobotController rc;
     static int attackCount = 0;
+    static int turnCount = 0;
     static RobotInfo[] enemies;
 
     public static void run(RobotController robotController) throws GameActionException {
@@ -22,12 +23,14 @@ public strictfp class Watchtower {
 
         //attack
         if (rc.isActionReady()) {
-            RobotInfo ri= getAttack(3, 1, 0, 2);
+            RobotInfo ri= getAttack(3, 1, 0, 2); //droids, buildings, archons miner prio
             if (ri != null) {
                 attackCount++;
                 rc.attack(ri.location);
             }
         }
+
+        turnCount++;
     }
 
     static RobotInfo getAttack(int prio1, int prio2, int prio3, int prio4) throws GameActionException {
@@ -39,25 +42,25 @@ public strictfp class Watchtower {
             int id = robot.getHealth();
             if(rc.getLocation().distanceSquaredTo(robot.location) <= 20){
                 if(type.isBuilding()){
-                    if(type.equals(RobotType.ARCHON)){
+                    if(type.equals(RobotType.ARCHON)){ // archons
                         if(id < minHealth[0]){
                             ml[0] = robot;
                             minHealth[0] = id;
                         }
                     } else{
-                        if(id < minHealth[1]){
+                        if(id < minHealth[1]){ // other buildings
                             ml[1] = robot;
                             minHealth[1] = id;
                         }
                     }
                 } else{
-                    if(type.equals(RobotType.MINER)){
+                    if(type.equals(RobotType.MINER)){ // miners
                         if(id < minHealth[2]){
                             ml[2] = robot;
                             minHealth[2] = id;
                         }
                     } else {
-                        if(id < minHealth[3]){
+                        if(id < minHealth[3]){ // other droids
                             ml[3] = robot;
                             minHealth[3] = id;
                         }
