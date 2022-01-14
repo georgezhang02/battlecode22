@@ -18,7 +18,7 @@ public strictfp class Miner {
     static Pathfinder pathfinder;
 
     private static enum MinerType {
-        None, BaseMiner, CenterMiner, ExpandMiner
+        None, BaseMiner, CenterMiner, ExpandMiner, ExploreMiner
     }
     /**
      * Run a single turn for a Miner.
@@ -26,7 +26,7 @@ public strictfp class Miner {
      */
     static void run(RobotController rc) throws GameActionException {
 
-        if(pathfinder == null){
+        if (pathfinder == null){
             pathfinder = new BFPathing20(rc);
         }
 
@@ -41,9 +41,6 @@ public strictfp class Miner {
 
         MapLocation me = rc.getLocation();
 
-        // Mine around if possible
-        mineAround(rc, me);
-
         // If just spawned, see if miner is the base or center miner
         if (minerType == MinerType.None) {
             if (Communications.getArchonMinerCount(rc, archonID) <= 2) {
@@ -53,7 +50,18 @@ public strictfp class Miner {
             }
         }
 
-        rc.setIndicatorString(Communications.getTeamArchonIndexFromID(rc, archonID)+" ");
+        // Detect enemy archon location
+        for (RobotInfo robot : rc.senseNearbyRobots()) {
+            if (robot.getTeam() != rc.getTeam() && robot.getType() == RobotType.ARCHON) {
+                Communications.setEnemyArchonLocation(rc, robot.getID(), robot.getLocation());
+                System.out.println(robot.getLocation());
+            }
+        }
+
+        // Mine around if possible
+        mineAround(rc, me);
+
+        //rc.setIndicatorString(Communications.getTeamArchonIndexFromID(rc, archonID)+" ");
         // If not on lead
         if (rc.senseLead(me) == 0) {
 
@@ -80,6 +88,9 @@ public strictfp class Miner {
                         case ExpandMiner:
                             //rc.setIndicatorString("Expand Miner");
                             expandMiner(rc, me);
+                            break;
+                        case ExploreMiner:
+                            exploreMiner(rc, me);
                             break;
                         default:
                             break;
@@ -135,9 +146,19 @@ public strictfp class Miner {
 
     static void expandMiner(RobotController rc, MapLocation me) throws GameActionException{
 
-        // Move towards selected location
-        tryMove(rc, me, selectedLocation);
+        // Move towards selected location, when edge is reached, become explore miner
+        if (atEdge(rc, me)) {
+            minerType = MinerType.ExploreMiner;
+        } else {
+            tryMove(rc, me, selectedLocation);
+        }
+    }
 
+    static void exploreMiner(RobotController rc, MapLocation me) throws GameActionException{
+        Direction exploreDir = pathfinder.pathToExplore();
+        if (rc.canMove(exploreDir)) {
+            rc.move(exploreDir);
+        }
     }
 
     static void mineAround(RobotController rc, MapLocation me) throws GameActionException {
