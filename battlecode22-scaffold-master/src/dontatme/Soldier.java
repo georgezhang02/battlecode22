@@ -159,38 +159,51 @@ public strictfp class Soldier {
     static RobotInfo getAttack(int prio1, int prio2, int prio3, int prio4) throws GameActionException {
         RobotInfo[] ml = new RobotInfo[4];
         int[] minHealth = {2000,2000,2000,2000};
+        int[] maxID = {0,0,0,0};
 
         for(RobotInfo robot : enemies){
             RobotType type = robot.getType();
-            int id = robot.getHealth();
+            int health = robot.getHealth();
+            int id = robot.getID();
             if(rc.getLocation().distanceSquaredTo(robot.location) <= 13){
                 if(type.isBuilding()){
                     if(type.equals(RobotType.ARCHON)){
-                        if(id < minHealth[0]){
+                        if(health < minHealth[0]){
                             ml[0] = robot;
-                            minHealth[0] = id;
+                            minHealth[0] = health;
+                        } else if(health == minHealth[0] && id > maxID[0]){
+                            ml[0] = robot;
+                            maxID[0] = id;
                         }
                     } else{
-                        if(id < minHealth[1]){
+                        if(health < minHealth[1]){
                             ml[1] = robot;
-                            minHealth[1] = id;
+                            minHealth[1] = health;
+                        }else if(health == minHealth[1] && id > maxID[1]){
+                            ml[1] = robot;
+                            maxID[1] = id;
                         }
                     }
                 } else{
                     if(type.equals(RobotType.MINER)){
-                        if(id < minHealth[2]){
+                        if(health < minHealth[2]){
                             ml[2] = robot;
-                            minHealth[2] = id;
+                            minHealth[2] = health;
+                        }else if(health == minHealth[2] && id > maxID[2]){
+                            ml[2] = robot;
+                            maxID[2] = id;
                         }
                     } else {
-                        if(id < minHealth[3]){
+                        if(health < minHealth[3]){
                             ml[3] = robot;
-                            minHealth[3] = id;
+                            minHealth[3] = health;
+                        }else if(health == minHealth[3] && id > maxID[3]){
+                            ml[3] = robot;
+                            maxID[3] = id;
                         }
                     }
                 }
             }
-
         }
 
         if(ml[prio1] != null){

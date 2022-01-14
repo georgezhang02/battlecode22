@@ -36,38 +36,51 @@ public strictfp class Watchtower {
     static RobotInfo getAttack(int prio1, int prio2, int prio3, int prio4) throws GameActionException {
         RobotInfo[] ml = new RobotInfo[4];
         int[] minHealth = {2000,2000,2000,2000};
+        int[] maxID = {0,0,0,0};
 
         for(RobotInfo robot : enemies){
             RobotType type = robot.getType();
-            int id = robot.getHealth();
-            if(rc.getLocation().distanceSquaredTo(robot.location) <= 20){
+            int health = robot.getHealth();
+            int id = robot.getID();
+            if(rc.getLocation().distanceSquaredTo(robot.location) <= 13){
                 if(type.isBuilding()){
-                    if(type.equals(RobotType.ARCHON)){ // archons
-                        if(id < minHealth[0]){
+                    if(type.equals(RobotType.ARCHON)){ // Archon prio
+                        if(health < minHealth[0]){ // focus low health targets
                             ml[0] = robot;
-                            minHealth[0] = id;
+                            minHealth[0] = health;
+                        } else if(health == minHealth[0] && id > maxID[0]){ // ties broken by max  ID
+                            ml[0] = robot;
+                            maxID[0] = id;
                         }
-                    } else{
-                        if(id < minHealth[1]){ // other buildings
+                    } else{ // Building prio
+                        if(health < minHealth[1]){
                             ml[1] = robot;
-                            minHealth[1] = id;
+                            minHealth[1] = health;
+                        }else if(health == minHealth[1] && id > maxID[1]){
+                            ml[1] = robot;
+                            maxID[1] = id;
                         }
                     }
                 } else{
-                    if(type.equals(RobotType.MINER)){ // miners
-                        if(id < minHealth[2]){
+                    if(type.equals(RobotType.MINER)){// Miner Prio
+                        if(health < minHealth[2]){
                             ml[2] = robot;
-                            minHealth[2] = id;
+                            minHealth[2] = health;
+                        }else if(health == minHealth[2] && id > maxID[2]){
+                            ml[2] = robot;
+                            maxID[2] = id;
                         }
                     } else {
-                        if(id < minHealth[3]){ // other droids
+                        if(health < minHealth[3]){// droid Prio
                             ml[3] = robot;
-                            minHealth[3] = id;
+                            minHealth[3] = health;
+                        }else if(health == minHealth[3] && id > maxID[3]){
+                            ml[3] = robot;
+                            maxID[3] = id;
                         }
                     }
                 }
             }
-
         }
 
         if(ml[prio1] != null){
