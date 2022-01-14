@@ -13,8 +13,20 @@ public strictfp class Builder {
     //checks if the builder has moved towards the center already
     static boolean movedTowardsCenter = false;
     static boolean hasBuiltTower = false;
+    static Pathfinder pathfinder;
     public static void run(RobotController rc) throws GameActionException {
         //part 1: see if there are any nearby buildings that are in prototype mode
+        searchNonMoveActions(rc);
+        //need to implement mutations for watchtowers
+
+        //now just explore
+        Direction dir = pathfinder.pathToExplore();
+        while (rc.canMove(dir)) {
+            rc.move(dir);
+            searchNonMoveActions(rc);
+        }
+    }
+    static void searchNonMoveActions(RobotController rc) throws GameActionException {
         RobotInfo [] buildings = getNearbyTowers(rc);
         RobotInfo [] protoBuildings = findPrototypeTowers(rc, buildings);
 
@@ -28,12 +40,6 @@ public strictfp class Builder {
         if (buildings[0] != null) {
             repairBuild(rc, buildings);
         }
-
-        //need to implement mutations
-
-        //now just explore
-
-
     }
     static void repairBuild(RobotController rc, RobotInfo [] buildings) throws GameActionException{
         int counter = 0;
