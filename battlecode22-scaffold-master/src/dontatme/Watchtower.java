@@ -11,7 +11,7 @@ public strictfp class Watchtower {
      */
 
     //number of droids killed by watchtower
-    static int killCount = 0;
+    static int attackCount = 0;
 
     public static void run(RobotController rc) throws GameActionException {
         int radius = rc.getType().actionRadiusSquared;
@@ -19,25 +19,12 @@ public strictfp class Watchtower {
         RobotInfo[] enemies = rc.senseNearbyRobots(radius, opponent);
 
         //attack
-        int counter = 0;
-        while (rc.isActionReady() && enemies.length > 0) {
-            MapLocation toAttack = enemies[counter].location;
-            boolean killed = false;
-            if (rc.canAttack(toAttack)) {
-                killed = checkAttackKilled(rc, enemies[0]);
-                rc.attack(toAttack);
+        int position = 0;
+        if (rc.isActionReady() && enemies.length > 0) {
+            if (rc.canAttack(enemies[position].getLocation())) {
+                attackCount++;
+                rc.attack(enemies[position].getLocation());
             }
-            if (killed) {
-                killCount++;
-                counter++;
-            }
-            //don't increment counter if the enemy is not killed -> try and attack them again
         }
-    }
-    static boolean checkAttackKilled(RobotController rc, RobotInfo enemy)
-            throws GameActionException {
-
-        //does the damage of my attack kill the enemy I targeted
-        return rc.getType().getDamage(rc.getLevel()) > enemy.getHealth();
     }
 }
