@@ -6,7 +6,7 @@ import battlecode.common.*;
 public class Communications {
 
     // Indices
-    private static final int ARCHON_TURN = 0;
+    private static final int TURN_INFO = 0;
 
     // TODO: Fix archon ID bug
     private static final int ARCHON_IDS = 1;
@@ -19,22 +19,22 @@ public class Communications {
      * @throws GameActionException
      */
     public static int getArchonTurn(RobotController rc) throws GameActionException {
-        return decode(rc.readSharedArray(ARCHON_TURN), 0);
+        return decode(rc.readSharedArray(TURN_INFO), 0);
     }
 
     public static void incrementArchonTurn(RobotController rc) throws GameActionException {
-        int arrayValue = rc.readSharedArray(ARCHON_TURN);
-        rc.writeSharedArray(ARCHON_TURN, encode(decode(arrayValue, 0) + 1, decode(arrayValue, 1)));
+        int arrayValue = rc.readSharedArray(TURN_INFO);
+        rc.writeSharedArray(TURN_INFO, encode((decode(arrayValue, 0) + 1) % rc.getArchonCount(), decode(arrayValue, 1)));
     }
 
 
     public static int getMinerTurn(RobotController rc) throws GameActionException {
-        return decode(rc.readSharedArray(ARCHON_TURN), 1);
+        return decode(rc.readSharedArray(TURN_INFO), 1);
     }
 
     public static void incrementMinerTurn(RobotController rc, int size) throws GameActionException {
-        int arrayValue = rc.readSharedArray(ARCHON_TURN);
-        rc.writeSharedArray(ARCHON_TURN, encode(decode(arrayValue, 0), (decode(arrayValue, 1) + 1) % size));
+        int arrayValue = rc.readSharedArray(TURN_INFO);
+        rc.writeSharedArray(TURN_INFO, encode(decode(arrayValue, 0), (decode(arrayValue, 1) + 1) % size));
     }
 
 
