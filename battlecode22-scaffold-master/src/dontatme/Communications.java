@@ -26,6 +26,7 @@ public class Communications {
     static int[]commandIndices= new int[4];
     static int[]commands= new int[4];
 
+    //cleans out your previous commands and adds your robot type to the ongoing count
     public static void runStart(RobotController rc) throws GameActionException {
         for(int i = 0; i < totalCommands; i++){
             cleanCommand(rc, commandIndices[i],commands[i]);
@@ -33,6 +34,21 @@ public class Communications {
         totalCommands = 0;
         commandIndices = new int[4];
         commands = new int[4];
+
+        switch(rc.getType()){
+            case ARCHON:
+                wipeCurUnitCounts(rc);
+            break;
+            case MINER:
+                incrementMinerCount(rc);
+                break;
+            case SOLDIER:
+                incrementSoldierCount(rc);
+                break;
+            case BUILDER:
+                incrementBuilderCount(rc);
+                break;
+        }
     }
 
     /**
