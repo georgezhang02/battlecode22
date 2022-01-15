@@ -3,7 +3,6 @@ package dontatme;
 import java.util.Arrays;
 
 import battlecode.common.*;
-import javafx.scene.shape.Arc;
 
 public strictfp class Archon {
 
@@ -49,7 +48,7 @@ public strictfp class Archon {
         Communications.setTeamArchonLocation(rc, id, me);
 
         if(turn ==1){
-            for(int i = 0; i< 4; i++){
+            for(int i = 0; i < 4; i++){
                 Communications.setEnemyArchonLocationByIndex(rc, -1, i, new MapLocation(-1, -1));
             }
         }
@@ -103,7 +102,7 @@ public strictfp class Archon {
             MapLocation[] allLoc = rc.getAllLocationsWithinRadiusSquared(rc.getLocation(), 34);
             boolean found = false;
             for (MapLocation loc : allLoc) {
-                if (rc.senseLead(loc) > 2 && rc.senseRobotAtLocation(loc) == null) {
+                if (rc.senseLead(loc) > 1 && rc.senseRobotAtLocation(loc) == null) {
                     Communications.setArchonVisionLead(rc, id, loc);
                     found = true;
                     break;
@@ -163,8 +162,6 @@ public strictfp class Archon {
                 } else if (soldierCount / rc.getArchonCount() < 5 ){
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
                         buildTowardsLowRubble(rc, RobotType.SOLDIER, turn);
-
-
                     }
                 } else if (minerCount / rc.getArchonCount() < 10 ){
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
