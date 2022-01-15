@@ -47,8 +47,8 @@ public strictfp class Builder {
     static void seeBuildingMutation(RobotController rc, RobotInfo [] buildings) throws GameActionException {
         int counter = 0;
         while (counter < buildings.length && buildings[counter] != null ) {
-            if (buildings[counter].getLevel() == 1) {
-                if (rc.canMutate(buildings[counter].getLocation()) /*&& implement secondary conditoin here*/)
+            if (buildings[counter].getLevel() == 1 && buildings[counter].getType().equals(RobotType.WATCHTOWER)) {
+                if (rc.canMutate(buildings[counter].getLocation()))//also implement watchtower analysis
                     rc.mutate(buildings[counter].getLocation());
             }
             counter++;
