@@ -218,7 +218,7 @@ public strictfp class Soldier {
                 if(attacking){
                     return 100 * (rc.getMapHeight() + rc.getMapWidth()) / 120;
                 } else{
-                    return 100 * (rc.getMapHeight() + rc.getMapWidth()) / 120;
+                    return 10 * (rc.getMapHeight() + rc.getMapWidth()) / 120;
                 }
             case MINER:
                 return 5;
@@ -280,7 +280,7 @@ public strictfp class Soldier {
                 soldierCount++;
             }
         }
-        if(enemyCount >= 2 * soldierCount){
+        if(enemyCount >= 2 * (soldierCount + 1) && enemyCount != 0){
             move(pathfinder.pathAwayFrom(enemyPos));
             attack(attackType);
         }

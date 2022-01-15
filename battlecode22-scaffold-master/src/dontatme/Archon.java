@@ -20,6 +20,10 @@ public strictfp class Archon {
     // gameState 1 for rushing
     static int[] commandCooldown = new int[2];
     static int attackingArchon = -1;
+
+    static RobotInfo[] enemies;
+    static RobotInfo[] allies;
+
     static int commandSentLastTurn = 0;
     // command cooldowns for attacking and defending
 
@@ -32,6 +36,9 @@ public strictfp class Archon {
         turn++;
         commandCooldown[0]--;
         commandCooldown[1]--;
+        Team opponent = rc.getTeam().opponent();
+        enemies = rc.senseNearbyRobots(20, opponent);
+        allies = rc.senseNearbyRobots(20, rc.getTeam());
 
         // Get the archon ID if needed
         if (id == -1) {
@@ -39,17 +46,41 @@ public strictfp class Archon {
         }
 
         // Write archon location if needed
-        if (me == null || !rc.getLocation().equals(me)) {
-            me = rc.getLocation();
-            Communications.setTeamArchonLocation(rc, id, me);
-
-        }
+        me = rc.getLocation();
+        Communications.setTeamArchonLocation(rc, id, me);
 
         if(turn ==1){
             for(int i = 0; i< 4; i++){
                 Communications.setEnemyArchonLocationByIndex(rc, -1, i, new MapLocation(-1, -1));
             }
         }
+
+        // determining whether archon should run away
+        /*
+        int enemyCount = 0;
+        int soldierCount = 0;
+
+        MapLocation[] enemyPos = new MapLocation[5];
+
+        for(RobotInfo robot:enemies){
+            if(robot.getType() == RobotType.SOLDIER){
+                enemyCount++;
+                if(enemyCount < 5){
+                    enemyPos[enemyCount] = robot.getLocation();
+                }
+            }
+        }
+        for(RobotInfo robot: allies){
+            if(robot.getType() == RobotType.SOLDIER){
+                soldierCount++;
+            }
+        }
+        if(enemyCount >= 2 * soldierCount && enemyCount > 2){
+            Direction dir = pathfinder.pathAwayFrom(enemyPos));
+            attack(attackType);
+        }
+        */
+
         
         // If there is lead left, save the first open lead location in the shared array
         MapLocation leadLoc = Communications.getArchonVisionLead(rc, id);
@@ -90,35 +121,51 @@ public strictfp class Archon {
                 gameState = 0;
                 attackingArchon = -1;
             }
-
-
         }
+
+
+
         
         // If there are less than 4 miners per archon
         // Build a miner in any direction (but take turns)
 
-        rc.setIndicatorString(turn % rc.getArchonCount()  +" "+Communications.getTeamArchonIndexFromID(rc, id));
-        if (miners < 4) {
-            if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
+        if(rc.isActionReady()){
+            if(turn == 1){
                 buildTowardsLowRubble(rc, RobotType.MINER, turn);
             }
-        } else if (soldierCount / rc.getArchonCount() < 5 ){
-            if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
-                buildTowardsLowRubble(rc, RobotType.SOLDIER, turn);
+            else if(turn < 5 * rc.getArchonCount()){
+                if (miners < 4 && turn % rc.getArchonCount() == Communications.getTeamArchonIndexFromID(rc,rc.getID())) {
+                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
+                        buildTowardsLowRubble(rc, RobotType.MINER, turn);
+                    }
+                }
+            } else{
+                if (miners < 4) {
+                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
+                        buildTowardsLowRubble(rc, RobotType.MINER, turn);
+                    }
+                } else if (soldierCount / rc.getArchonCount() < 5 ){
+                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
+                        buildTowardsLowRubble(rc, RobotType.SOLDIER, turn);
 
 
+                    }
+                } else if (minerCount / rc.getArchonCount() < 10 ){
+                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
+                        buildTowardsLowRubble(rc, RobotType.MINER, turn);
+                    }
+                } else if (soldierCount/rc.getArchonCount() < 30 ){
+                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
+                        buildTowardsLowRubble(rc, RobotType.SOLDIER, turn);
+
+
+                    }
+                }
             }
-        } else if (minerCount / rc.getArchonCount() < 10 ){
-            if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
-                buildTowardsLowRubble(rc, RobotType.MINER, turn);
-            }
-        } else if (soldierCount/rc.getArchonCount() < 30 ){
-            if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
-                buildTowardsLowRubble(rc, RobotType.SOLDIER, turn);
 
 
-            }
         }
+
 
     }
 
