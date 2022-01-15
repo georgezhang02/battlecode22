@@ -17,7 +17,6 @@ public class Communications {
     private static final int BUILD_OFFSET = 33;
     private static final int ANOMALY = 38;
 
-
     /**
      * @return the archon that should be active in the alternating turn system
      * @throws GameActionException
@@ -193,6 +192,45 @@ public class Communications {
             }
         }
         return -1;
+    }
+
+    
+
+
+
+    public static class AttackCommand
+    {
+        public MapLocation location; 
+        public RobotType type;  
+        public int ID;
+
+        public AttackCommand(MapLocation location, RobotType type, int ID) {
+            this.location = location;
+            this.type = type;
+            this.ID = ID;
+        }
+    };
+
+    public static void sendAttackCommand(RobotController rc, MapLocation location, RobotType t, int ID) {
+        
+    }
+
+    public static AttackCommand[] getAttackCommands(RobotController rc) throws GameActionException{
+        AttackCommand[] commands = new AttackCommand[10];
+        for (int i = 0; i < 10; i++) {
+            
+            int arrayValue = rc.readSharedArray(i + ATTACK_OFFSET);
+            
+            MapLocation attackLocation = new MapLocation(decode(arrayValue, 0), decode(arrayValue, 1));
+            
+            int targetTypeOrdinal = decode(arrayValue, 2);
+            RobotType targetType = RobotType.values()[targetTypeOrdinal];
+            
+            int ID = decode(arrayValue, 3);
+            commands[i] = new AttackCommand(attackLocation, targetType, ID);
+        }
+
+        return commands;
     }
 
     /**
