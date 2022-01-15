@@ -20,14 +20,18 @@ public strictfp class Miner {
 
     static RobotInfo[] robotInfo;
 
+    static int commandCooldown = 0;
+
     private static enum MinerType {
         None, BaseMiner, CenterMiner, ExpandMiner, ExploreMiner, RunningMiner
     }
+
     /**
      * Run a single turn for a Miner.
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
      */
     static void run(RobotController rc) throws GameActionException {
+        commandCooldown --;
 
         if (pathfinder == null){
             pathfinder = new BFPathing20(rc);
@@ -43,6 +47,8 @@ public strictfp class Miner {
                 }
             }
         }
+
+
 
         MapLocation me = rc.getLocation();
 
@@ -85,9 +91,13 @@ public strictfp class Miner {
             rc.setIndicatorString("Running Away");
             Direction dir = pathfinder.pathAwayFrom(nearbyEnemies);
 
-
             if(rc.canMove(dir)){
                 rc.move(dir);
+            }
+
+            if(index > 1 && commandCooldown <0){
+                Communications.sendDefenseCommand(rc,rc.getLocation(), RobotType.MINER, rc.getID());
+                commandCooldown = 5;
             }
         }
         // run away from nearby enemies

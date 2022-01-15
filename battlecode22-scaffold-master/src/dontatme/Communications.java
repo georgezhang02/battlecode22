@@ -176,7 +176,7 @@ public class Communications {
         for(int i = 0; i< GameConstants.MAX_STARTING_ARCHONS; i++){
             int arrayValue = rc.readSharedArray(i + ENEMY_ARCHON_OFFSET);
             int arrID = decode(arrayValue,2);
-            if(arrID == archonID || arrID == 0){
+            if(arrID == archonID || arrayValue == -1){
                 rc.writeSharedArray(i + ENEMY_ARCHON_OFFSET, writeValue);
                 return;
 
@@ -184,17 +184,28 @@ public class Communications {
         }
     }
 
+    public static void setEnemyArchonLocationByIndex(RobotController rc, int archonID, int index, MapLocation archonLocation) throws GameActionException {
+        if (!(index >= 0 && index < GameConstants.MAX_STARTING_ARCHONS)) {
+            throw new IllegalArgumentException();
+        }
+        int writeValue = encode(archonLocation.x, archonLocation.y, archonID);
+        rc.writeSharedArray(index + ENEMY_ARCHON_OFFSET, writeValue);
+
+    }
+
     public static int getEnemyArchonIndexFromID(RobotController rc, int archonID) throws GameActionException {
         for(int i = 0; i < GameConstants.MAX_STARTING_ARCHONS; i++) {
             int arrayValue = rc.readSharedArray(i + ENEMY_ARCHON_OFFSET);
-            if(arrayValue != 0 && decode(arrayValue, 2) != 0){
+            if(arrayValue != 0 && decode(arrayValue, 2) != -1){
                 return i;
             }
         }
         return -1;
     }
 
-    
+    public static int getEnemyArchonIDFromIndex(RobotController rc, int index) throws GameActionException {
+        return decode(rc.readSharedArray(index + ENEMY_ARCHON_OFFSET), 2);
+    }
 
 
 
