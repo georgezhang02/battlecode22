@@ -17,7 +17,6 @@ public strictfp class Builder {
     public static void run(RobotController rc) throws GameActionException {
         //part 1: see if there are any nearby buildings that are in prototype mode
         searchNonMoveActions(rc);
-        //need to implement mutations for watchtowers
 
         //now just explore
         Direction dir = pathfinder.pathToExplore();
@@ -35,10 +34,24 @@ public strictfp class Builder {
             int counter = 0;
             repairBuild(rc, protoBuildings);
         }
+        //check if there's a level 1 building that can be mutated
+        if (buildings[0] != null ) {
+            seeBuildingMutation(rc, buildings);
+        }
         //means that there is a nearby building
         //check if it can be repaired
         if (buildings[0] != null) {
             repairBuild(rc, buildings);
+        }
+    }
+    static void seeBuildingMutation(RobotController rc, RobotInfo [] buildings) throws GameActionException {
+        int counter = 0;
+        while (counter < buildings.length && buildings[counter] != null ) {
+            if (buildings[counter].getLevel() == 1) {
+                if (rc.canMutate(buildings[counter].getLocation()) && /*implement secondary conditoin here*/)
+                    rc.mutate(buildings[counter].getLocation());
+            }
+            counter++;
         }
     }
     static void repairBuild(RobotController rc, RobotInfo [] buildings) throws GameActionException{
