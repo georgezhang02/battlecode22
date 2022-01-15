@@ -219,23 +219,25 @@ public class Communications {
      * (each command is guaranteed one full turn).
      * Archons can overwrite non-archon commands, regardless of turn.
      * 
+     * @return a boolean of whether the command was succesfully published 
      * @throws GameActionException
      */
-    public static void sendAttackCommand(RobotController rc, MapLocation location, RobotType t, int id) throws GameActionException {
+    public static boolean sendAttackCommand(RobotController rc, MapLocation location, RobotType t, int id) throws GameActionException {
         int newCommand = encode(location.x, location.y, t.ordinal(), id, rc.getRoundNum());
         Command[] currentCommands = getAttackCommands(rc);
         
         for (int i = 0; i < 10; i++) {
             if (rc.getRoundNum() > currentCommands[i].round + 1) {
                 rc.writeSharedArray(i + ATTACK_OFFSET, newCommand);
-                return;
+                return true;
             } 
             // archon can overwrite non-archon commands
             else if (currentCommands[i].id > 10000 && id < 10000) {
                 rc.writeSharedArray(i + ATTACK_OFFSET, newCommand);
-                return;
+                return true;
             }
         }
+        return false;
     }
 
     /**
@@ -268,23 +270,25 @@ public class Communications {
      * (each command is guaranteed one full turn).
      * Archons can overwrite non-archon commands, regardless of turn.
      * 
+     * @return a boolean of whether the command was succesfully published 
      * @throws GameActionException
      */
-    public static void sendDefenseCommand(RobotController rc, MapLocation location, RobotType t, int id) throws GameActionException {
+    public static boolean sendDefenseCommand(RobotController rc, MapLocation location, RobotType t, int id) throws GameActionException {
         int newCommand = encode(location.x, location.y, t.ordinal(), id, rc.getRoundNum());
         Command[] currentCommands = getDefenseCommand(rc);
         
         for (int i = 0; i < 10; i++) {
             if (rc.getRoundNum() > currentCommands[i].round + 1) {
                 rc.writeSharedArray(i + DEFENSE_OFFSET, newCommand);
-                return;
+                return true;
             } 
             // archon can overwrite non-archon commands
             else if (currentCommands[i].id > 10000 && id < 10000) {
                 rc.writeSharedArray(i + DEFENSE_OFFSET, newCommand);
-                return;
+                return true;
             }
         }
+        return false;
     }
 
     /**
