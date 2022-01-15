@@ -13,21 +13,14 @@ public class Communications {
     private static final int FRIENDLY_ARCHON_OFFSET = 1;
     private static final int ENEMY_ARCHON_OFFSET = 5;
     private static final int LEAD_OFFSET = 9;
-    private static final int ATTACK_OFFSET = 13;
-    private static final int DEFENSE_OFFSET = 23;
-    private static final int BUILD_OFFSET = 33;
+    public static final int ATTACK_OFFSET = 13;
+    public  static final int DEFENSE_OFFSET = 23;
+    public static final int BUILD_OFFSET = 33;
     private static final int ANOMALY = 38;
     private static final int NEXT_INDICES = 61;
     private static final int UNIT_COUNT_OFFSET = 62;
 
-    private static int lastCommandIndex= -1;
-
-    private static Command lastCommand = null;
-
-
-
-
-
+    private static final int NULL_LOCATION = 61;
 
     /**
      * @return the archon that should be active in the alternating turn system
@@ -227,26 +220,23 @@ public class Communications {
     {
         public MapLocation location; 
         public RobotType type;  
-        public int id;
-        public int round;
 
-        public Command(MapLocation location, RobotType type, int id, int round) {
+
+        public Command(MapLocation location, RobotType type) {
             this.location = location;
             this.type = type;
-            this.id= id;
-            this.round = round;
         }
 
         @Override
         public boolean equals(Object o) {
             if (o == null) return false;
             Command command = (Command) o;
-            return id == command.id && round == command.round && Objects.equals(location, command.location) && type == command.type;
+            return Objects.equals(location, command.location) && type == command.type;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(location, type, id, round);
+            return Objects.hash(location, type);
         }
     };
 
@@ -259,20 +249,16 @@ public class Communications {
      * @return a boolean of whether the command was succesfully published 
      * @throws GameActionException
      */
-    public static boolean sendAttackCommand(RobotController rc, MapLocation location, RobotType t, int id) throws GameActionException {
-        int newCommand = encode(location.x, location.y, t.ordinal(), id, rc.getRoundNum());
+    public static boolean sendAttackCommand(RobotController rc, MapLocation location, RobotType t) throws GameActionException {
+        int newCommand = encode(location.x, location.y, t.ordinal(),rc.getRoundNum());
         Command[] currentCommands = getAttackCommands(rc);
-        
-        for (int i = 0; i < 10; i++) {
-            if (rc.getRoundNum() > currentCommands[i].round + 1) {
-                rc.writeSharedArray(i + ATTACK_OFFSET, newCommand);
-                return true;
-            } 
-            // archon can overwrite non-archon commands
-            else if (currentCommands[i].id > 10000 && id < 10000) {
-                rc.writeSharedArray(i + ATTACK_OFFSET, newCommand);
-                return true;
-            }
+
+        int nextIndex = getNextAttackIndex(rc);
+        int readVal = rc.readSharedArray(nextIndex);
+        if(decode(readVal, 0) == NULL_LOCATION || rc.getType().equals(RobotType.ARCHON) ){
+            rc.writeSharedArray(nextIndex, newCommand);
+            incrementAttackIndex(rc);
+            return true;
         }
         return false;
     }
@@ -301,20 +287,16 @@ public class Communications {
      * @return a boolean of whether the command was succesfully published 
      * @throws GameActionException
      */
-    public static boolean sendDefenseCommand(RobotController rc, MapLocation location, RobotType t, int id) throws GameActionException {
-        int newCommand = encode(location.x, location.y, t.ordinal(), id, rc.getRoundNum());
-        Command[] currentCommands = getDefenseCommand(rc);
-        
-        for (int i = 0; i < 10; i++) {
-            if (rc.getRoundNum() > currentCommands[i].round + 1) {
-                rc.writeSharedArray(i + DEFENSE_OFFSET, newCommand);
-                return true;
-            } 
-            // archon can overwrite non-archon commands
-            else if (currentCommands[i].id > 10000 && id < 10000) {
-                rc.writeSharedArray(i + DEFENSE_OFFSET, newCommand);
-                return true;
-            }
+    public static boolean sendDefenseCommand(RobotController rc, MapLocation location, RobotType t) throws GameActionException {
+        int newCommand = encode(location.x, location.y, t.ordinal(),rc.getRoundNum());
+        Command[] currentCommands = getAttackCommands(rc);
+
+        int nextIndex = getNextAttackIndex(rc);
+        int readVal = rc.readSharedArray(nextIndex);
+        if(decode(readVal, 0) == NULL_LOCATION || rc.getType().equals(RobotType.ARCHON) ){
+            rc.writeSharedArray(nextIndex, newCommand);
+            incrementAttackIndex(rc);
+            return true;
         }
         return false;
     }
@@ -461,12 +443,13 @@ public class Communications {
         MapLocation location = new MapLocation(decode(arrayValue, 0), decode(arrayValue, 1));
 
         int targetTypeOrdinal = decode(arrayValue, 2);
-        RobotType targetType = RobotType.values()[targetTypeOrdinal];
+        RobotType targetType = null;
+        if(targetTypeOrdinal < 6 ){
+            targetType = RobotType.values()[targetTypeOrdinal];
+        }
 
-        int id = decode(arrayValue, 3);
-        int round = decode(arrayValue, 4);
 
-        return new Command(location, targetType, id, round);
+        return new Command(location, targetType);
     }
 
 
@@ -477,7 +460,7 @@ public class Communications {
     public static boolean cleanCommand(RobotController rc, int index, Command command) throws GameActionException {
         if(index != -1){
             if(getCommandFromArray(rc, index).equals(command)){
-                rc.writeSharedArray(index, 0);
+                rc.writeSharedArray(index, 61);
             }
         }
         return true;
