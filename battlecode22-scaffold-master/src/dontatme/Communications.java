@@ -228,6 +228,12 @@ public class Communications {
         for (int i = 0; i < 10; i++) {
             if (rc.getRoundNum() > currentCommands[i].round + 1) {
                 rc.writeSharedArray(i + ATTACK_OFFSET, newCommand);
+                return;
+            } 
+            // archon can overwrite non-archon commands
+            else if (currentCommands[i].id > 10000 && id < 10000) {
+                rc.writeSharedArray(i + ATTACK_OFFSET, newCommand);
+                return;
             }
         }
     }
@@ -271,10 +277,12 @@ public class Communications {
         for (int i = 0; i < 10; i++) {
             if (rc.getRoundNum() > currentCommands[i].round + 1) {
                 rc.writeSharedArray(i + DEFENSE_OFFSET, newCommand);
+                return;
             } 
             // archon can overwrite non-archon commands
             else if (currentCommands[i].id > 10000 && id < 10000) {
                 rc.writeSharedArray(i + DEFENSE_OFFSET, newCommand);
+                return;
             }
         }
     }
