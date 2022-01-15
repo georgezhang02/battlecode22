@@ -22,6 +22,19 @@ public class Communications {
 
     private static final int NULL_LOCATION = 61;
 
+    static int totalCommands = 0;
+    static int[]commandIndices= new int[4];
+    static int[]commands= new int[4];
+
+    public static void runStart(RobotController rc) throws GameActionException {
+        for(int i = 0; i < totalCommands; i++){
+            cleanCommand(rc, commandIndices[i],commands[i]);
+        }
+        totalCommands = 0;
+        commandIndices = new int[4];
+        commands = new int[4];
+    }
+
     /**
      * @return the archon that should be active in the alternating turn system
      * @throws GameActionException
@@ -253,11 +266,16 @@ public class Communications {
         int newCommand = encode(location.x, location.y, t.ordinal(),rc.getRoundNum());
         Command[] currentCommands = getAttackCommands(rc);
 
-        int nextIndex = getNextAttackIndex(rc);
+        int nextIndex = getNextAttackIndex(rc) + ATTACK_OFFSET;
         int readVal = rc.readSharedArray(nextIndex);
         if(decode(readVal, 0) == NULL_LOCATION || rc.getType().equals(RobotType.ARCHON) ){
             rc.writeSharedArray(nextIndex, newCommand);
             incrementAttackIndex(rc);
+
+            commandIndices[totalCommands] = nextIndex;
+            commands[totalCommands] = newCommand;
+            totalCommands ++;
+
             return true;
         }
         return false;
@@ -291,11 +309,16 @@ public class Communications {
         int newCommand = encode(location.x, location.y, t.ordinal(),rc.getRoundNum());
         Command[] currentCommands = getAttackCommands(rc);
 
-        int nextIndex = getNextAttackIndex(rc);
+        int nextIndex = getNextAttackIndex(rc) + DEFENSE_OFFSET;
         int readVal = rc.readSharedArray(nextIndex);
         if(decode(readVal, 0) == NULL_LOCATION || rc.getType().equals(RobotType.ARCHON) ){
             rc.writeSharedArray(nextIndex, newCommand);
             incrementAttackIndex(rc);
+
+            commandIndices[totalCommands] = nextIndex;
+            commands[totalCommands] = newCommand;
+            totalCommands++;
+
             return true;
         }
         return false;
@@ -457,9 +480,9 @@ public class Communications {
     /**
      * Cleans out the command from the shared array given that it is equal to the given command.
      */
-    public static boolean cleanCommand(RobotController rc, int index, Command command) throws GameActionException {
+    public static boolean cleanCommand(RobotController rc, int index, int command) throws GameActionException {
         if(index != -1){
-            if(getCommandFromArray(rc, index).equals(command)){
+            if(rc.readSharedArray(index) == command){
                 rc.writeSharedArray(index, 61);
             }
         }
