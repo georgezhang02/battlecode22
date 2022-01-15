@@ -198,47 +198,25 @@ public class Communications {
 
 
 
-    public static class Command
+    public static class AttackCommand
     {
         public MapLocation location; 
         public RobotType type;  
-        public int id;
-        public int round;
+        public int ID;
 
-        public Command(MapLocation location, RobotType type, int id, int round) {
+        public AttackCommand(MapLocation location, RobotType type, int ID) {
             this.location = location;
             this.type = type;
-            this.id= id;
-            this.round = round;
+            this.ID = ID;
         }
     };
 
-    /**
-     * Send a command to attack (map location, robot type, robot id).
-     * Commands are only overwriteable after one full turn
-     * (each command is guaranteed one full turn).
-     * Archons can overwrite non-archon commands, regardless of turn.
-     * 
-     * @throws GameActionException
-     */
-    public static void sendAttackCommand(RobotController rc, MapLocation location, RobotType t, int id) throws GameActionException {
-        int newCommand = encode(location.x, location.y, t.ordinal(), id, rc.getRoundNum());
-        Command[] currentCommands = getAttackCommands(rc);
+    public static void sendAttackCommand(RobotController rc, MapLocation location, RobotType t, int ID) {
         
-        for (int i = 0; i < 10; i++) {
-            if (rc.getRoundNum() > currentCommands[i].round + 1) {
-                rc.writeSharedArray(i + ATTACK_OFFSET, newCommand);
-            }
-        }
     }
 
-    /**
-     * Retrieve all attack commands (use turn to determine turn)
-     * 
-     * @throws GameActionException
-     */
-    public static Command[] getAttackCommands(RobotController rc) throws GameActionException{
-        Command[] commands = new Command[10];
+    public static AttackCommand[] getAttackCommands(RobotController rc) throws GameActionException{
+        AttackCommand[] commands = new AttackCommand[10];
         for (int i = 0; i < 10; i++) {
             
             int arrayValue = rc.readSharedArray(i + ATTACK_OFFSET);
@@ -248,56 +226,8 @@ public class Communications {
             int targetTypeOrdinal = decode(arrayValue, 2);
             RobotType targetType = RobotType.values()[targetTypeOrdinal];
             
-            int id = decode(arrayValue, 3);
-            int round = decode(arrayValue, 4);
-            commands[i] = new Command(attackLocation, targetType, id, round);
-        }
-
-        return commands;
-    }
-
-    /**
-     * Send a command to defend (map location, robot type, robot id)
-     * Commands are only overwriteable after one full turn 
-     * (each command is guaranteed one full turn).
-     * Archons can overwrite non-archon commands, regardless of turn.
-     * 
-     * @throws GameActionException
-     */
-    public static void sendDefenseCommand(RobotController rc, MapLocation location, RobotType t, int id) throws GameActionException {
-        int newCommand = encode(location.x, location.y, t.ordinal(), id, rc.getRoundNum());
-        Command[] currentCommands = getDefenseCommand(rc);
-        
-        for (int i = 0; i < 10; i++) {
-            if (rc.getRoundNum() > currentCommands[i].round + 1) {
-                rc.writeSharedArray(i + DEFENSE_OFFSET, newCommand);
-            } 
-            // archon can overwrite non-archon commands
-            else if (currentCommands[i].id > 10000 && id < 10000) {
-                rc.writeSharedArray(i + DEFENSE_OFFSET, newCommand);
-            }
-        }
-    }
-
-    /**
-     * Retrieve all defend commands (use turn to determine turn)
-     * 
-     * @throws GameActionException
-     */ 
-    public static Command[] getDefenseCommand(RobotController rc) throws GameActionException{
-        Command[] commands = new Command[10];
-        for (int i = 0; i < 10; i++) {
-            
-            int arrayValue = rc.readSharedArray(i + DEFENSE_OFFSET);
-            
-            MapLocation defenseLocation = new MapLocation(decode(arrayValue, 0), decode(arrayValue, 1));
-            
-            int targetTypeOrdinal = decode(arrayValue, 2);
-            RobotType targetType = RobotType.values()[targetTypeOrdinal];
-            
-            int id = decode(arrayValue, 3);
-            int round = decode(arrayValue, 4);
-            commands[i] = new Command(defenseLocation, targetType, id, round);
+            int ID = decode(arrayValue, 3);
+            commands[i] = new AttackCommand(attackLocation, targetType, ID);
         }
 
         return commands;
