@@ -2,6 +2,8 @@ package dontatme;
 
 import battlecode.common.*;
 
+import java.awt.*;
+
 public strictfp class Soldier {
     /**
      * Run a single turn for a Soldier.
@@ -10,32 +12,75 @@ public strictfp class Soldier {
 
     static Pathfinder pathfinder;
 
-    static int state;
+    static int state = -1;
     static RobotInfo[] enemies;
+    static RobotInfo[] allies;
 
     static MapLocation curTarget;
+    static MapLocation archonDef;
 
     static RobotController rc;
 
     static int commandID = -1;
+    static boolean rusher;
+
+    static Direction[] directions = {
+            Direction.NORTH,
+            Direction.WEST,
+            Direction.EAST,
+            Direction.SOUTH,
+            Direction.NORTHWEST,
+            Direction.NORTHEAST,
+            Direction.SOUTHWEST,
+            Direction.SOUTHEAST
+
+    };
+
 
     public Soldier (RobotController rc) throws GameActionException {
         this.rc = rc;
         pathfinder = new BFPathing20(rc);
-        state = 2;
+
+        if(Math.random() > .5){
+            rusher = false;
+            state = 2;
+        } else{
+            rusher = true;
+            int x = (int) (2 * Math.random()) ;
+            int y = (int) (2 * Math.random()) ;
+
+            if(2 * Math.random() >= 1){
+                x = -x;
+            }
+            if(2 * Math.random() >= 1){
+                y = -y;
+            }
+            x = rc.getLocation().x + x;
+            y = rc.getLocation().y + y;
+
+            x = Math.max(0, Math.min(x, rc.getMapWidth()-1));
+            y = Math.max(0, Math.min(y, rc.getMapHeight()-1));
+
+            curTarget = new MapLocation(x, y);
+
+            state = 5;
+        }
     }
 
     public void run() throws GameActionException {
         //readComms();
         Team opponent = rc.getTeam().opponent();
         enemies = rc.senseNearbyRobots(20, opponent);
+        allies = rc.senseNearbyRobots(20, rc.getTeam());
+
+
 
         switch (state){
             case 0: // Attacking
                 offense(curTarget, 4);
                 break;
             case 1: //Defending
-                defense(curTarget);
+                defense(curTarget, 6);
                 break;
             case 2: //Exploring
                 explore();
@@ -43,7 +88,12 @@ public strictfp class Soldier {
             case 3: //Pursuing
                 offense(curTarget, 1);
                 break;
-            case 4: //Prep for anomaly
+            case 4: // Rushing Enemy Archon
+                break;
+            case 5: // Defending Own Archon
+                defense(curTarget, 8);
+                break;
+            case 6: //Prep for anomaly
                 prepForAnomaly(AnomalyType.ABYSS);
                 break;
 
@@ -83,7 +133,7 @@ public strictfp class Soldier {
     }
     static void offense(MapLocation target, int attackType) throws GameActionException {
         rc.setIndicatorString("offense"+Clock.getBytecodesLeft());
-        if(target != null && !pathfinder.targetWithinRadius(target, 2)){
+        if(target != null && !pathfinder.targetWithinRadius(target, 6)){
             move(pathfinder.pathToTarget(target, false));
             attack(attackType);
 
@@ -101,13 +151,17 @@ public strictfp class Soldier {
 
     }
 
-    static void defense(MapLocation target) throws GameActionException {
+    static void defense(MapLocation target, int minDistance) throws GameActionException {
         rc.setIndicatorString("defense "+Clock.getBytecodesLeft());
-        if(!pathfinder.targetWithinRadius(target, 6)){
+        if(target != null && !pathfinder.targetWithinRadius(target, minDistance)){
             move(pathfinder.pathToTarget(target, false));
         } else{
+            Direction dir = directions[(int)(Math.random() * 8)];
+            if(rc.canMove(dir)){
+                rc.move(dir);
+            }
             MapLocation ml = attack(1);
-            if(ml== null){
+            if(ml== null && !rusher){
                 state = 2;
             }
         }
@@ -116,10 +170,14 @@ public strictfp class Soldier {
 
     static void explore() throws GameActionException {
         rc.setIndicatorString("explore "+Clock.getBytecodesLeft());
+
         if(!pathfinder.exploring){
             curTarget = null;
         }
+
+
         move(pathfinder.pathToExplore());
+        rc.setIndicatorLine(rc.getLocation(), pathfinder.explorer.target, 255,255,0);
 
         MapLocation ml = attack(1);
 
@@ -131,25 +189,27 @@ public strictfp class Soldier {
 
     static MapLocation attack(int attackType) throws GameActionException {
 
-        if(rc.isActionReady()){
-            RobotInfo attackLoc;
 
-            if(attackType == 0){ // attack all
-                attackLoc = getAttack(3, 1, 0, 2);
-            } else if(attackType == 1){ //attack droids
-                attackLoc = getAttack(3, 2, 1, 0);
-            }  else if (attackType == 3){// attack army (soldiers/sages/builders)
-                attackLoc = getAttack(3, 1, 2, 0);
-            } else if (attackType == 4){ // attack archon
-                attackLoc = getAttack(0, 3, 1, 2);
-            } else { // attack eco
-                attackLoc = getAttack(2, 1, 3, 0);
-            }
-            if(attackLoc!= null && rc.canAttack(attackLoc.getLocation())){
-                rc.attack(attackLoc.getLocation());
+        RobotInfo attackLoc;
 
-                return attackLoc.getLocation();
-            }
+        if(attackType == 0){ // attack all
+            attackLoc = getAttack(3, 1, 0, 2);
+        } else if(attackType == 1){ //attack droids
+            attackLoc = getAttack(3, 2, 1, 0);
+        }  else if (attackType == 3){// attack army (soldiers/sages/builders)
+            attackLoc = getAttack(3, 1, 2, 0);
+        } else if (attackType == 4){ // attack archon
+            attackLoc = getAttack(0, 3, 1, 2);
+        } else { // attack eco
+            attackLoc = getAttack(2, 1, 3, 0);
+        }
+        if(attackLoc!= null && rc.canAttack(attackLoc.getLocation())){
+            rc.attack(attackLoc.getLocation());
+
+
+        }
+        if(attackLoc != null){
+            return attackLoc.getLocation();
         }
         return null;
     }

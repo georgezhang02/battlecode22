@@ -52,8 +52,6 @@ public strictfp class Archon {
         // If there are less than 4 miners per archon
         // Build a miner in any direction (but take turns)
 
-
-
         if (turn == 1 ||  rc.getTeamLeadAmount(rc.getTeam()) >= 150 || rc.getArchonCount() == 1 ||
                 turn % rc.getArchonCount()  == Communications.getTeamArchonIndexFromID(rc, id) ) {
             rc.setIndicatorString(turn % rc.getArchonCount()  +" "+Communications.getTeamArchonIndexFromID(rc, id));

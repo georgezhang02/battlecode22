@@ -1,5 +1,6 @@
 package dontatme;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,8 +18,10 @@ public strictfp class Miner {
 
     static Pathfinder pathfinder;
 
+    static RobotInfo[] robotInfo;
+
     private static enum MinerType {
-        None, BaseMiner, CenterMiner, ExpandMiner, ExploreMiner
+        None, BaseMiner, CenterMiner, ExpandMiner, ExploreMiner, RunningMiner
     }
     /**
      * Run a single turn for a Miner.
@@ -30,9 +33,11 @@ public strictfp class Miner {
             pathfinder = new BFPathing20(rc);
         }
 
+        robotInfo = rc.senseNearbyRobots();
+
         // Save the index of the archon the miner spawned from
         if (archonID == -1) {
-            for (RobotInfo info : rc.senseNearbyRobots()) {
+            for (RobotInfo info : robotInfo) {
                 if (info.getType() == RobotType.ARCHON) {
                     archonID = info.getID();
                 }
@@ -43,30 +48,53 @@ public strictfp class Miner {
 
         // If just spawned, see if miner is the base or center miner
         if (minerType == MinerType.None) {
-            if (Communications.getArchonMinerCount(rc, archonID) <= 2) {
+            int minerCount = Communications.getArchonMinerCount(rc, archonID);
+            if ( minerCount <= 2) {
                 minerType = MinerType.BaseMiner;
-            } else {
+            } else if (minerCount <= 6) {
                 minerType = MinerType.CenterMiner;
+            } else {
+                minerType = MinerType.ExploreMiner;
             }
         }
 
+        MapLocation[]nearbyEnemies = new MapLocation[10];
+        int index = 0;
+
         // Detect enemy archon location
-        for (RobotInfo robot : rc.senseNearbyRobots()) {
-            if (robot.getTeam() != rc.getTeam() && robot.getType() == RobotType.ARCHON) {
-                Communications.setEnemyArchonLocation(rc, robot.getID(), robot.getLocation());
-                System.out.println(robot.getLocation());
+        for (RobotInfo robot : robotInfo) {
+
+            if (robot.getTeam() != rc.getTeam()) {
+                if(robot.getType() == RobotType.ARCHON){
+                    Communications.setEnemyArchonLocation(rc, robot.getID(), robot.getLocation());
+                } else if(index < 10 && (robot.getType() == RobotType.SOLDIER || robot.getType() == RobotType.SAGE
+                        || robot.getType() == RobotType.WATCHTOWER)){
+                    nearbyEnemies[index] = robot.getLocation();
+                    index++;
+
+                }
+
+
             }
         }
 
         // Mine around if possible
         mineAround(rc, me);
 
-        //rc.setIndicatorString(Communications.getTeamArchonIndexFromID(rc, archonID)+" ");
-        // If not on lead
-        if (rc.senseLead(me) == 0) {
+        if(index > 0){
+            rc.setIndicatorString("Running Away");
+            Direction dir = pathfinder.pathAwayFrom(nearbyEnemies);
+
+
+            if(rc.canMove(dir)){
+                rc.move(dir);
+            }
+        }
+        // run away from nearby enemies
+        else if (rc.senseLead(me) <= 2) {
 
             // If the current heading still has lead and no miners, go there
-            if (heading != null && rc.canSenseLocation(heading) && rc.senseLead(heading) > 0 && !rc.isLocationOccupied(heading)) {
+            if (heading != null && rc.canSenseLocation(heading) && rc.senseLead(heading) > 2 && !rc.isLocationOccupied(heading)) {
                 tryMove(rc, me, heading);
             }
 
@@ -77,19 +105,22 @@ public strictfp class Miner {
                 // If no lead within vision, run code based on miner type
                 if (heading == null) {
                     switch (minerType) {
+
                         case BaseMiner:
-                            //rc.setIndicatorString("Base Miner");
+                            rc.setIndicatorString("Base Miner");
                             baseMiner(rc, me);
                             break;
                         case CenterMiner:
-                            //rc.setIndicatorString("Center Miner");
-                            centerMiner(rc, me);
+                            rc.setIndicatorString("Center Miner");
+                            exploreMiner(rc, me);
                             break;
                         case ExpandMiner:
-                            //rc.setIndicatorString("Expand Miner");
-                            expandMiner(rc, me);
+                            rc.setIndicatorString("Expand Miner");
+
+                            exploreMiner(rc, me);
                             break;
                         case ExploreMiner:
+                            rc.setIndicatorString("Explore Miner");
                             exploreMiner(rc, me);
                             break;
                         default:
@@ -99,6 +130,7 @@ public strictfp class Miner {
             }
         }
     }
+
 
     static void baseMiner(RobotController rc, MapLocation me) throws GameActionException {
 
@@ -110,7 +142,7 @@ public strictfp class Miner {
 
         // If no more resources left, become center miner
         else {
-            minerType = MinerType.CenterMiner;
+            minerType = MinerType.ExploreMiner;
         }
     }
 
@@ -168,7 +200,7 @@ public strictfp class Miner {
                 while (rc.canMineGold(mineLocation)) {
                     rc.mineGold(mineLocation);
                 }
-                while (rc.canMineLead(mineLocation)) {
+                while (rc.canMineLead(mineLocation) &&  rc.senseLead(mineLocation) > 2) {
                     rc.mineLead(mineLocation);
                 }
             }
@@ -177,8 +209,10 @@ public strictfp class Miner {
     }
 
     static MapLocation goTowardsNearbyLead(RobotController rc, MapLocation me, MapLocation[] leads) throws GameActionException {
+
         for (MapLocation lead : leads) {
-            if (!rc.isLocationOccupied(lead)) {
+            if (!rc.isLocationOccupied(lead) && rc.senseLead(lead) > 2) {
+
                 tryMove(rc, me, lead);
                 return lead;
             }
@@ -188,7 +222,7 @@ public strictfp class Miner {
 
     static void tryMove(RobotController rc, MapLocation me, MapLocation loc) throws GameActionException {
         Direction dir = pathfinder.pathToTarget(loc,false);
-        if (rc.canMove(dir)) {
+        if (dir != null && rc.canMove(dir)) {
             rc.move(dir);
             rc.setIndicatorLine(me.add(dir), loc, 0, 255, 0);
         }
