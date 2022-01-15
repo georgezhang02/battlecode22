@@ -82,14 +82,16 @@ public strictfp class Soldier {
 
     }
     static void offense(MapLocation target, int attackType) throws GameActionException {
-        rc.setIndicatorString("offense");
-        if(target!=null && !pathfinder.targetWithinRadius(target, 2)){
+        rc.setIndicatorString("offense"+Clock.getBytecodesLeft());
+        if(target != null && !pathfinder.targetWithinRadius(target, 2)){
             move(pathfinder.pathToTarget(target, false));
             attack(attackType);
 
         }  else{
+
             MapLocation ml = attack(attackType);
             if(ml!= null){
+
                 curTarget = ml;
             } else{
                 state = 2;
@@ -100,8 +102,8 @@ public strictfp class Soldier {
     }
 
     static void defense(MapLocation target) throws GameActionException {
-        rc.setIndicatorString("defense");
-        if(!pathfinder.targetWithinRadius(target, 2)){
+        rc.setIndicatorString("defense "+Clock.getBytecodesLeft());
+        if(!pathfinder.targetWithinRadius(target, 6)){
             move(pathfinder.pathToTarget(target, false));
         } else{
             MapLocation ml = attack(1);
@@ -113,14 +115,11 @@ public strictfp class Soldier {
 
 
     static void explore() throws GameActionException {
-        rc.setIndicatorString("explore");
+        rc.setIndicatorString("explore "+Clock.getBytecodesLeft());
         if(!pathfinder.exploring){
             curTarget = null;
         }
         move(pathfinder.pathToExplore());
-        if(pathfinder.explorer.target != null){
-            rc.setIndicatorLine(rc.getLocation(), pathfinder.explorer.target,255, 255, 0 );
-        }
 
         MapLocation ml = attack(1);
 
@@ -146,8 +145,7 @@ public strictfp class Soldier {
             } else { // attack eco
                 attackLoc = getAttack(2, 1, 3, 0);
             }
-            if(attackLoc != null){
-                rc.setIndicatorString(attackLoc.getLocation().x+" "+attackLoc.getLocation().y+" ");
+            if(attackLoc!= null && rc.canAttack(attackLoc.getLocation())){
                 rc.attack(attackLoc.getLocation());
 
                 return attackLoc.getLocation();
@@ -165,7 +163,7 @@ public strictfp class Soldier {
             RobotType type = robot.getType();
             int health = robot.getHealth();
             int id = robot.getID();
-            if(rc.getLocation().distanceSquaredTo(robot.location) <= 13){
+            if(rc.getLocation().distanceSquaredTo(robot.getLocation()) <= 13){
                 if(type.isBuilding()){
                     if(type.equals(RobotType.ARCHON)){
                         if(health < minHealth[0]){

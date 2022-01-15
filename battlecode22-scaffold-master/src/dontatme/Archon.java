@@ -11,12 +11,14 @@ public strictfp class Archon {
     static int miners = 0, soldiers = 0;
     static int comms = 0;
 
+    static int turn = 0;
+
     /**
      * Run a single turn for an Archon.
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
      */
     static void run(RobotController rc) throws GameActionException {
-
+        turn++;
         // Get the archon ID if needed
         if (id == -1) {
             id = rc.getID();
@@ -36,7 +38,7 @@ public strictfp class Archon {
             MapLocation[] allLoc = rc.getAllLocationsWithinRadiusSquared(rc.getLocation(), 34);
             boolean found = false;
             for (MapLocation loc : allLoc) {
-                if (rc.senseLead(loc) > 0 && rc.senseRobotAtLocation(loc) == null) {
+                if (rc.senseLead(loc) > 2 && rc.senseRobotAtLocation(loc) == null) {
                     Communications.setArchonVisionLead(rc, id, loc);
                     found = true;
                     break;
@@ -49,19 +51,26 @@ public strictfp class Archon {
         
         // If there are less than 4 miners per archon
         // Build a miner in any direction (but take turns)
-        int turn = Communications.getArchonTurn(rc);
-        rc.setIndicatorString(turn+" ");
 
 
-        if (turn  == Communications.getTeamArchonIndexFromID(rc, id) ) {
 
+        if (turn == 1 ||  rc.getTeamLeadAmount(rc.getTeam()) >= 150 || rc.getArchonCount() == 1 ||
+                turn % rc.getArchonCount()  == Communications.getTeamArchonIndexFromID(rc, id) ) {
+            rc.setIndicatorString(turn % rc.getArchonCount()  +" "+Communications.getTeamArchonIndexFromID(rc, id));
             if (miners < 4) {
                 if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
                     buildTowardsLowRubble(rc, RobotType.MINER, turn);
                 }
             } else {
                 if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
-                    buildTowardsLowRubble(rc, RobotType.SOLDIER, turn);
+                    int x = (int )(3 * Math.random());
+
+                    if(x >= 1){
+                        buildTowardsLowRubble(rc, RobotType.SOLDIER, turn);
+                    } else{
+                        buildTowardsLowRubble(rc, RobotType.MINER, turn);
+                    }
+
                 }
             }
         }

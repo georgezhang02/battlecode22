@@ -22,14 +22,13 @@ public abstract class Pathfinder {
 
 
 
-    boolean targetWithinRadius(MapLocation target, int minDistToTarget){
-        return rc.getLocation().distanceSquaredTo(target) < minDistToTarget * minDistToTarget;
+    boolean targetWithinRadius(MapLocation target, int minDistToTargetSquared){
+        return rc.getLocation().distanceSquaredTo(target) <= minDistToTargetSquared;
     }
 
     //randomly choose unvisited locations to path to
     Direction pathToExplore() throws GameActionException{
         if(!exploring || rc.getLocation().distanceSquaredTo(explorer.target) <= 4){
-            rc.setIndicatorString(exploring+" ");
             int width = rc.getMapWidth();
             int height =rc.getMapHeight();
             explorer.getExploreTarget(10, width, height);
@@ -47,12 +46,15 @@ public abstract class Pathfinder {
         int x = curPos.x;
         int y = curPos.y;
         for(MapLocation ml : mapLocations){
-            double vect = 10/Math.sqrt(curPos.distanceSquaredTo(ml));
-            int xdiff = curPos.x - ml.x;
-            int ydiff = curPos.y - ml.y;
+            if(ml != null){
+                double vect = 10/Math.sqrt(curPos.distanceSquaredTo(ml));
+                int xdiff = curPos.x - ml.x;
+                int ydiff = curPos.y - ml.y;
 
-            x += (int)(xdiff * vect);
-            y += (int)(ydiff * vect);
+                x += (int)(xdiff * vect);
+                y += (int)(ydiff * vect);
+            }
+
         }
         MapLocation target = new MapLocation(x, y);
         return pathToTargetGreedy(target);
