@@ -1,9 +1,5 @@
 package dontatme;
 
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-
 import battlecode.common.*;
 
 public strictfp class Miner {
@@ -12,18 +8,14 @@ public strictfp class Miner {
     static MinerType minerType = MinerType.None;
 
     static MapLocation heading = null;
-
-    static int stuckCounter = 0;
-    static MapLocation selectedLocation = null;
-
+    static MapLocation pastHeading = null;
     static Pathfinder pathfinder;
 
-    static RobotInfo[] robotInfo;
-
-    static int commandCooldown = 0;
+    static int runAwayTimer = 0;
+    static MapLocation[] currentEnemies = null;
 
     private static enum MinerType {
-        None, BaseMiner, CenterMiner, ExpandMiner, ExploreMiner, RunningMiner
+        None, BaseMiner, CampMiner, ExploreMiner
     }
 
     /**
@@ -31,15 +23,14 @@ public strictfp class Miner {
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
      */
     static void run(RobotController rc) throws GameActionException {
-        commandCooldown --;
 
+        RobotInfo[] robotInfo = rc.senseNearbyRobots();
+        MapLocation me = rc.getLocation();
+
+        // Initialize pathfinding and archon index
         if (pathfinder == null){
             pathfinder = new BFPathing20(rc);
         }
-
-        robotInfo = rc.senseNearbyRobots();
-
-        // Save the index of the archon the miner spawned from
         if (archonID == -1) {
             for (RobotInfo info : robotInfo) {
                 if (info.getType() == RobotType.ARCHON) {
@@ -48,151 +39,111 @@ public strictfp class Miner {
             }
         }
 
-
-
-        MapLocation me = rc.getLocation();
-
-        // If just spawned, see if miner is the base or center miner
+        // If just spawned, set miner type
         if (minerType == MinerType.None) {
             int minerCount = Communications.getArchonMinerCount(rc, archonID);
-            if ( minerCount <= 2) {
+            if (minerCount <= 2) {
                 minerType = MinerType.BaseMiner;
-            } else if (minerCount <= 6) {
-                minerType = MinerType.CenterMiner;
             } else {
-                minerType = MinerType.ExploreMiner;
-            }
-        }
-
-        MapLocation[]nearbyEnemies = new MapLocation[10];
-        int index = 0;
-
-        // Detect enemy archon location
-        for (RobotInfo robot : robotInfo) {
-
-            if (robot.getTeam() != rc.getTeam()) {
-                if(robot.getType() == RobotType.ARCHON){
-                    Communications.setEnemyArchonLocation(rc, robot.getID(), robot.getLocation());
-                } else if(index < 10 && (robot.getType() == RobotType.SOLDIER || robot.getType() == RobotType.SAGE
-                        || robot.getType() == RobotType.WATCHTOWER)){
-                    nearbyEnemies[index] = robot.getLocation();
-                    index++;
-
+                if (Math.random() > .5){
+                    minerType = MinerType.CampMiner;
+                } else {
+                    minerType = MinerType.ExploreMiner;
                 }
-
-
             }
         }
 
-        // Mine around if possible
         mineAround(rc, me);
 
-        if(index > 0){
-            rc.setIndicatorString("Running Away");
-            Direction dir = pathfinder.pathAwayFrom(nearbyEnemies);
+        // Run away if needed
+        MapLocation[] newEnemies = Helper.updateEnemyLocations(rc, robotInfo);
+        if (newEnemies[0] != null || currentEnemies == null) {
+            currentEnemies = newEnemies;
+        }
 
-            if(rc.canMove(dir)){
+        if (currentEnemies[0] != null && runAwayTimer < 3){
+            System.out.println(me + " " + "running away");
+            Direction dir = pathfinder.pathAwayFrom(currentEnemies);
+            if (rc.canMove(dir)){
                 rc.move(dir);
             }
-
-            if(index > 1 && commandCooldown <0){
-                Communications.sendDefenseCommand(rc,rc.getLocation(), RobotType.MINER, rc.getID());
-                commandCooldown = 5;
+            if (newEnemies[1] != null){
+                //Communications.sendDefenseCommand(rc,rc.getLocation(), RobotType.MINER, rc.getID());
             }
+            runAwayTimer++;
         }
-        // run away from nearby enemies
-        else if (rc.senseLead(me) <= 2) {
 
-            // If the current heading still has lead and no miners, go there
-            if (heading != null && rc.canSenseLocation(heading) && rc.senseLead(heading) > 2 && !rc.isLocationOccupied(heading)) {
-                tryMove(rc, me, heading);
+        // Otherwise, go mining
+        else if (currentEnemies[0] == null) {
+            runAwayTimer = 0;
+
+            // Mine around if possible
+            int leadThreshold = 1;
+            if (minerType == MinerType.CampMiner) {
+                leadThreshold = 0;
             }
 
-            // If no current heading, move towards lead within miner vision if possible (and avoid other miners)
-            else {
-                heading = goTowardsNearbyLead(rc, me, rc.senseNearbyLocationsWithLead(20));
+            // If not on lead
+            if (rc.senseLead(me) <= leadThreshold) {
 
-                // If no lead within vision, run code based on miner type
-                if (heading == null) {
-                    switch (minerType) {
+                // If the current heading still has lead and no miners, go there
+                if (heading != null && rc.senseLead(heading) > leadThreshold && noMinersAround(rc, heading)) {
+                    tryMove(rc, me, heading);
+                }
 
-                        case BaseMiner:
-                            rc.setIndicatorString("Base Miner");
-                            baseMiner(rc, me);
-                            break;
-                        case CenterMiner:
-                            rc.setIndicatorString("Center Miner");
-                            exploreMiner(rc, me);
-                            break;
-                        case ExpandMiner:
-                            rc.setIndicatorString("Expand Miner");
+                // If no current heading, move towards lead within miner vision if possible (and avoid other miners)
+                else {
+                    heading = goTowardsNearbyLead(rc, me, leadThreshold);
 
-                            exploreMiner(rc, me);
-                            break;
-                        case ExploreMiner:
-                            rc.setIndicatorString("Explore Miner");
-                            exploreMiner(rc, me);
-                            break;
-                        default:
-                            break;
+                    // If no lead within vision, run code based on miner type
+                    if (heading == null) {
+                        switch (minerType) {
+                            case BaseMiner:
+                                rc.setIndicatorString("Base Miner");
+                                baseMiner(rc, me);
+                                break;
+                            case CampMiner:
+                                rc.setIndicatorString("Camp Miner");
+                                exploreMiner(rc, me);
+                            case ExploreMiner:
+                                rc.setIndicatorString("Explore Miner");
+                                exploreMiner(rc, me);
+                                break;
+                            default:
+                                break;
+                        }
+                    } else {
+                        pastHeading = heading;
+                        rc.setIndicatorString("" + pastHeading.x + pastHeading.y);
                     }
                 }
             }
         }
     }
 
+    static boolean noMinersAround(RobotController rc, MapLocation loc) throws GameActionException {
+        for (Direction dir : Direction.allDirections()) {
+            MapLocation nearby = loc.add(dir);
+            if (rc.canSenseLocation(nearby)) {
+                RobotInfo nearbyRobot = rc.senseRobotAtLocation(nearby);
+                if (nearbyRobot != null && nearbyRobot.ID != rc.getID()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
     static void baseMiner(RobotController rc, MapLocation me) throws GameActionException {
-
         // Move towards lead location given by archon
         MapLocation archonLead = Communications.getArchonVisionLead(rc, archonID);
-        if (archonLead.y != 61) {
+        if (archonLead.y != 61 && noMinersAround(rc, archonLead)) {
             tryMove(rc, me, archonLead);
         }
 
-        // If no more resources left, become center miner
+        // If no more resources left, become camp miner
         else {
-            minerType = MinerType.ExploreMiner;
-        }
-    }
-
-    static void centerMiner(RobotController rc, MapLocation me) throws GameActionException{
-
-        // Move towards the center
-        MapLocation center = new MapLocation(rc.getMapWidth() / 2, rc.getMapHeight() / 2);
-        Direction dir = pathfinder.pathToTarget(center, false);
-        if (rc.canMove(dir)) {
-            rc.move(dir);
-            stuckCounter = 0;
-        }
-        else if (rc.isMovementReady() && rc.senseRobotAtLocation(me.add(dir)) != null) {
-            stuckCounter++;
-        }
-
-        // If at the center, expand in a direction not towards a friendly archon
-        if ((me.x == center.x && me.y == center.y) || stuckCounter >= 2) {
-            List<Direction> archonDirections = new ArrayList<Direction>();
-            for (Direction d : Helper.directions) {
-                archonDirections.add(d);
-            }
-            for (int i = 0; i < rc.getArchonCount(); i++) {
-                MapLocation archonLocation = Communications.getTeamArchonLocationByIndex(rc, i);
-                archonDirections.remove(center.directionTo(archonLocation));
-            }
-            Direction selectedDirection = archonDirections.get(Communications.getMinerTurn(rc));
-            selectedLocation = toEdge(rc, me, selectedDirection);
-            Communications.incrementMinerTurn(rc, archonDirections.size());
-            minerType = MinerType.ExpandMiner;
-        }
-    }
-
-    static void expandMiner(RobotController rc, MapLocation me) throws GameActionException{
-
-        // Move towards selected location, when edge is reached, become explore miner
-        if (atEdge(rc, me)) {
-            minerType = MinerType.ExploreMiner;
-        } else {
-            tryMove(rc, me, selectedLocation);
+            minerType = MinerType.CampMiner;
         }
     }
 
@@ -200,6 +151,7 @@ public strictfp class Miner {
         Direction exploreDir = pathfinder.pathToExplore();
         if (rc.canMove(exploreDir)) {
             rc.move(exploreDir);
+            rc.setIndicatorLine(me.add(exploreDir), me.add(exploreDir).add(exploreDir), 0, 0, 255);
         }
     }
 
@@ -210,7 +162,7 @@ public strictfp class Miner {
                 while (rc.canMineGold(mineLocation)) {
                     rc.mineGold(mineLocation);
                 }
-                while (rc.canMineLead(mineLocation) &&  rc.senseLead(mineLocation) > 2) {
+                while (rc.canMineLead(mineLocation) && rc.senseLead(mineLocation) > 1) {
                     rc.mineLead(mineLocation);
                 }
             }
@@ -218,11 +170,10 @@ public strictfp class Miner {
 
     }
 
-    static MapLocation goTowardsNearbyLead(RobotController rc, MapLocation me, MapLocation[] leads) throws GameActionException {
-
+    static MapLocation goTowardsNearbyLead(RobotController rc, MapLocation me, int leadThreshold) throws GameActionException {
+        MapLocation[] leads = rc.senseNearbyLocationsWithLead(20);
         for (MapLocation lead : leads) {
-            if (!rc.isLocationOccupied(lead) && rc.senseLead(lead) > 2) {
-
+            if (rc.senseLead(lead) > leadThreshold && noMinersAround(rc, lead) && !lead.equals(pastHeading)) {
                 tryMove(rc, me, lead);
                 return lead;
             }
@@ -236,16 +187,5 @@ public strictfp class Miner {
             rc.move(dir);
             rc.setIndicatorLine(me.add(dir), loc, 0, 255, 0);
         }
-    }
-
-    static MapLocation toEdge(RobotController rc, MapLocation loc, Direction dir) {
-        while (!atEdge(rc, loc)) {
-            loc = loc.add(dir);
-        }
-        return loc;
-    }
-
-    static boolean atEdge(RobotController rc, MapLocation loc) {
-        return loc.x == 0 || loc.x == rc.getMapWidth() - 1 || loc.y == 0 || loc.y == rc.getMapHeight() - 1;
     }
 }
