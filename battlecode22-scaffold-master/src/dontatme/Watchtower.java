@@ -40,6 +40,15 @@ public strictfp class Watchtower {
 
         turnCount = (turnCount + 1) % TURNS_CHECKED;
     }
+    static void rush(RobotController rc) throws GameActionException {
+        /*Nub, move according to the conditions*/
+    }
+    static void goPortable(RobotController rc, RobotMode givenMode) throws GameActionException {
+        if (rc.canTransform() && !rc.getMode().equals(givenMode)) {
+            rc.transform();
+        }
+    }
+
 
     static RobotInfo getAttack(int prio1, int prio2, int prio3, int prio4) throws GameActionException {
         RobotInfo[] ml = new RobotInfo[4];

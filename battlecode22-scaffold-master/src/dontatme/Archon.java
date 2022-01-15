@@ -3,7 +3,7 @@ package dontatme;
 import java.util.Arrays;
 
 import battlecode.common.*;
-import javafx.scene.shape.Arc;
+//import javafx.scene.shape.Arc;
 
 public strictfp class Archon {
 
