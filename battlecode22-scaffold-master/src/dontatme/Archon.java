@@ -10,11 +10,8 @@ public strictfp class Archon {
     static int id = -1;
     static MapLocation me = null;
     static int miners = 0, soldiers = 0;
-    static int comms = 0;
 
     static int turn = 0;
-    static int rushCoolDown;
-    static int rushTurns;
     static int gameState = 0;
     // gamestate 0 for building soldiers and miners
     // gameState 1 for rushing
@@ -23,6 +20,8 @@ public strictfp class Archon {
 
     static RobotInfo[] enemies;
     static RobotInfo[] allies;
+
+    static boolean transformed = false;
 
     static int commandSentLastTurn = 0;
     // command cooldowns for attacking and defending
@@ -56,9 +55,9 @@ public strictfp class Archon {
         }
 
         // determining whether archon should run away
-        /*
+
         int enemyCount = 0;
-        int soldierCount = 0;
+        int allyCount = 0;
 
         MapLocation[] enemyPos = new MapLocation[5];
 
@@ -72,12 +71,28 @@ public strictfp class Archon {
         }
         for(RobotInfo robot: allies){
             if(robot.getType() == RobotType.SOLDIER){
-                soldierCount++;
+                allyCount++;
             }
         }
+        if(enemyCount >= allyCount && enemyCount > 1){
+            Communications.sendDefenseCommand(rc, rc.getLocation(), RobotType.ARCHON, rc.getID());
+        }
+        /*
         if(enemyCount >= 2 * soldierCount && enemyCount > 2){
-            Direction dir = pathfinder.pathAwayFrom(enemyPos));
-            attack(attackType);
+            if(!transformed && rc.canTransform()){
+                rc.transform();
+                transformed = true;
+            } else{
+                Direction dir = pathfinder.pathAwayFrom(enemyPos));
+                if(dir != null && rc.canMove(dir)){
+                    rc.move(dir);
+                }
+            }
+        } else {
+            if(transformed && rc.canTransform()){
+                rc.transform();
+                transformed = false;
+            }
         }
         */
 
@@ -98,6 +113,7 @@ public strictfp class Archon {
                 Communications.setArchonVisionNoLead(rc, id);
             }
         }
+
 
         // deciding to rush
         int minerCount = 0;

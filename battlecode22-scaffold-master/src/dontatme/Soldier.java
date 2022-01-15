@@ -263,7 +263,7 @@ public strictfp class Soldier {
     static void offense(MapLocation target, int attackType) throws GameActionException {
         rc.setIndicatorString("offense"+Clock.getBytecodesLeft());
         int enemyCount = 0;
-        int soldierCount = 0;
+        int allyCount = 0;
 
         MapLocation[] enemyPos = new MapLocation[5];
 
@@ -277,10 +277,10 @@ public strictfp class Soldier {
         }
         for(RobotInfo robot: allies){
             if(robot.getType() == RobotType.SOLDIER){
-                soldierCount++;
+                allyCount++;
             }
         }
-        if(enemyCount >= 2 * (soldierCount + 1) && enemyCount != 0){
+        if(enemyCount >= 2 * (allyCount + 1) && enemyCount != 0){
             move(pathfinder.pathAwayFrom(enemyPos));
             attack(attackType);
         }
