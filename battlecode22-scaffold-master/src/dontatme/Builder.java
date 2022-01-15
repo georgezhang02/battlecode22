@@ -48,7 +48,7 @@ public strictfp class Builder {
         int counter = 0;
         while (counter < buildings.length && buildings[counter] != null ) {
             if (buildings[counter].getLevel() == 1) {
-                if (rc.canMutate(buildings[counter].getLocation()) && /*implement secondary conditoin here*/)
+                if (rc.canMutate(buildings[counter].getLocation()) /*&& implement secondary conditoin here*/)
                     rc.mutate(buildings[counter].getLocation());
             }
             counter++;
