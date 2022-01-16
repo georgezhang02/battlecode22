@@ -147,11 +147,7 @@ public strictfp class Archon {
 
         if(gameState == 0){
             if(commandCooldown[0] < 0 && soldierCount / rc.getArchonCount() >= 15){
-
-
                 rushArchon(rc);
-
-
             }
         } else if (gameState == 1){
 
@@ -163,9 +159,11 @@ public strictfp class Archon {
                     rushArchon(rc);
                     if(attackingArchon == -1){
                         Communications.sendStopAttackCommand(rc, commands[0].location);
+                        System.out.println("Stop Attacking");
                     }
                 } else{
                     Communications.sendStopAttackCommand(rc, commands[0].location);
+                    System.out.println("Stop Attacking");
                 }
 
 

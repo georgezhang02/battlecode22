@@ -545,10 +545,9 @@ public class Communications {
 
         int targetTypeOrdinal = decode(arrayValue, 2);
         RobotType targetType = null;
-        if(targetTypeOrdinal < 6 ){
+        if(targetTypeOrdinal <= 6 ){
             targetType = RobotType.values()[targetTypeOrdinal];
         }
-
 
         return new Command(location, targetType);
     }
