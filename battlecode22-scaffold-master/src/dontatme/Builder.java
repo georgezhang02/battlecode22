@@ -25,6 +25,22 @@ public strictfp class Builder {
             searchNonMoveActions(rc);
         }
     }
+    static void detonate(RobotController rc) throws GameActionException {
+        //search areas near me in cardinal directions
+        int lowestRubble = Integer.MAX_VALUE;
+        int lowestIndex = Integer.MAX_VALUE;
+        for (int i = 0; i < Helper.directions.length; i++) {
+            int amountRubble = rc.senseRubble(rc.getLocation().add(Helper.directions[i]));
+            if (amountRubble < lowestRubble && rc.canMove(Helper.directions[i])) {
+                lowestRubble = amountRubble;
+                lowestIndex = i;
+            }
+        }
+        Direction dir = Helper.directions[lowestIndex];
+        rc.move(dir);
+        rc.disintegrate();
+
+    }
     static void searchNonMoveActions(RobotController rc) throws GameActionException {
         RobotInfo [] buildings = getNearbyTowers(rc);
         RobotInfo [] protoBuildings = findPrototypeTowers(rc, buildings);
