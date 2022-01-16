@@ -36,6 +36,7 @@ public class Communications {
                 wipeCurUnitCounts(rc);
                 wipeBuildCommands(rc);
                 wipeNextIndex(rc);
+                wipeArchonOrder(rc);
             break;
             case MINER:
                 incrementMinerCount(rc);
@@ -54,12 +55,13 @@ public class Communications {
      * @throws GameActionException
      */
     public static int getArchonTurn(RobotController rc) throws GameActionException {
-        return decode(rc.readSharedArray(TURN_INFO), 0);
+        return decode(rc.readSharedArray(TURN_INFO), 0) % rc.getArchonCount();
     }
 
     public static void incrementArchonTurn(RobotController rc) throws GameActionException {
         int arrayValue = rc.readSharedArray(TURN_INFO);
-        rc.writeSharedArray(TURN_INFO, encode((decode(arrayValue, 0) + 1) % rc.getArchonCount(), decode(arrayValue, 1)));
+        rc.writeSharedArray(TURN_INFO, encode((decode(arrayValue, 0) + 1) % rc.getArchonCount(),
+                decode(arrayValue, 1), decode(arrayValue, 2)));
     }
 
 
@@ -581,10 +583,42 @@ public class Communications {
     }
 
     /**
+     * Gets the value of the archon order & increments it.
+     */
+    public static int getArchonOrder(RobotController rc )throws GameActionException{
+        int arrVal = rc.readSharedArray(TURN_INFO);
+        int x = decode(arrVal, 2);
+
+        int writeVal = encode(decode(arrVal, 0), decode(arrVal, 1), x + 1);
+        rc.setIndicatorString(arrVal+" "+writeVal);
+
+        rc.writeSharedArray(TURN_INFO, writeVal);
+        return x % 5;
+
+    }
+
+    /**
+     * Wipes archon order from array depending on if round has switched to even or odd.
+     */
+    public static void wipeArchonOrder(RobotController rc )throws GameActionException{
+        int arrVal = rc.readSharedArray(0);
+        int x = decode(arrVal, 2);
+
+        if(x >= 5 && rc.getRoundNum() % 2 == 0){
+            int writeVal = encode(decode(arrVal, 0), decode(arrVal, 1), 0);
+            rc.writeSharedArray(0, writeVal);
+        } else if(x < 5 && rc.getRoundNum() % 2 != 0){
+            int writeVal = encode(decode(arrVal, 0), decode(arrVal, 1), 5);
+            rc.writeSharedArray(0, writeVal);
+        }
+
+    }
+
+    /**
      * Wipes unit counts to prepare for current round of incrementing unit counts.
      */
     public static void wipeCurUnitCounts(RobotController rc )throws GameActionException{
-        rc.writeSharedArray(rc.getRoundNum() % 2 + UNIT_COUNT_OFFSET, 0);
+        rc.writeSharedArray(0, rc.getRoundNum() % 2 + UNIT_COUNT_OFFSET);
     }
 
     /**
@@ -592,7 +626,7 @@ public class Communications {
      */
     public static void wipeAttackCommands(RobotController rc )throws GameActionException{
         int offset = (rc.getRoundNum() % 2 == 0) ? ATTACK_EVEN_OFFSET : ATTACK_ODD_OFFSET;
-        rc.writeSharedArray(rc.getRoundNum() % 2 + UNIT_COUNT_OFFSET, 0);
+        rc.writeSharedArray(0,rc.getRoundNum() % 2 + UNIT_COUNT_OFFSET );
         for(int i = 0; i< 5; i++){
             rc.writeSharedArray(i+offset, 61);
         }

@@ -14,6 +14,8 @@ public strictfp class Miner {
     static int runAwayTimer = 0;
     static MapLocation[] currentEnemies = null;
 
+
+
     private static enum MinerType {
         None, BaseMiner, CampMiner, ExploreMiner
     }
@@ -55,8 +57,15 @@ public strictfp class Miner {
 
         mineAround(rc, me);
 
-        // Run away if needed
-        MapLocation[] newEnemies = Helper.updateEnemyLocations(rc, robotInfo);
+        MapLocation[] newEnemies = new MapLocation[10];
+        int index = 0;
+        for(RobotInfo robot: robotInfo){
+            if(index < 10 && !robot.getTeam().isPlayer() && (robot.type == RobotType.SOLDIER ||
+                    robot.type == RobotType.SAGE ||robot.type == RobotType.WATCHTOWER)){
+                newEnemies[index] = robot.getLocation();
+                index++;
+            }
+        }
         if (newEnemies[0] != null || currentEnemies == null) {
             currentEnemies = newEnemies;
         }

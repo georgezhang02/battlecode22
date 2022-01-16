@@ -10,12 +10,12 @@ public strictfp class Archon {
     static MapLocation me = null;
     static int miners = 0, soldiers = 0;
 
-    static int turn = 0;
     static int gameState = 0;
     // gamestate 0 for building soldiers and miners
     // gameState 1 for rushing
     static int[] commandCooldown = new int[2];
     static int attackingArchon = -1;
+    static boolean firstTurn = true;
 
     static RobotInfo[] enemies;
     static RobotInfo[] allies;
@@ -25,20 +25,22 @@ public strictfp class Archon {
     static int commandSentLastTurn = 0;
     // command cooldowns for attacking and defending
 
+    static int curArchonOrder = -1;
+
     /**
      * Run a single turn for an Archon.
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
      */
     static void run(RobotController rc) throws GameActionException {
+        Communications.runStart(rc);
 
-        turn++;
+        curArchonOrder = Communications.getArchonOrder(rc);
+
         commandCooldown[0]--;
         commandCooldown[1]--;
         Team opponent = rc.getTeam().opponent();
         enemies = rc.senseNearbyRobots(20, opponent);
         allies = rc.senseNearbyRobots(20, rc.getTeam());
-
-
 
         // Get the archon ID if needed
         if (id == -1) {
@@ -49,18 +51,18 @@ public strictfp class Archon {
         me = rc.getLocation();
         Communications.setTeamArchonLocation(rc, id, me);
 
-        if(turn ==1){
+        if(firstTurn){
             for(int i = 0; i < 4; i++){
                 Communications.setEnemyArchonLocationByIndex(rc, 15, i, new MapLocation(61, 61));
             }
             for(int i = 0; i< 10; i++){
-                rc.writeSharedArray(i + Communications.ATTACK_OFFSET, 61);
-                rc.writeSharedArray(i + Communications.DEFENSE_OFFSET, 61);
+                rc.writeSharedArray(i + Communications.ATTACK_EVEN_OFFSET, 61);
+                rc.writeSharedArray(i + Communications.DEFENSE_EVEN_OFFSET, 61);
 
             }
 
-            for(int i = 0; i < 5; i++){
-                rc.writeSharedArray(i + Communications.BUILD_OFFSET, 61);
+            for(int i = 0; i < 4; i++){
+                rc.writeSharedArray(i + Communications.BUILD_EVEN_OFFSET, 61);
             }
         }
 
@@ -149,56 +151,31 @@ public strictfp class Archon {
                 attackingArchon = -1;
             }
         }
-
-
-
         
         // If there are less than 4 miners per archon
         // Build a miner in any direction (but take turns)
 
-        if(rc.isActionReady()){
-            if(turn == 1){
-                rc.setIndicatorString("Miners 0");
-                buildTowardsLowRubble(rc, RobotType.MINER, turn);
-            }
-            else if(turn < 5 * rc.getArchonCount()){
-                rc.setIndicatorString("Miners Intermediat");
-                if (miners < 4 && turn % rc.getArchonCount() == Communications.getTeamArchonIndexFromID(rc,rc.getID())) {
-                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
-                        buildTowardsLowRubble(rc, RobotType.MINER, turn);
-                    }
+        if( rc.isActionReady() && Communications.getArchonTurn(rc)  == curArchonOrder){
+            if (miners < 4) {
+                if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
+                    buildTowardsLowRubble(rc, RobotType.MINER);
                 }
-            } else{
-                rc.setIndicatorString(miners+"");
-                if (miners < 4) {
-                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
-                        buildTowardsLowRubble(rc, RobotType.MINER, turn);
+            } else if (soldierCount / rc.getArchonCount() < 5 ){
+                if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
+                    buildTowardsLowRubble(rc, RobotType.SOLDIER);
 
-                    }
-                } else if (soldierCount / rc.getArchonCount() < 5 ){
-                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
-                        buildTowardsLowRubble(rc, RobotType.SOLDIER, turn);
-                        rc.setIndicatorString("Soldier 1");
-                    }
-                } else if (minerCount / rc.getArchonCount() < 10 ){
-                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
-                        buildTowardsLowRubble(rc, RobotType.MINER, turn);
-                        rc.setIndicatorString("Miners 2");
-                    }
-                } else if (soldierCount/rc.getArchonCount() < 30 ){
-                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
-                        buildTowardsLowRubble(rc, RobotType.SOLDIER, turn);
-                        rc.setIndicatorString("Soldier 2");
+                }
+            } else if (minerCount / rc.getArchonCount() < 10 ){
+                if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
+                    buildTowardsLowRubble(rc, RobotType.MINER);
 
-
-                    }
+                }
+            } else if (soldierCount/rc.getArchonCount() < 30 ){
+                if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
+                    buildTowardsLowRubble(rc, RobotType.SOLDIER);
                 }
             }
-
-
         }
-
-
     }
 
     static void rushArchon(RobotController rc) throws GameActionException {
@@ -216,24 +193,19 @@ public strictfp class Archon {
 
     }
 
-    static void buildTowardsLowRubble(RobotController rc, RobotType type, int turn) throws GameActionException {
+    static void buildTowardsLowRubble(RobotController rc, RobotType type) throws GameActionException {
         Direction [] dirs = Arrays.copyOf(Helper.directions, Helper.directions.length);
         Arrays.sort(dirs, (a, b) -> getRubble(rc, a) - getRubble(rc, b));
         for (Direction d: dirs) {
             if (rc.canBuildRobot(type, d)) {
                 rc.buildRobot(type, d);
+                Communications.incrementArchonTurn(rc);
                 switch(type) {
                     case MINER:
-                        /*if (Communications.getArchonMinerCount(rc, id) < 15) {
-                            Communications.incrementArchonMinerCount(rc, id);
-                        }*/
-
                         miners++;
-                        Communications.incrementArchonTurn(rc);
                         break;
                     case SOLDIER:
                         soldiers++;
-                        Communications.incrementArchonTurn(rc);
                         break;
                     default:
                         break;

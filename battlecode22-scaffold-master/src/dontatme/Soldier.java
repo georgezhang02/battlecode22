@@ -110,7 +110,7 @@ public strictfp class Soldier {
 
         switch (state){
             case 0: // Rushing Enemy Archon
-                offense(curTarget, 3);
+                offense(curTarget, 0);
                 break;
             case 1: //Defending
                 defense(curTarget, 6);
@@ -140,119 +140,65 @@ public strictfp class Soldier {
         int index;
         for(index = 0; index<attackCommands.length; index++){
             Communications.Command ac = attackCommands[index];
-            int priority = prio(ac.type, true);
-            if(priority >= maxPrio && inCommandRadius(ac.type, ac.location)){
-                maxPrio = priority;
-                index = priority;
+
+            if(ac.type == null && ac.location.equals(curTarget) && attacking){
+                curPrio = -1;
+                curFollow = -1;
+                attacking = false;
+                commandTimer = 0;
+                return;
+            } else{
+                int priority = Communications.getCommandPrio(ac.type, true);
+                if(priority >= maxPrio && Communications.inCommandRadius(rc, ac.type, ac.location, true)){
+
+                    if((rusher && ac.type != RobotType.MINER )|| !rusher){
+                        maxPrio = priority;
+                        index = priority;
+                    }
+
+                }
             }
+
         }
 
         Communications.Command[] defendCommands = Communications.getDefenseCommand(rc);
 
         for(; index<defendCommands.length + attackCommands.length; index++){
             Communications.Command dc = defendCommands[index - attackCommands.length];
-            int priority = prio(dc.type, false);
-            if(priority >= maxPrio && inCommandRadius(dc.type, dc.location)){
-                maxPrio = priority;
-                curFollow = index;
+            if(dc.type == null && dc.location.equals(curTarget) && !attacking){
+                curPrio = -1;
+                curFollow = -1;
+                attacking = false;
+                commandTimer = 0;
+                return;
+            } else{
+                int priority = Communications.getCommandPrio(dc.type, false);
+
+                if(priority >= maxPrio && Communications.inCommandRadius(rc, dc.type, dc.location, false)){
+                    maxPrio = priority;
+                    curFollow = index;
+                }
             }
+
         }
+
 
         if(curFollow != -1 && curFollow < attackCommands.length){
             command = attackCommands[curFollow];
             attacking = true;
-            commandTimer = commandLength(command.type, true);
+            commandTimer = Communications.getCommandCooldown(rc, command.type, true);
             curPrio = maxPrio;
         } else if (curFollow != -1){
             curFollow -= attackCommands.length;
             command = defendCommands[curFollow];
             attacking = false;
-            commandTimer = commandLength(command.type, false);
+            commandTimer = Communications.getCommandCooldown(rc, command.type, false);
             curPrio = maxPrio;
         }
 
     }
 
-    static int prio(RobotType type, boolean attacking){
-        if(rusher){
-            switch(type){
-                case ARCHON:
-                    if(attacking){
-                        return 10;
-                    } else{
-                        return 9;
-                    }
-                case MINER:
-                    return 5;
 
-                case WATCHTOWER:
-                    if(attacking){
-                        return 6;
-                    } else{
-                        return 7;
-                    }
-            }
-        } else {
-            switch(type){
-                case ARCHON:
-                    if(attacking){
-                        return 10;
-                    } else{
-                        return 9;
-                    }
-                case WATCHTOWER:
-                    if(attacking){
-                        return 6;
-                    } else{
-                        return 7;
-                    }
-            }
-        }
-
-        return -1;
-    }
-
-    static int commandLength(RobotType type, boolean attacking){
-        switch(type){
-            case ARCHON:
-                if(attacking){
-                    return 100 * (rc.getMapHeight() + rc.getMapWidth()) / 120;
-                } else{
-                    return 10 * (rc.getMapHeight() + rc.getMapWidth()) / 120;
-                }
-            case MINER:
-                return 5;
-
-            case WATCHTOWER:
-                if(attacking){
-                    return 50;
-                } else{
-                    return 50;
-                }
-        }
-        return -1;
-    }
-
-    static boolean inCommandRadius(RobotType type, MapLocation ml){
-        switch(type){
-            case ARCHON:
-                if(attacking){
-                    return rc.getLocation().distanceSquaredTo(ml) <= 3600;
-                } else{
-                    return rc.getLocation().distanceSquaredTo(ml) <= 3600;
-                }
-            case MINER:
-                return rc.getLocation().distanceSquaredTo(ml) <= 50;
-
-            case WATCHTOWER:
-                if(attacking) {
-                    return rc.getLocation().distanceSquaredTo(ml) <= 3600;
-                } else{
-                    return rc.getLocation().distanceSquaredTo(ml) <= 3600;
-                }
-        }
-        return false;
-    }
 
 
 
@@ -268,7 +214,7 @@ public strictfp class Soldier {
         MapLocation[] enemyPos = new MapLocation[5];
 
         for(RobotInfo robot:enemies){
-            if(robot.getType() == RobotType.SOLDIER){
+            if(robot.getType() == RobotType.SOLDIER || robot.getType() == RobotType.WATCHTOWER){
                 enemyCount++;
                 if(enemyCount < 5){
                     enemyPos[enemyCount] = robot.getLocation();
@@ -340,20 +286,20 @@ public strictfp class Soldier {
     static MapLocation attack(int attackType) throws GameActionException {
         RobotInfo attackLoc;
 
-        if(attackType == 0){ // attack all
+        if(attackType == 0){ // attack all (droids, buildings, archons, miners)
             attackLoc = getAttack(3, 1, 0, 2);
-        } else if(attackType == 1){ //attack droids
+        } else if(attackType == 1){ //attack droids (droids, miners, buildings, archons)
             attackLoc = getAttack(3, 2, 1, 0);
-        }  else if (attackType == 3){// attack army (watchtowers/soldiers/sages/builders)
+        }  else if (attackType == 3){// attack army (buidings, droids, miners, archons))
             attackLoc = getAttack(1, 3, 2, 0);
-        }  else { // attack eco
+        }  else { // attack eco (miners, buildings, droids, archons)
             attackLoc = getAttack(2, 1, 3, 0);
         }
         if(attackLoc!= null && rc.canAttack(attackLoc.getLocation())){
             rc.attack(attackLoc.getLocation());
             if(attackLoc.getType().equals(RobotType.ARCHON) && !rc.canSenseRobot(attackLoc.getID())){
                 int archIndex = Communications.getEnemyArchonIndexFromID(rc, attackLoc.getID());
-                Communications.setEnemyArchonLocationByIndex(rc, -1, archIndex, new MapLocation(-1, -1));
+                Communications.setEnemyArchonLocationByIndex(rc, 0, archIndex, new MapLocation(61, 61));
             }
         }
         if(attackLoc != null){
