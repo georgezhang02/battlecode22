@@ -2,6 +2,7 @@ package dontatme;
 
 import battlecode.common.*;
 
+import java.awt.*;
 import java.util.Random;
 
 public strictfp class Soldier {
@@ -52,7 +53,7 @@ public strictfp class Soldier {
         double d = Math.random();
 
 
-        if(d > -1){
+        if(d > 0){
             rusher = false;
             state = 2;
         } else{
@@ -163,7 +164,7 @@ public strictfp class Soldier {
                     return;
                 } else{
                     int priority = Communications.getCommandPrio(ac.type, true);
-                    if(priority >= maxPrio && Communications.inCommandRadius(rc, ac.type, ac.location, true)){
+                    if(priority > maxPrio && Communications.inCommandRadius(rc, ac.type, ac.location, true)){
 
                             maxPrio = priority;
                             curFollow = index;
@@ -192,9 +193,9 @@ public strictfp class Soldier {
                 } else {
                     rc.setIndicatorString("Defending");
                     int priority = Communications.getCommandPrio(dc.type, false);
-                    if( dc.type != RobotType.MINER){
+                    if( true){
 
-                        if (priority >= maxPrio && Communications.inCommandRadius(rc, dc.type, dc.location, false)) {
+                        if (priority > maxPrio && Communications.inCommandRadius(rc, dc.type, dc.location, false)) {
                             maxPrio = priority;
                             curFollow = index;
                         }
@@ -255,7 +256,10 @@ public strictfp class Soldier {
                 allyCount++;
             }
         }
-         if(target != null && !pathfinder.targetWithinRadius(target, 6)){
+        if(enemyCount > 0){
+            Communications.sendAttackCommand(rc, rc.getLocation(), RobotType.SOLDIER);
+        }
+        if(target != null && !pathfinder.targetWithinRadius(target, 6)){
             move(pathfinder.pathToTarget(target, false));
             attack(attackType);
 
@@ -277,21 +281,25 @@ public strictfp class Soldier {
         rc.setIndicatorString(state + " defense "+ curTarget.toString());
         if(target != null && !pathfinder.targetWithinRadius(target, minDistance)){
             move(pathfinder.pathToTarget(target, false));
+            MapLocation ml = attack(1);
         } else{
-            int start = (int)(8 * Math.random());
-            Direction dir = Direction.CENTER;
-            for(int i = 0 ; i < 8 && dir == Direction.CENTER; i++){
-                if(rc.canMove(directions[(start+i) % 8])) {
-                    if (rc.senseRubble(rc.getLocation().add(directions[(start+i) % 8])) -
-                            rc.senseRubble(rc.getLocation()) < 10) {
-                        dir = directions[(start+i) % 8];
+            if(rusher){
+                int start = (int)(8 * Math.random());
+                Direction dir = Direction.CENTER;
+                for(int i = 0 ; i < 8 && dir == Direction.CENTER; i++){
+                    if(rc.canMove(directions[(start+i) % 8])) {
+                        if (rc.senseRubble(rc.getLocation().add(directions[(start+i) % 8])) -
+                                rc.senseRubble(rc.getLocation()) < 10) {
+                            dir = directions[(start+i) % 8];
+                        }
                     }
                 }
+                move(dir);
             }
-            move(dir);
+
 
             MapLocation ml = attack(1);
-            if(ml== null && !rusher){
+            if(ml== null){
                 state = 2;
             }
         }

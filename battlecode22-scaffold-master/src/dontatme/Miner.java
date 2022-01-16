@@ -84,7 +84,7 @@ public strictfp class Miner {
                 visionLeadCount += rc.senseLead(lead);
             }
 
-            if (leadOnMe == 0 || (leadOnMe == 1 && (leadsClose.length < 10 || visionLeadCount > 4 * leads.length || !noMinersAround(rc, me)))) {
+            if (leadOnMe == 0 || (leadOnMe == 1 && (leadsClose.length < 6 || visionLeadCount > 4 * leads.length || !noMinersAround(rc, me)))) {
 
                 // If the current heading still has lead and no miners, go there
                 if (heading != null && rc.canSenseLocation(heading) && rc.senseLead(heading) > 1 && noMinersAround(rc, heading)) {

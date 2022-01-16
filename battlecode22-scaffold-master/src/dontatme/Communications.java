@@ -424,6 +424,8 @@ public class Communications {
                 }
             case MINER:
                 return 5;
+            case SOLDIER:
+                return 5;
 
             case WATCHTOWER:
                 if(attacking){
@@ -470,7 +472,10 @@ public class Communications {
                     return 10 * (rc.getMapHeight() + rc.getMapWidth()) / 120;
                 }
             case MINER:
-                return 20;
+                return 10;
+
+            case SOLDIER:
+                return 10;
 
             case WATCHTOWER:
                 if(attacking){
@@ -501,8 +506,9 @@ public class Communications {
                     return Math.sqrt(rc.getLocation().distanceSquaredTo(ml)) <= (rc.getMapWidth() + rc.getMapHeight())/4;
                 }
             case MINER:
-                return Math.sqrt(rc.getLocation().distanceSquaredTo(ml)) <=  10 * (.25 + .75 *(rc.getMapWidth() + rc.getMapHeight()))/120;
-
+                return Math.sqrt(rc.getLocation().distanceSquaredTo(ml)) <=  20 * (.25 + .75 *(rc.getMapWidth() + rc.getMapHeight()))/120;
+            case SOLDIER:
+                return Math.sqrt(rc.getLocation().distanceSquaredTo(ml)) <=  20 * (.25 + .75 *(rc.getMapWidth() + rc.getMapHeight()))/120;
             case WATCHTOWER:
                 if(attacking) {
                     return Math.sqrt(rc.getLocation().distanceSquaredTo(ml)) <= 120;
