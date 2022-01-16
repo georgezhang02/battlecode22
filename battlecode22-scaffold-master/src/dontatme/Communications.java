@@ -97,6 +97,7 @@ public class Communications {
 
     public static void setArchonVisionLead(RobotController rc, int archonID, MapLocation leadLocation) throws GameActionException {
         int archonIndex = getTeamArchonIndexFromID(rc, archonID);
+
         int arrayValue = rc.readSharedArray(archonIndex+ LEAD_OFFSET);
         if(archonIndex != -1) {
             rc.writeSharedArray(archonIndex + LEAD_OFFSET, encode(leadLocation.x, leadLocation.y, decode(arrayValue, 2)));
@@ -166,6 +167,8 @@ public class Communications {
     public static void setTeamArchonLocation(RobotController rc, int archonID, MapLocation archonLocation) throws GameActionException {
         int writeValue = encode(archonLocation.x, archonLocation.y, archonID);
 
+        rc.setIndicatorString(archonLocation.x+" " + archonLocation.y +" "+archonID);
+
         for(int i = 0; i< GameConstants.MAX_STARTING_ARCHONS; i++){
             int arrayValue = rc.readSharedArray(i + FRIENDLY_ARCHON_OFFSET);
             int arrID = decode(arrayValue,2);
@@ -179,12 +182,20 @@ public class Communications {
         }
     }
 
+    public static void setTeamArchonLocationByIndex(RobotController rc, int archonID, int index, MapLocation archonLocation) throws GameActionException {
+        if (!(index >= 0 && index < GameConstants.MAX_STARTING_ARCHONS)) {
+            throw new IllegalArgumentException();
+        }
+        int writeValue = encode(archonLocation.x, archonLocation.y, archonID);
+        rc.writeSharedArray(index + FRIENDLY_ARCHON_OFFSET, writeValue);
+
+    }
+
     public static int getTeamArchonIndexFromID(RobotController rc, int archonID) throws GameActionException {
         for(int i = 0; i < GameConstants.MAX_STARTING_ARCHONS; i++) {
             int arrayValue = rc.readSharedArray(i + FRIENDLY_ARCHON_OFFSET);
             int arrID = decode(arrayValue,2);
-            int arrX = decode(arrayValue,0);
-            if(arrID == archonID && arrX < 60){
+            if(arrID == archonID){
                 return i;
             }
         }

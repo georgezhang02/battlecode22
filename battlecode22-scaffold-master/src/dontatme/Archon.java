@@ -52,16 +52,11 @@ public strictfp class Archon {
         if (id == -1) {
             id = rc.getID();
         }
-
-
-
-        // Write archon location if needed
-        me = rc.getLocation();
-        Communications.setTeamArchonLocation(rc, id, me);
-
         if(firstTurn){
             for(int i = 0; i < 4; i++){
+                Communications.setTeamArchonLocationByIndex(rc, 15, i, new MapLocation(60, 60));
                 Communications.setEnemyArchonLocationByIndex(rc, 15, i, new MapLocation(60, 60));
+
             }
             for(int i = 0; i< 10; i++){
                 rc.writeSharedArray(i + Communications.ATTACK_EVEN_OFFSET, 61);
@@ -74,6 +69,16 @@ public strictfp class Archon {
             }
             firstTurn = false;
         }
+
+
+
+
+        // Write archon location if needed
+        me = rc.getLocation();
+        Communications.setTeamArchonLocation(rc, id, me);
+        Communications.setArchonVisionNoLead(rc, id);
+
+
 
         // determining whether archon should run away
 
@@ -96,7 +101,6 @@ public strictfp class Archon {
             }
         }
         if( (enemyCount >= allyCount && enemyCount > 1)  || (enemyCount > 2) && commandCooldown[1] <= 0){
-            rc.setIndicatorString("HELP ME");
             Communications.sendDefenseCommand(rc, rc.getLocation(), RobotType.ARCHON);
             commandCooldown[1] = Communications.getCommandCooldown(rc, RobotType.ARCHON, false);
         }
@@ -121,15 +125,16 @@ public strictfp class Archon {
         }
         */
 
-        
+
         // If there is lead left, save the first open lead location in the shared array
         MapLocation leadLoc = Communications.getArchonVisionLead(rc, id);
-        if (leadLoc.y != 61) {
+        if (leadLoc.y >= 60) {
             MapLocation[] allLoc = rc.getAllLocationsWithinRadiusSquared(rc.getLocation(), 34);
             boolean found = false;
             for (MapLocation loc : allLoc) {
-                if (rc.senseLead(loc) > 1 && rc.senseRobotAtLocation(loc) == null) {
+                if (rc.senseLead(loc) > 1 && !rc.isLocationOccupied(loc)) {
                     Communications.setArchonVisionLead(rc, id, loc);
+
                     found = true;
                     break;
                 }
