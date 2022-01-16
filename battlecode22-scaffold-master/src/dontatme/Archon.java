@@ -22,9 +22,6 @@ public strictfp class Archon {
 
     static boolean transformed = false;
 
-    static int commandSentLastTurn = 0;
-    // command cooldowns for attacking and defending
-
     static int curArchonOrder = -1;
 
     /**
@@ -46,6 +43,8 @@ public strictfp class Archon {
         if (id == -1) {
             id = rc.getID();
         }
+
+
 
         // Write archon location if needed
         me = rc.getLocation();
@@ -90,6 +89,8 @@ public strictfp class Archon {
             Communications.sendDefenseCommand(rc, rc.getLocation(), RobotType.ARCHON);
             commandCooldown[1] = 10 * (rc.getMapHeight() + rc.getMapWidth()) / 120;
         }
+
+
         /*
         if(enemyCount >= 2 * soldierCount && enemyCount > 2){
             if(!transformed && rc.canTransform()){
@@ -128,6 +129,8 @@ public strictfp class Archon {
         }
 
 
+
+
         // deciding to rush
         int minerCount = 0;
         int soldierCount = 0;
@@ -155,6 +158,7 @@ public strictfp class Archon {
         // If there are less than 4 miners per archon
         // Build a miner in any direction (but take turns)
 
+
         if( rc.isActionReady() && Communications.getArchonTurn(rc)  == curArchonOrder){
             if (miners < 4) {
                 if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
@@ -176,6 +180,7 @@ public strictfp class Archon {
                 }
             }
         }
+        rc.setIndicatorString(Communications.decode(rc.readSharedArray(Communications.TURN_INFO), 2)+" ");
     }
 
     static void rushArchon(RobotController rc) throws GameActionException {

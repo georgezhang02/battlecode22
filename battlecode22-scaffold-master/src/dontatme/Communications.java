@@ -8,7 +8,7 @@ import java.util.Objects;
 // For Commmunication Scheme: https://docs.google.com/spreadsheets/d/1U5TSMQ_MRm_tilbJa-L8_SL3OOONUCgavhuT9dSQ4Jg/edit#gid=0
 public class Communications {
     // Indices
-    private static final int TURN_INFO = 0;
+    public static final int TURN_INFO = 0;
 
     private static final int FRIENDLY_ARCHON_OFFSET = 1;
     private static final int ENEMY_ARCHON_OFFSET = 5;
@@ -461,7 +461,7 @@ public class Communications {
      *      number % 64^2 / 64
      * ...
      */
-    private static int decode(int number, int index) {
+    static int decode(int number, int index) {
         if (index < 0) {
             throw new IllegalArgumentException();
         } else {
@@ -590,9 +590,10 @@ public class Communications {
         int x = decode(arrVal, 2);
 
         int writeVal = encode(decode(arrVal, 0), decode(arrVal, 1), x + 1);
-        rc.setIndicatorString(arrVal+" "+writeVal);
+
 
         rc.writeSharedArray(TURN_INFO, writeVal);
+
         return x % 5;
 
     }
@@ -618,7 +619,7 @@ public class Communications {
      * Wipes unit counts to prepare for current round of incrementing unit counts.
      */
     public static void wipeCurUnitCounts(RobotController rc )throws GameActionException{
-        rc.writeSharedArray(0, rc.getRoundNum() % 2 + UNIT_COUNT_OFFSET);
+        rc.writeSharedArray(rc.getRoundNum() % 2 + UNIT_COUNT_OFFSET,0 );
     }
 
     /**
@@ -626,7 +627,6 @@ public class Communications {
      */
     public static void wipeAttackCommands(RobotController rc )throws GameActionException{
         int offset = (rc.getRoundNum() % 2 == 0) ? ATTACK_EVEN_OFFSET : ATTACK_ODD_OFFSET;
-        rc.writeSharedArray(0,rc.getRoundNum() % 2 + UNIT_COUNT_OFFSET );
         for(int i = 0; i< 5; i++){
             rc.writeSharedArray(i+offset, 61);
         }
