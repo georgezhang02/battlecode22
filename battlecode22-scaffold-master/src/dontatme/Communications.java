@@ -20,6 +20,7 @@ public class Communications {
     public static final int BUILD_EVEN_OFFSET = 33;
     public static final int BUILD_ODD_OFFSET = 35;
     private static final int ANOMALY = 37;
+    private static final int HAS_WIPED = 60;
     private static final int NEXT_INDICES = 61;
     private static final int UNIT_COUNT_OFFSET = 62;
 
@@ -31,12 +32,16 @@ public class Communications {
 
         switch(rc.getType()){
             case ARCHON:
+                if (hasWiped(rc)) {
+                    break;
+                }
                 wipeAttackCommands(rc);
                 wipeDefCommands(rc);
                 wipeUnitCounts(rc);
                 wipeBuildCommands(rc);
                 wipeNextIndex(rc);
                 wipeArchonOrder(rc);
+                setWiped(rc);
                 break;
             case MINER:
                 incrementMinerCount(rc);
@@ -716,6 +721,35 @@ public class Communications {
      */
     public static void wipeNextIndex(RobotController rc )throws GameActionException{
         rc.writeSharedArray(NEXT_INDICES, 0);
+    }
+
+
+
+    /**
+     * Attempt to wipe commands this turn. 
+     * Return whether command was wiped succesfully.
+     *
+     * @throws GameActionException
+     */
+    public static boolean setWiped(RobotController rc) throws GameActionException{
+        if (hasWiped(rc)) {
+            return false;
+        }
+        rc.writeSharedArray(HAS_WIPED, encode(rc.getRoundNum() % 2));
+        return true;
+    }
+
+    /**
+     * Return if the commands has been wiped this turn.
+     * 
+     * @throws GameActionException
+     */
+    public static boolean hasWiped(RobotController rc) throws GameActionException{
+        int arrValue = rc.readSharedArray(HAS_WIPED);
+        if (decode(arrValue, 0) == rc.getRoundNum() % 2) {
+            return true;
+        }
+        return false;
     }
 
 
