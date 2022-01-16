@@ -26,11 +26,18 @@ public strictfp class Archon {
     static Communications.Command commands[] = new Communications.Command[2];
     static int curArchonOrder = -1;
 
+    static double MAP_SCALER = -1;
+
     /**
      * Run a single turn for an Archon.
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
      */
     static void run(RobotController rc) throws GameActionException {
+
+        if(MAP_SCALER == -1){
+            MAP_SCALER = .4 + .6 * ((rc.getMapWidth() + rc.getMapHeight())/ 120.0);
+        }
+
         Communications.runStart(rc);
 
         curArchonOrder = Communications.getArchonOrder(rc);
@@ -138,15 +145,8 @@ public strictfp class Archon {
         // deciding to rush
         int minerCount = units[0];
         int soldierCount = units[1];
-        String str ="";
-
-        for(int i = 0; i< 4; i++){
-            str += Communications.getEnemyArchonLocationByIndex(rc, i).toString()+" ";
-
-        }
-
         if(gameState == 0){
-            if(commandCooldown[0] < 0 && soldierCount / rc.getArchonCount() >= 15){
+            if(commandCooldown[0] < 0 && soldierCount / rc.getArchonCount() >= 15 * MAP_SCALER){
                 rushArchon(rc);
             }
         } else if (gameState == 1){
@@ -155,7 +155,7 @@ public strictfp class Archon {
                 rc.setIndicatorString("destroyed");
                 attackingArchon = -1;
                 gameState = 0;
-                if(soldierCount / rc.getArchonCount() >= 10){
+                if(soldierCount / rc.getArchonCount() >= 10 * MAP_SCALER){
                     rushArchon(rc);
                     if(attackingArchon == -1){
                         Communications.sendStopAttackCommand(rc, commands[0].location);
@@ -187,13 +187,13 @@ public strictfp class Archon {
                     buildTowardsLowRubble(rc, RobotType.SOLDIER);
 
                 }
-            } else if (minerCount / rc.getArchonCount() < 10 ){
+            } else if (minerCount / rc.getArchonCount() < 10 *  MAP_SCALER){
                 if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
                     buildTowardsLowRubble(rc, RobotType.MINER);
 
                 }
             } else {
-                if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
+                if (rc.getTeamLeadAmount(rc.getTeam()) >= 75 * MAP_SCALER) {
                     buildTowardsLowRubble(rc, RobotType.SOLDIER);
                 }
             }
