@@ -4,7 +4,6 @@ import battlecode.common.Direction;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
-import scala.collection.Map;
 
 public class Pathing {
     static Direction pathTo(RobotController rc, MapLocation target)

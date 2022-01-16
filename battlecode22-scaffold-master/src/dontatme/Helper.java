@@ -24,4 +24,32 @@ public strictfp class Helper {
      * we get the same sequence of numbers every time this code is run. This is very useful for debugging!
      */
     public static final Random rng = new Random(6147);
+
+    // Updates enemy location (should be called each turn)
+    public static MapLocation[] updateEnemyLocations(RobotController rc, RobotInfo[] robotsDetected) throws GameActionException {
+        MapLocation[] nearbyEnemies = new MapLocation[10];
+        int index = 0;
+        for (RobotInfo robot : robotsDetected){
+            if (robot.getTeam() != rc.getTeam()) {
+                if (robot.getType().equals(RobotType.ARCHON) && robot.getTeam() == rc.getTeam().opponent()) {
+                    // get id and location
+                    int enemyArchonId = robot.ID;
+                    MapLocation enemyArchonLocation = robot.location;
+                    MapLocation currentEnemyLocation = Communications.getEnemyArchonLocation(rc, enemyArchonId);
+    
+                    // if new location found update array
+                    if (!enemyArchonLocation.equals(currentEnemyLocation)) {
+                        Communications.setEnemyArchonLocation(rc, enemyArchonId, enemyArchonLocation);
+                    }
+                } else if (index < 10 && (robot.getType() == RobotType.SOLDIER || robot.getType() == RobotType.SAGE
+                        || robot.getType() == RobotType.WATCHTOWER)){
+                    nearbyEnemies[index] = robot.getLocation();
+                    index++;
+                }
+            }
+        }
+        return nearbyEnemies;
+
+        // TODO: check archon location with current location and clear if necessary
+    }
 }

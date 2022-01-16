@@ -57,15 +57,7 @@ public strictfp class Miner {
 
         mineAround(rc, me);
 
-        MapLocation[] newEnemies = new MapLocation[10];
-        int index = 0;
-        for(RobotInfo robot: robotInfo){
-            if(index < 10 && !robot.getTeam().isPlayer() && (robot.type == RobotType.SOLDIER ||
-                    robot.type == RobotType.SAGE ||robot.type == RobotType.WATCHTOWER)){
-                newEnemies[index] = robot.getLocation();
-                index++;
-            }
-        }
+        MapLocation[] newEnemies = Helper.updateEnemyLocations(rc, robotInfo);
         if (newEnemies[0] != null || currentEnemies == null) {
             currentEnemies = newEnemies;
         }
