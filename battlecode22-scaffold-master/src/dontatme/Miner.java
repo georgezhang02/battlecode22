@@ -8,16 +8,13 @@ public strictfp class Miner {
     static MinerType minerType = MinerType.None;
 
     static MapLocation heading = null;
-    static MapLocation pastHeading = null;
     static Pathfinder pathfinder;
 
     static int runAwayTimer = 0;
     static MapLocation[] currentEnemies = null;
 
-
-
     private static enum MinerType {
-        None, BaseMiner, CampMiner, ExploreMiner
+        None, BaseMiner, ExploreMiner
     }
 
     /**
@@ -29,6 +26,8 @@ public strictfp class Miner {
 
         RobotInfo[] robotInfo = rc.senseNearbyRobots();
         MapLocation me = rc.getLocation();
+        MapLocation[] leads = rc.senseNearbyLocationsWithLead(20);
+        MapLocation[] leadsClose = rc.senseNearbyLocationsWithLead(2);
 
         // Initialize pathfinding and archon index
         if (pathfinder == null){
@@ -49,55 +48,50 @@ public strictfp class Miner {
                 Communications.incrementArchonMinerCount(rc, archonID);
                 minerType = MinerType.BaseMiner;
             } else {
-                if (Math.random() > .5){
-                    minerType = MinerType.CampMiner;
-                } else {
-                    minerType = MinerType.ExploreMiner;
-                }
+                minerType = MinerType.ExploreMiner;
             }
         }
 
+        // Mine around if possible
         mineAround(rc, me);
 
         currentEnemies = Helper.updateEnemyLocations(rc, robotInfo);
 
-
         runAwayTimer--;
-        if (currentEnemies[0] != null || runAwayTimer > 0 ){
+        if (currentEnemies[0] != null || runAwayTimer > 0){
 
             Direction dir = pathfinder.pathAwayFrom(currentEnemies);
             if (rc.canMove(dir)){
                 rc.move(dir);
             }
 
-            if(currentEnemies[0]!= null){
-                runAwayTimer  = 3;
+            if(currentEnemies[0] != null){
+                runAwayTimer = 3;
             }
 
-
+            System.out.println("Running away " + me + " " + runAwayTimer);
         }
         // Otherwise, go mining
         else if (currentEnemies[0] == null) {
 
+            // If not on lead
+            int leadOnMe = rc.senseLead(me);
 
-            // Mine around if possible
-            int leadThreshold = 1;
-            if (minerType == MinerType.CampMiner) {
-                leadThreshold = 0;
+            int visionLeadCount = 0;
+            for (MapLocation lead : leads) {
+                visionLeadCount += rc.senseLead(lead);
             }
 
-            // If not on lead
-            if (rc.senseLead(me) <= leadThreshold) {
+            if (leadOnMe == 0 || (leadOnMe == 1 && (leadsClose.length < 4 || visionLeadCount > 4 * leads.length || !noMinersAround(rc, me)))) {
 
                 // If the current heading still has lead and no miners, go there
-                if (heading != null && rc.canSenseLocation(heading) &&
-                        rc.senseLead(heading) > leadThreshold && noMinersAround(rc, heading)) {
+                if (heading != null && rc.canSenseLocation(heading) && rc.senseLead(heading) > 1 && noMinersAround(rc, heading)) {
                     tryMove(rc, me, heading);
                 }
 
                 // If no current heading, move towards lead within miner vision if possible (and avoid other miners)
                 else {
-                    heading = goTowardsNearbyLead(rc, me, leadThreshold);
+                    heading = goTowardsNearbyLead(rc, me, leads);
 
                     // If no lead within vision, run code based on miner type
                     if (heading == null) {
@@ -106,9 +100,6 @@ public strictfp class Miner {
                                 rc.setIndicatorString("Base Miner");
                                 baseMiner(rc, me);
                                 break;
-                            case CampMiner:
-                                rc.setIndicatorString("Camp Miner");
-                                exploreMiner(rc, me);
                             case ExploreMiner:
                                 rc.setIndicatorString("Explore Miner");
                                 exploreMiner(rc, me);
@@ -116,9 +107,6 @@ public strictfp class Miner {
                             default:
                                 break;
                         }
-                    } else {
-                        pastHeading = heading;
-                        rc.setIndicatorString("" + pastHeading.x + pastHeading.y);
                     }
                 }
             }
@@ -130,7 +118,7 @@ public strictfp class Miner {
             MapLocation nearby = loc.add(dir);
             if (rc.canSenseLocation(nearby)) {
                 RobotInfo nearbyRobot = rc.senseRobotAtLocation(nearby);
-                if (nearbyRobot != null && nearbyRobot.ID != rc.getID()) {
+                if (nearbyRobot != null && nearbyRobot.getID() != rc.getID() && nearbyRobot.getType() == RobotType.MINER) {
                     return false;
                 }
             }
@@ -141,13 +129,13 @@ public strictfp class Miner {
     static void baseMiner(RobotController rc, MapLocation me) throws GameActionException {
         // Move towards lead location given by archon
         MapLocation archonLead = Communications.getArchonVisionLead(rc, archonID);
-        if (archonLead.y != 61 && noMinersAround(rc, archonLead)) {
+        if (archonLead.y != 61) {
+            rc.setIndicatorDot(me, 255, 0, 0);
             tryMove(rc, me, archonLead);
         }
-
-        // If no more resources left, become camp miner
+        // If no more resources left, become explorer
         else {
-            minerType = MinerType.CampMiner;
+            minerType = MinerType.ExploreMiner;
         }
     }
 
@@ -155,7 +143,7 @@ public strictfp class Miner {
         Direction exploreDir = pathfinder.pathToExplore();
         if (rc.canMove(exploreDir)) {
             rc.move(exploreDir);
-            rc.setIndicatorLine(me.add(exploreDir), me.add(exploreDir).add(exploreDir), 0, 0, 255);
+            rc.setIndicatorLine(me.add(exploreDir), pathfinder.explorer.target, 0, 0, 255);
         }
     }
 
@@ -174,10 +162,9 @@ public strictfp class Miner {
 
     }
 
-    static MapLocation goTowardsNearbyLead(RobotController rc, MapLocation me, int leadThreshold) throws GameActionException {
-        MapLocation[] leads = rc.senseNearbyLocationsWithLead(20);
+    static MapLocation goTowardsNearbyLead(RobotController rc, MapLocation me, MapLocation[] leads) throws GameActionException {
         for (MapLocation lead : leads) {
-            if (rc.senseLead(lead) > leadThreshold && noMinersAround(rc, lead) && !lead.equals(pastHeading)) {
+            if (rc.senseLead(lead) > 1 && noMinersAround(rc, lead)) {
                 tryMove(rc, me, lead);
                 return lead;
             }
