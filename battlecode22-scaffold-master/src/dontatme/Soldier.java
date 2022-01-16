@@ -74,7 +74,6 @@ public strictfp class Soldier {
             y = Math.max(0, Math.min(y, rc.getMapHeight()-1));
 
             curTarget = new MapLocation(x, y);
-            rc.setIndicatorString(curTarget.toString());
 
 
 
@@ -96,7 +95,6 @@ public strictfp class Soldier {
         enemies = rc.senseNearbyRobots(20, opponent);
         allies = rc.senseNearbyRobots(20, rc.getTeam());
 
-        rc.setIndicatorString(curPrio+" ");
 
         if(command != null && curPrio != -1){
 
@@ -193,8 +191,10 @@ public strictfp class Soldier {
                     curTarget = null;
                     return;
                 } else {
+                    rc.setIndicatorString("Defending");
                     int priority = Communications.getCommandPrio(dc.type, false);
                     if(!rusher || dc.type != RobotType.MINER){
+
                         if (priority >= maxPrio && Communications.inCommandRadius(rc, dc.type, dc.location, false)) {
                             maxPrio = priority;
                             curFollow = index;
@@ -205,6 +205,9 @@ public strictfp class Soldier {
             }
 
         }
+        rc.setIndicatorString(count+"");
+
+
         if(curFollow != -1 && curFollow < attackCommands.length){
             command = attackCommands[curFollow];
             attacking = true;
@@ -313,7 +316,6 @@ public strictfp class Soldier {
         MapLocation ml = attack(1);
 
         if(ml != null){
-            rc.setIndicatorString("explore "+ (command == null)+" "+state);
             curTarget = ml;
             state = 3;
         }

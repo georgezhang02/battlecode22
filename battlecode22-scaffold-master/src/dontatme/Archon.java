@@ -45,8 +45,8 @@ public strictfp class Archon {
         commandCooldown[0]--;
         commandCooldown[1]--;
         Team opponent = rc.getTeam().opponent();
-        enemies = rc.senseNearbyRobots(20, opponent);
-        allies = rc.senseNearbyRobots(20, rc.getTeam());
+        enemies = rc.senseNearbyRobots(34, opponent);
+        allies = rc.senseNearbyRobots(34, rc.getTeam());
 
         // Get the archon ID if needed
         if (id == -1) {
@@ -88,7 +88,8 @@ public strictfp class Archon {
         MapLocation[] enemyPos = new MapLocation[5];
 
         for(RobotInfo robot:enemies){
-            if(robot.getType() == RobotType.SOLDIER){
+            RobotType type = robot.getType();
+            if(type == RobotType.SOLDIER || type == RobotType.WATCHTOWER || type == RobotType.SAGE){
                 enemyCount++;
                 if(enemyCount < 5){
                     enemyPos[enemyCount] = robot.getLocation();
@@ -96,11 +97,14 @@ public strictfp class Archon {
             }
         }
         for(RobotInfo robot: allies){
-            if(robot.getType() == RobotType.SOLDIER){
+            RobotType type = robot.getType();
+            if(type == RobotType.SOLDIER || type == RobotType.WATCHTOWER || type == RobotType.SAGE){
                 allyCount++;
             }
         }
-        if( (enemyCount >= allyCount && enemyCount > 1)  || (enemyCount > 2) && commandCooldown[1] <= 0){
+
+        rc.setIndicatorString(enemyCount + " "+ commandCooldown[1]);
+        if( ((enemyCount >= allyCount && enemyCount > 1)  || (enemyCount > 2)) && commandCooldown[1] <= 0){
             Communications.sendDefenseCommand(rc, rc.getLocation(), RobotType.ARCHON);
             commandCooldown[1] = Communications.getCommandCooldown(rc, RobotType.ARCHON, false);
         }

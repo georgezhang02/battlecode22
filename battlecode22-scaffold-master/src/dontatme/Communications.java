@@ -310,7 +310,7 @@ public class Communications {
 
         int nextIndex = getNextAttackIndex(rc) + offset;
         int readVal = rc.readSharedArray(nextIndex);
-        if(decode(readVal, 0) == NULL_LOCATION || rc.getType().equals(RobotType.ARCHON) ){
+        if(decode(readVal, 0) >=60 || rc.getType().equals(RobotType.ARCHON) ){
             rc.writeSharedArray(nextIndex, newCommand);
             incrementAttackIndex(rc);
 
@@ -365,7 +365,7 @@ public class Communications {
 
         int nextIndex = getNextDefIndex(rc) + offset;
         int readVal = rc.readSharedArray(nextIndex);
-        if( (decode(readVal, 0) <= 60 || rc.getType().equals(RobotType.ARCHON) )){
+        if( (decode(readVal, 0) >= 60 || rc.getType().equals(RobotType.ARCHON) )){
             rc.setIndicatorString("Defend " + location);
             rc.writeSharedArray(nextIndex, newCommand);
             incrementDefIndex(rc);
@@ -471,7 +471,7 @@ public class Communications {
                     return 10 * (rc.getMapHeight() + rc.getMapWidth()) / 120;
                 }
             case MINER:
-                return 5;
+                return 20;
 
             case WATCHTOWER:
                 if(attacking){
@@ -502,7 +502,7 @@ public class Communications {
                     return Math.sqrt(rc.getLocation().distanceSquaredTo(ml)) <= (rc.getMapWidth() + rc.getMapHeight())/4;
                 }
             case MINER:
-                return Math.sqrt(rc.getLocation().distanceSquaredTo(ml)) <= 5;
+                return Math.sqrt(rc.getLocation().distanceSquaredTo(ml)) <=  10 * (.25 + .75 *(rc.getMapWidth() + rc.getMapHeight()))/120;
 
             case WATCHTOWER:
                 if(attacking) {
@@ -790,7 +790,7 @@ public class Communications {
      */
     public static int getNextDefIndex(RobotController rc) throws GameActionException{
         int readVal = rc.readSharedArray(NEXT_INDICES);
-        return decode(readVal, 0);
+        return decode(readVal, 1);
     }
 
 

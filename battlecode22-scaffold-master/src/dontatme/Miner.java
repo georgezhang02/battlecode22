@@ -56,19 +56,22 @@ public strictfp class Miner {
         mineAround(rc, me);
 
         currentEnemies = Helper.updateEnemyLocations(rc, robotInfo);
-
+        runAwayTimer--;
         if (currentEnemies[0] != null || runAwayTimer > 0){
             Direction dir = pathfinder.pathAwayFrom(currentEnemies);
             if (rc.canMove(dir)){
-                runAwayTimer--;
+
                 rc.move(dir);
             }
 
             if(currentEnemies[0] != null){
                 runAwayTimer = 3;
+                Communications.sendDefenseCommand(rc, rc.getLocation(), RobotType.MINER);
+                rc.setIndicatorString("Help me");
             }
 
-            System.out.println("Running away " + me + " " + runAwayTimer);
+
+
         }
         // Otherwise, go mining
         else if (currentEnemies[0] == null) {
