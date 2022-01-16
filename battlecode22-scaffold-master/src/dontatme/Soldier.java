@@ -205,7 +205,9 @@ public strictfp class Soldier {
 
         }
 
-        rc.setIndicatorString(count+" ");
+        rc.setIndicatorString(count+"");
+
+
 
 
         if(curFollow != -1 && curFollow < attackCommands.length){
@@ -215,11 +217,14 @@ public strictfp class Soldier {
             curPrio = maxPrio;
 
         } else if (curFollow != -1){
+
             curFollow -= attackCommands.length;
             command = defendCommands[curFollow];
             attacking = false;
             commandTimer = Communications.getCommandCooldown(rc, command.type, false);
             curPrio = maxPrio;
+
+            rc.setIndicatorString(command.location+" ");
         }
 
     }

@@ -1,5 +1,6 @@
 package dontatme;
 
+import java.awt.*;
 import java.util.Arrays;
 
 import battlecode.common.*;
@@ -87,9 +88,10 @@ public strictfp class Archon {
                 allyCount++;
             }
         }
-        if(enemyCount >= allyCount && enemyCount > 1){
+        if( (enemyCount >= allyCount && enemyCount > 1)  || (enemyCount > 2) && commandCooldown[1] <= 0){
+            rc.setIndicatorString("HELP ME");
             Communications.sendDefenseCommand(rc, rc.getLocation(), RobotType.ARCHON);
-            commandCooldown[1] = 10 * (rc.getMapHeight() + rc.getMapWidth()) / 120;
+            commandCooldown[1] = Communications.getCommandCooldown(rc, RobotType.ARCHON, false);
         }
 
 
@@ -142,7 +144,6 @@ public strictfp class Archon {
             str += Communications.getEnemyArchonLocationByIndex(rc, i).toString()+" ";
 
         }
-        rc.setIndicatorString(str);
 
         if(gameState == 0){
             if(commandCooldown[0] < 0 && soldierCount / rc.getArchonCount() >= 15){

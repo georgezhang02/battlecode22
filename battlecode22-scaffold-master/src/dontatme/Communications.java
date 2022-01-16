@@ -347,9 +347,10 @@ public class Communications {
         int offset = (rc.getRoundNum() % 2 == 0) ? DEFENSE_EVEN_OFFSET : DEFENSE_ODD_OFFSET;
         int newCommand = encode(location.x, location.y, t.ordinal());
 
-        int nextIndex = getNextAttackIndex(rc) + offset;
+        int nextIndex = getNextDefIndex(rc) + offset;
         int readVal = rc.readSharedArray(nextIndex);
-        if( (decode(readVal, 0) == NULL_LOCATION || rc.getType().equals(RobotType.ARCHON) )){
+        if( (decode(readVal, 0) <= 60 || rc.getType().equals(RobotType.ARCHON) )){
+            rc.setIndicatorString("Defend " + location);
             rc.writeSharedArray(nextIndex, newCommand);
             incrementDefIndex(rc);
 
@@ -363,7 +364,7 @@ public class Communications {
         int offset = (rc.getRoundNum() % 2 == 0) ? DEFENSE_EVEN_OFFSET : DEFENSE_ODD_OFFSET;
         int newCommand = encode(location.x, location.y, 15);
 
-        int nextIndex = getNextAttackIndex(rc) + offset;
+        int nextIndex = getNextDefIndex(rc) + offset;
         int readVal = rc.readSharedArray(nextIndex);
         if( (decode(readVal, 0) == NULL_LOCATION || rc.getType().equals(RobotType.ARCHON) )){
             rc.writeSharedArray(nextIndex, newCommand);
@@ -475,24 +476,23 @@ public class Communications {
      */
     public static boolean inCommandRadius(RobotController rc, RobotType type, MapLocation ml, boolean attacking){
         if(type == null){
-            return rc.getLocation().distanceSquaredTo(ml) <= 3600;
+            return Math.sqrt(rc.getLocation().distanceSquaredTo(ml)) <= 3600;
         }
         switch(type){
             case ARCHON:
                 if(attacking){
-                    return rc.getLocation().distanceSquaredTo(ml) <= 3600;
+                    return Math.sqrt(rc.getLocation().distanceSquaredTo(ml)) <= 120;
                 } else{
-                    return rc.getLocation().distanceSquaredTo(ml) <= (rc.getMapWidth()* rc.getMapWidth() +
-                            rc.getMapHeight() * rc.getMapHeight())/4;
+                    return Math.sqrt(rc.getLocation().distanceSquaredTo(ml)) <= (rc.getMapWidth() + rc.getMapHeight())/4;
                 }
             case MINER:
-                return rc.getLocation().distanceSquaredTo(ml) <= 50;
+                return Math.sqrt(rc.getLocation().distanceSquaredTo(ml)) <= 5;
 
             case WATCHTOWER:
                 if(attacking) {
-                    return rc.getLocation().distanceSquaredTo(ml) <= 3600;
+                    return Math.sqrt(rc.getLocation().distanceSquaredTo(ml)) <= 120;
                 } else{
-                    return rc.getLocation().distanceSquaredTo(ml) <= 3600;
+                    return Math.sqrt(rc.getLocation().distanceSquaredTo(ml)) <= 120;
                 }
             default:
                 break;
