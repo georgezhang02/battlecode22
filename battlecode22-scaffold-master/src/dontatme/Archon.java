@@ -1,6 +1,5 @@
 package dontatme;
 
-import java.awt.*;
 import java.util.Arrays;
 
 import battlecode.common.*;
@@ -187,6 +186,7 @@ public strictfp class Archon {
 
 
         if( rc.isActionReady() && Communications.getArchonTurn(rc)  == curArchonOrder){
+            /*
             if (miners < 4) {
                 if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
                     buildTowardsLowRubble(rc, RobotType.MINER);
@@ -204,6 +204,25 @@ public strictfp class Archon {
             } else {
                 if (rc.getTeamLeadAmount(rc.getTeam()) >= 75 * MAP_SCALER) {
                     buildTowardsLowRubble(rc, RobotType.SOLDIER);
+                }
+            }
+            */
+
+
+            if (miners < 4) {
+                if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
+                    buildTowardsLowRubble(rc, RobotType.MINER);
+                }
+            } else {
+                if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
+                    int x = (int )(3 * Math.random());
+
+                    if(x >= 1){
+                        buildTowardsLowRubble(rc, RobotType.SOLDIER);
+                    } else{
+                        buildTowardsLowRubble(rc, RobotType.MINER);
+                    }
+
                 }
             }
         }

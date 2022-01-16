@@ -2,7 +2,6 @@ package dontatme;
 
 import battlecode.common.*;
 
-import java.awt.*;
 import java.util.Random;
 
 public strictfp class Soldier {
@@ -53,7 +52,7 @@ public strictfp class Soldier {
         double d = Math.random();
 
 
-        if( d> .3){
+        if(d > -1){
             rusher = false;
             state = 2;
         } else{
@@ -193,7 +192,7 @@ public strictfp class Soldier {
                 } else {
                     rc.setIndicatorString("Defending");
                     int priority = Communications.getCommandPrio(dc.type, false);
-                    if(!rusher || dc.type != RobotType.MINER){
+                    if( dc.type != RobotType.MINER){
 
                         if (priority >= maxPrio && Communications.inCommandRadius(rc, dc.type, dc.location, false)) {
                             maxPrio = priority;
@@ -256,11 +255,7 @@ public strictfp class Soldier {
                 allyCount++;
             }
         }
-        if(enemyCount >= 2 * (allyCount + 1) && enemyCount > 1){
-            move(pathfinder.pathAwayFrom(enemyPos));
-            attack(attackType);
-        }
-        else if(target != null && !pathfinder.targetWithinRadius(target, 6)){
+         if(target != null && !pathfinder.targetWithinRadius(target, 6)){
             move(pathfinder.pathToTarget(target, false));
             attack(attackType);
 

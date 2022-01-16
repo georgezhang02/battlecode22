@@ -2,7 +2,6 @@ package dontatme;
 
 import battlecode.common.*;
 
-import java.awt.*;
 import java.util.Objects;
 
 // For Commmunication Scheme: https://docs.google.com/spreadsheets/d/1U5TSMQ_MRm_tilbJa-L8_SL3OOONUCgavhuT9dSQ4Jg/edit#gid=0

@@ -1,4 +1,4 @@
-package dontatme;
+package dontatme_old;
 
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
