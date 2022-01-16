@@ -3,7 +3,7 @@ package dontatme;
 import battlecode.common.*;
 
 import java.awt.*;
-import java.util.Map;
+import java.util.Random;
 
 public strictfp class Soldier {
     /**
@@ -29,6 +29,10 @@ public strictfp class Soldier {
     static int commandTimer = 0;
     static int curPrio = -1;
 
+    static Random random = new Random();
+
+
+
     static Direction[] directions = {
             Direction.NORTH,
             Direction.WEST,
@@ -46,7 +50,11 @@ public strictfp class Soldier {
         this.rc = rc;
         pathfinder = new BFPathing20(rc);
 
-        if(Math.random() > .5){
+        double d = Math.random();
+
+        System.out.println(d+"");
+
+        if( d> .3){
             rusher = false;
             state = 2;
         } else{
@@ -68,6 +76,8 @@ public strictfp class Soldier {
 
             curTarget = new MapLocation(x, y);
             rc.setIndicatorString(curTarget.toString());
+
+
 
             state = 5;
         }
