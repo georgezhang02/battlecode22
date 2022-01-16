@@ -27,6 +27,7 @@ public strictfp class Helper {
 
     // Updates enemy location (should be called each turn)
     public static MapLocation[] updateEnemyLocations(RobotController rc, RobotInfo[] robotsDetected) throws GameActionException {
+
         MapLocation[] nearbyEnemies = new MapLocation[10];
         int index = 0;
         for (RobotInfo robot : robotsDetected){
@@ -45,6 +46,30 @@ public strictfp class Helper {
                 }
             }
         }
+
+        for(int i = 0; i< 4; i++){
+            MapLocation archLocation = Communications.getEnemyArchonLocationByIndex(rc, i);
+            if(rc.canSenseLocation(archLocation)){
+                if(rc.canSenseRobotAtLocation(archLocation)){
+                    if(rc.senseRobotAtLocation(archLocation).getType() != RobotType.ARCHON){
+                        Communications.setEnemyArchonLocationByIndex(rc, 15, i, new MapLocation(60,60));
+                    }
+                } else{
+                    Communications.setEnemyArchonLocationByIndex(rc, 15, i, new MapLocation(60,60));
+                }
+            }
+        }
+
+
+        String str = "";
+        for(int i = 0; i< 4; i++){
+            MapLocation ml = Communications.getEnemyArchonLocationByIndex(rc, i);
+
+            str += ml.toString()+" ";
+
+        }
+        rc.setIndicatorString(str);
+
         return nearbyEnemies;
 
         // TODO: check archon location with current location and clear if necessary

@@ -57,6 +57,7 @@ public strictfp class Soldier {
             rusher = false;
             state = 2;
         } else{
+            /*
             rusher = true;
             int x = (int) (2 * Math.random()) ;
             int y = (int) (2 * Math.random()) ;
@@ -78,6 +79,8 @@ public strictfp class Soldier {
 
 
             state = 5;
+            */
+
         }
     }
 
@@ -95,6 +98,7 @@ public strictfp class Soldier {
         enemies = rc.senseNearbyRobots(20, opponent);
         allies = rc.senseNearbyRobots(20, rc.getTeam());
 
+        Helper.updateEnemyLocations(rc, enemies);
 
         if(command != null && curPrio != -1){
 
@@ -153,14 +157,13 @@ public strictfp class Soldier {
         for(index = 0; index<attackCommands.length; index++){
             Communications.Command ac = attackCommands[index];
             if(ac.location.x < 60){
+
                 if(ac.type == null && ac.location.equals(curTarget) && attacking){
+                    System.out.println("stop");
                     curPrio = -1;
-                    curFollow = -1;
-                    attacking = false;
                     commandTimer = 0;
                     curTarget = null;
-
-                    rc.setIndicatorString("CancelComm");
+                    command = null;
                     return;
                 } else{
                     int priority = Communications.getCommandPrio(ac.type, true);
@@ -185,13 +188,11 @@ public strictfp class Soldier {
                 count ++;
                 if (dc.type == null && dc.location.equals(curTarget) && !attacking) {
                     curPrio = -1;
-                    curFollow = -1;
-                    attacking = false;
                     commandTimer = 0;
                     curTarget = null;
+                    command = null;
                     return;
                 } else {
-                    rc.setIndicatorString("Defending");
                     int priority = Communications.getCommandPrio(dc.type, false);
                     if( true){
 
@@ -205,8 +206,6 @@ public strictfp class Soldier {
             }
 
         }
-        rc.setIndicatorString(count+"");
-
 
         if(curFollow != -1 && curFollow < attackCommands.length){
             command = attackCommands[curFollow];
@@ -222,7 +221,6 @@ public strictfp class Soldier {
             commandTimer = Communications.getCommandCooldown(rc, command.type, false);
             curPrio = maxPrio;
 
-            rc.setIndicatorString(command.location+" ");
         }
 
     }
@@ -236,7 +234,18 @@ public strictfp class Soldier {
 
     }
     static void offense(MapLocation target, int attackType) throws GameActionException {
-        rc.setIndicatorString(state+" Offense");
+        //rc.setIndicatorString(state+" Offense");
+
+        if(command != null && rc.canSenseLocation(command.location) && attacking ){
+
+            System.out.println("stop my attack");
+            RobotInfo robot = rc.senseRobotAtLocation(command.location);
+            if(robot == null || (robot.getType() != command.type &&
+                    !robot.getTeam().isPlayer() && robot.getType().isBuilding())){
+                Communications.sendStopAttackCommand(rc, command.location);
+            }
+
+        }
 
         int enemyCount = 0;
         int allyCount = 0;
@@ -257,7 +266,7 @@ public strictfp class Soldier {
             }
         }
         if(enemyCount > 0){
-            Communications.sendAttackCommand(rc, rc.getLocation(), RobotType.SOLDIER);
+            Communications.sendDefenseCommand(rc, rc.getLocation(), RobotType.SOLDIER);
         }
         if(target != null && !pathfinder.targetWithinRadius(target, 6)){
             move(pathfinder.pathToTarget(target, false));
@@ -266,19 +275,16 @@ public strictfp class Soldier {
         }  else{
             MapLocation ml = attack(attackType);
             if(ml!= null){
-
                 curTarget = ml;
             } else{
                 attacking = false;
                 state = 2;
             }
         }
-
-
     }
 
     static void defense(MapLocation target, int minDistance) throws GameActionException {
-        rc.setIndicatorString(state + " defense "+ curTarget.toString());
+        ///rc.setIndicatorString(state + " defense "+ curTarget.toString());
         if(target != null && !pathfinder.targetWithinRadius(target, minDistance)){
             move(pathfinder.pathToTarget(target, false));
             MapLocation ml = attack(1);
@@ -338,10 +344,7 @@ public strictfp class Soldier {
         }
         if(attackLoc!= null && rc.canAttack(attackLoc.getLocation())){
             rc.attack(attackLoc.getLocation());
-            if(attackLoc.getType().equals(RobotType.ARCHON) && !rc.canSenseRobot(attackLoc.getID())){
-                Communications.setEnemyArchonLocation(rc, attackLoc.getID(), new MapLocation(61, 61));
-                System.out.println("Archon destroyed");
-            }
+
         }
         if(attackLoc != null){
             return attackLoc.getLocation();

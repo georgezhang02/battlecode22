@@ -159,7 +159,7 @@ public strictfp class Archon {
             }
         } else if (gameState == 1){
 
-            if(Communications.getEnemyArchonLocationByIndex(rc, attackingArchon).x == 61){
+            if(Communications.getEnemyArchonLocationByIndex(rc, attackingArchon).x < 60){
                 rc.setIndicatorString("destroyed");
                 attackingArchon = -1;
                 gameState = 0;
@@ -186,7 +186,7 @@ public strictfp class Archon {
 
 
         if( rc.isActionReady() && Communications.getArchonTurn(rc)  == curArchonOrder){
-            /*
+
             if (miners < 4) {
                 if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
                     buildTowardsLowRubble(rc, RobotType.MINER);
@@ -206,25 +206,9 @@ public strictfp class Archon {
                     buildTowardsLowRubble(rc, RobotType.SOLDIER);
                 }
             }
-            */
 
 
-            if (miners < 4) {
-                if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
-                    buildTowardsLowRubble(rc, RobotType.MINER);
-                }
-            } else {
-                if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
-                    int x = (int )(3 * Math.random());
 
-                    if(x >= 1){
-                        buildTowardsLowRubble(rc, RobotType.SOLDIER);
-                    } else{
-                        buildTowardsLowRubble(rc, RobotType.MINER);
-                    }
-
-                }
-            }
         }
 
     }
