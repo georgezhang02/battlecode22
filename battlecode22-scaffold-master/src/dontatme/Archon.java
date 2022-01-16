@@ -38,6 +38,8 @@ public strictfp class Archon {
         enemies = rc.senseNearbyRobots(20, opponent);
         allies = rc.senseNearbyRobots(20, rc.getTeam());
 
+
+
         // Get the archon ID if needed
         if (id == -1) {
             id = rc.getID();
@@ -49,7 +51,16 @@ public strictfp class Archon {
 
         if(turn ==1){
             for(int i = 0; i < 4; i++){
-                Communications.setEnemyArchonLocationByIndex(rc, -1, i, new MapLocation(-1, -1));
+                Communications.setEnemyArchonLocationByIndex(rc, 15, i, new MapLocation(61, 61));
+            }
+            for(int i = 0; i< 10; i++){
+                rc.writeSharedArray(i + Communications.ATTACK_OFFSET, 61);
+                rc.writeSharedArray(i + Communications.DEFENSE_OFFSET, 61);
+
+            }
+
+            for(int i = 0; i < 5; i++){
+                rc.writeSharedArray(i + Communications.BUILD_OFFSET, 61);
             }
         }
 
@@ -74,7 +85,8 @@ public strictfp class Archon {
             }
         }
         if(enemyCount >= allyCount && enemyCount > 1){
-            Communications.sendDefenseCommand(rc, rc.getLocation(), RobotType.ARCHON, rc.getID());
+            Communications.sendDefenseCommand(rc, rc.getLocation(), RobotType.ARCHON);
+            commandCooldown[1] = 10 * (rc.getMapHeight() + rc.getMapWidth()) / 120;
         }
         /*
         if(enemyCount >= 2 * soldierCount && enemyCount > 2){
@@ -119,7 +131,7 @@ public strictfp class Archon {
         int soldierCount = 0;
         if(gameState == 0){
             if(commandCooldown[0] < 0 && soldierCount / rc.getArchonCount() >= 30){
-                boolean archFound = false;
+
                 for(int i = 0; i<4 && attackingArchon == -1; i++){
                     rushArchon(rc);
                 }
@@ -146,30 +158,37 @@ public strictfp class Archon {
 
         if(rc.isActionReady()){
             if(turn == 1){
+                rc.setIndicatorString("Miners 0");
                 buildTowardsLowRubble(rc, RobotType.MINER, turn);
             }
             else if(turn < 5 * rc.getArchonCount()){
+                rc.setIndicatorString("Miners Intermediat");
                 if (miners < 4 && turn % rc.getArchonCount() == Communications.getTeamArchonIndexFromID(rc,rc.getID())) {
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
                         buildTowardsLowRubble(rc, RobotType.MINER, turn);
                     }
                 }
             } else{
+                rc.setIndicatorString(miners+"");
                 if (miners < 4) {
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
                         buildTowardsLowRubble(rc, RobotType.MINER, turn);
+
                     }
                 } else if (soldierCount / rc.getArchonCount() < 5 ){
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
                         buildTowardsLowRubble(rc, RobotType.SOLDIER, turn);
+                        rc.setIndicatorString("Soldier 1");
                     }
                 } else if (minerCount / rc.getArchonCount() < 10 ){
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
                         buildTowardsLowRubble(rc, RobotType.MINER, turn);
+                        rc.setIndicatorString("Miners 2");
                     }
                 } else if (soldierCount/rc.getArchonCount() < 30 ){
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
                         buildTowardsLowRubble(rc, RobotType.SOLDIER, turn);
+                        rc.setIndicatorString("Soldier 2");
 
 
                     }
@@ -183,16 +202,18 @@ public strictfp class Archon {
     }
 
     static void rushArchon(RobotController rc) throws GameActionException {
+
         for(int i = 0; i<4 && attackingArchon == -1; i++){
             if(Communications.getEnemyArchonIDFromIndex(rc, i) != -1){ // found
                 MapLocation attackLoc = Communications.getEnemyArchonLocationByIndex(rc, i);
-                Communications.sendAttackCommand(rc, attackLoc, RobotType.ARCHON, rc.getID());
+                Communications.sendAttackCommand(rc, attackLoc, RobotType.ARCHON);
                 attackingArchon = i;
 
                 commandCooldown[0] = 100 * (rc.getMapHeight() + rc.getMapWidth()) / 120;
                 gameState = 1;
             }
         }
+
     }
 
     static void buildTowardsLowRubble(RobotController rc, RobotType type, int turn) throws GameActionException {
@@ -203,9 +224,10 @@ public strictfp class Archon {
                 rc.buildRobot(type, d);
                 switch(type) {
                     case MINER:
-                        if (miners < 15) {
+                        /*if (Communications.getArchonMinerCount(rc, id) < 15) {
                             Communications.incrementArchonMinerCount(rc, id);
-                        }
+                        }*/
+
                         miners++;
                         Communications.incrementArchonTurn(rc);
                         break;
