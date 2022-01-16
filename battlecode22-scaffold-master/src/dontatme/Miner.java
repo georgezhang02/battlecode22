@@ -57,11 +57,10 @@ public strictfp class Miner {
 
         currentEnemies = Helper.updateEnemyLocations(rc, robotInfo);
 
-        runAwayTimer--;
         if (currentEnemies[0] != null || runAwayTimer > 0){
-
             Direction dir = pathfinder.pathAwayFrom(currentEnemies);
             if (rc.canMove(dir)){
+                runAwayTimer--;
                 rc.move(dir);
             }
 
