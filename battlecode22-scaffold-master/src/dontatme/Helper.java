@@ -31,16 +31,13 @@ public strictfp class Helper {
         int index = 0;
         for (RobotInfo robot : robotsDetected){
             if (robot.getTeam() != rc.getTeam()) {
-                if (robot.getType().equals(RobotType.ARCHON) && robot.getTeam() == rc.getTeam().opponent()) {
+                if (robot.getType().equals(RobotType.ARCHON)) {
                     // get id and location
                     int enemyArchonId = robot.ID;
                     MapLocation enemyArchonLocation = robot.location;
-                    MapLocation currentEnemyLocation = Communications.getEnemyArchonLocation(rc, enemyArchonId);
-    
-                    // if new location found update array
-                    if (!enemyArchonLocation.equals(currentEnemyLocation)) {
-                        Communications.setEnemyArchonLocation(rc, enemyArchonId, enemyArchonLocation);
-                    }
+
+                    Communications.setEnemyArchonLocation(rc, enemyArchonId, enemyArchonLocation);
+
                 } else if (index < 10 && (robot.getType() == RobotType.SOLDIER || robot.getType() == RobotType.SAGE
                         || robot.getType() == RobotType.WATCHTOWER)){
                     nearbyEnemies[index] = robot.getLocation();

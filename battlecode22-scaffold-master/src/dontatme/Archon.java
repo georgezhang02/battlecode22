@@ -22,6 +22,7 @@ public strictfp class Archon {
 
     static boolean transformed = false;
 
+    static Communications.Command commands[] = new Communications.Command[2];
     static int curArchonOrder = -1;
 
     /**
@@ -52,7 +53,7 @@ public strictfp class Archon {
 
         if(firstTurn){
             for(int i = 0; i < 4; i++){
-                Communications.setEnemyArchonLocationByIndex(rc, 15, i, new MapLocation(61, 61));
+                Communications.setEnemyArchonLocationByIndex(rc, 15, i, new MapLocation(60, 60));
             }
             for(int i = 0; i< 10; i++){
                 rc.writeSharedArray(i + Communications.ATTACK_EVEN_OFFSET, 61);
@@ -135,23 +136,38 @@ public strictfp class Archon {
         // deciding to rush
         int minerCount = units[0];
         int soldierCount = units[1];
-        rc.setIndicatorString(minerCount+" "+soldierCount);
+        String str ="";
+
+        for(int i = 0; i< 4; i++){
+            str += Communications.getEnemyArchonLocationByIndex(rc, i).toString()+" ";
+
+        }
+        rc.setIndicatorString(str);
 
         if(gameState == 0){
-            if(commandCooldown[0] < 0 && soldierCount / rc.getArchonCount() >= 30){
+            if(commandCooldown[0] < 0 && soldierCount / rc.getArchonCount() >= 15){
 
-                for(int i = 0; i<4 && attackingArchon == -1; i++){
-                    rushArchon(rc);
-                }
+
+                rushArchon(rc);
+
 
             }
         } else if (gameState == 1){
-            if(Communications.getEnemyArchonIDFromIndex(rc, attackingArchon) == -1){
+
+            if(Communications.getEnemyArchonLocationByIndex(rc, attackingArchon).x == 61){
+                rc.setIndicatorString("destroyed");
                 attackingArchon = -1;
                 gameState = 0;
-                if(soldierCount / rc.getArchonCount() >= 20){
+                if(soldierCount / rc.getArchonCount() >= 10){
                     rushArchon(rc);
+                    if(attackingArchon == -1){
+                        Communications.sendStopAttackCommand(rc, commands[0].location);
+                    }
+                } else{
+                    Communications.sendStopAttackCommand(rc, commands[0].location);
                 }
+
+
             } else if(commandCooldown[0] <= 0){
                 gameState = 0;
                 attackingArchon = -1;
@@ -189,12 +205,14 @@ public strictfp class Archon {
     static void rushArchon(RobotController rc) throws GameActionException {
 
         for(int i = 0; i<4 && attackingArchon == -1; i++){
-            if(Communications.getEnemyArchonIDFromIndex(rc, i) != -1){ // found
+            if(Communications.getEnemyArchonLocationByIndex(rc, i).x < 60){ // found
+                System.out.println("rush"+ Communications.getEnemyArchonLocationByIndex(rc, i));
                 MapLocation attackLoc = Communications.getEnemyArchonLocationByIndex(rc, i);
                 Communications.sendAttackCommand(rc, attackLoc, RobotType.ARCHON);
                 attackingArchon = i;
 
                 commandCooldown[0] = 100 * (rc.getMapHeight() + rc.getMapWidth()) / 120;
+                commands[0] = new Communications.Command(Communications.getEnemyArchonLocationByIndex(rc, i), RobotType.ARCHON);
                 gameState = 1;
             }
         }
