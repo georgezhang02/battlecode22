@@ -25,6 +25,7 @@ public strictfp class Miner {
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
      */
     static void run(RobotController rc) throws GameActionException {
+        Communications.runStart(rc);
 
         RobotInfo[] robotInfo = rc.senseNearbyRobots();
         MapLocation me = rc.getLocation();
@@ -45,6 +46,7 @@ public strictfp class Miner {
         if (minerType == MinerType.None) {
             int minerCount = Communications.getArchonMinerCount(rc, archonID);
             if (minerCount <= 2) {
+                Communications.incrementArchonMinerCount(rc, archonID);
                 minerType = MinerType.BaseMiner;
             } else {
                 if (Math.random() > .5){
@@ -57,26 +59,26 @@ public strictfp class Miner {
 
         mineAround(rc, me);
 
-        MapLocation[] newEnemies = Helper.updateEnemyLocations(rc, robotInfo);
-        if (newEnemies[0] != null || currentEnemies == null) {
-            currentEnemies = newEnemies;
-        }
+        currentEnemies = Helper.updateEnemyLocations(rc, robotInfo);
 
-        if (currentEnemies[0] != null && runAwayTimer < 3){
-            System.out.println(me + " " + "running away");
+
+        runAwayTimer--;
+        if (currentEnemies[0] != null || runAwayTimer > 0 ){
+
             Direction dir = pathfinder.pathAwayFrom(currentEnemies);
             if (rc.canMove(dir)){
                 rc.move(dir);
             }
-            if (newEnemies[1] != null){
-                //Communications.sendDefenseCommand(rc,rc.getLocation(), RobotType.MINER, rc.getID());
-            }
-            runAwayTimer++;
-        }
 
+            if(currentEnemies[0]!= null){
+                runAwayTimer  = 3;
+            }
+
+
+        }
         // Otherwise, go mining
         else if (currentEnemies[0] == null) {
-            runAwayTimer = 0;
+
 
             // Mine around if possible
             int leadThreshold = 1;
@@ -88,7 +90,8 @@ public strictfp class Miner {
             if (rc.senseLead(me) <= leadThreshold) {
 
                 // If the current heading still has lead and no miners, go there
-                if (heading != null && rc.senseLead(heading) > leadThreshold && noMinersAround(rc, heading)) {
+                if (heading != null && rc.canSenseLocation(heading) &&
+                        rc.senseLead(heading) > leadThreshold && noMinersAround(rc, heading)) {
                     tryMove(rc, me, heading);
                 }
 

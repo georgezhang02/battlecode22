@@ -33,7 +33,7 @@ public class Communications {
             case ARCHON:
                 wipeAttackCommands(rc);
                 wipeDefCommands(rc);
-                wipeCurUnitCounts(rc);
+                wipeUnitCounts(rc);
                 wipeBuildCommands(rc);
                 wipeNextIndex(rc);
                 wipeArchonOrder(rc);
@@ -301,8 +301,8 @@ public class Communications {
      */
     public static Command[] getAttackCommands(RobotController rc) throws GameActionException{
         int offset = (rc.getRoundNum() % 2 == 0) ? ATTACK_ODD_OFFSET : ATTACK_EVEN_OFFSET;
-        Command[] commands = new Command[10];
-        for (int i = 0; i < 10; i++) {
+        Command[] commands = new Command[5];
+        for (int i = 0; i < 5; i++) {
 
             commands[i] = getCommandFromArray(rc, i + offset);
         }
@@ -343,8 +343,8 @@ public class Communications {
      */ 
     public static Command[] getDefenseCommand(RobotController rc) throws GameActionException{
         int offset = (rc.getRoundNum() % 2 == 0) ? DEFENSE_ODD_OFFSET : DEFENSE_EVEN_OFFSET;
-        Command[] commands = new Command[10];
-        for (int i = 0; i < 10; i++) {
+        Command[] commands = new Command[5];
+        for (int i = 0; i < 5; i++) {
             commands[i] = getCommandFromArray(rc, i + offset);
         }
 
@@ -435,7 +435,8 @@ public class Communications {
                 if(attacking){
                     return rc.getLocation().distanceSquaredTo(ml) <= 3600;
                 } else{
-                    return rc.getLocation().distanceSquaredTo(ml) <= 3600;
+                    return rc.getLocation().distanceSquaredTo(ml) <= (rc.getMapWidth()* rc.getMapWidth() +
+                            rc.getMapHeight() * rc.getMapHeight())/4;
                 }
             case MINER:
                 return rc.getLocation().distanceSquaredTo(ml) <= 50;
@@ -512,6 +513,13 @@ public class Communications {
         return true;
 
     }
+    /**
+     * Wipes unit counts to prepare for current round of incrementing unit counts.
+     */
+    public static void wipeUnitCounts(RobotController rc )throws GameActionException{
+        rc.writeSharedArray(rc.getRoundNum() % 2 + UNIT_COUNT_OFFSET,0 );
+    }
+
 
     /**
      * Gets unit counts in miner, solder, builder order.
@@ -520,7 +528,7 @@ public class Communications {
      * @throws GameActionException
      */
     public static int[] getUnitCounts(RobotController rc) throws GameActionException {
-        int readVal = rc.readSharedArray((rc.getRoundNum()+1 % 2) + UNIT_COUNT_OFFSET);
+        int readVal = rc.readSharedArray(((rc.getRoundNum() + 1) % 2) + UNIT_COUNT_OFFSET);
 
         int minerCount = decode(readVal, 0);
         int soldierCount = decode(readVal, 1);
@@ -535,15 +543,18 @@ public class Communications {
      * @throws GameActionException
      */
     public static void incrementMinerCount(RobotController rc) throws GameActionException {
-        int readVal = rc.readSharedArray(rc.getRoundNum() % 2 + UNIT_COUNT_OFFSET);
+        int readVal = rc.readSharedArray((rc.getRoundNum() % 2) + UNIT_COUNT_OFFSET);
 
         int minerCount = decode(readVal, 0);
         int soldierCount = decode(readVal, 1);
         int builderCount = decode(readVal, 2);
 
-        int writeVal = encode(minerCount + 1, soldierCount, builderCount);
+        if(minerCount < 63){
+            int writeVal = encode(minerCount + 1, soldierCount, builderCount);
 
-        rc.writeSharedArray(rc.getRoundNum() % 2 + UNIT_COUNT_OFFSET, writeVal);
+            rc.writeSharedArray(rc.getRoundNum() % 2 + UNIT_COUNT_OFFSET, writeVal);
+        }
+
 
     }
 
@@ -559,9 +570,12 @@ public class Communications {
         int soldierCount = decode(readVal, 1);
         int builderCount = decode(readVal, 2);
 
-        int writeVal = encode(minerCount, soldierCount + 1, builderCount);
+        if(soldierCount < 63) {
 
-        rc.writeSharedArray(rc.getRoundNum() % 2 + UNIT_COUNT_OFFSET, writeVal);
+            int writeVal = encode(minerCount, soldierCount + 1, builderCount);
+
+            rc.writeSharedArray(rc.getRoundNum() % 2 + UNIT_COUNT_OFFSET, writeVal);
+        }
 
     }
 
@@ -577,9 +591,11 @@ public class Communications {
         int soldierCount = decode(readVal, 1);
         int builderCount = decode(readVal, 2);
 
-        int writeVal = encode(minerCount, soldierCount, builderCount+ 1);
+        if(builderCount < 15) {
+            int writeVal = encode(minerCount, soldierCount, builderCount + 1);
 
-        rc.writeSharedArray(rc.getRoundNum() % 2 + UNIT_COUNT_OFFSET, writeVal);
+            rc.writeSharedArray(rc.getRoundNum() % 2 + UNIT_COUNT_OFFSET, writeVal);
+        }
     }
 
     /**
@@ -615,12 +631,7 @@ public class Communications {
 
     }
 
-    /**
-     * Wipes unit counts to prepare for current round of incrementing unit counts.
-     */
-    public static void wipeCurUnitCounts(RobotController rc )throws GameActionException{
-        rc.writeSharedArray(rc.getRoundNum() % 2 + UNIT_COUNT_OFFSET,0 );
-    }
+
 
     /**
      * Wipes unit counts to prepare for current round of incrementing unit counts.

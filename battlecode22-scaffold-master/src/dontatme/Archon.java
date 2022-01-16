@@ -63,6 +63,7 @@ public strictfp class Archon {
             for(int i = 0; i < 4; i++){
                 rc.writeSharedArray(i + Communications.BUILD_EVEN_OFFSET, 61);
             }
+            firstTurn = false;
         }
 
         // determining whether archon should run away
@@ -129,11 +130,13 @@ public strictfp class Archon {
         }
 
 
-
+        int[] units = Communications.getUnitCounts(rc);
 
         // deciding to rush
-        int minerCount = 0;
-        int soldierCount = 0;
+        int minerCount = units[0];
+        int soldierCount = units[1];
+        rc.setIndicatorString(minerCount+" "+soldierCount);
+
         if(gameState == 0){
             if(commandCooldown[0] < 0 && soldierCount / rc.getArchonCount() >= 30){
 
@@ -174,13 +177,13 @@ public strictfp class Archon {
                     buildTowardsLowRubble(rc, RobotType.MINER);
 
                 }
-            } else if (soldierCount/rc.getArchonCount() < 30 ){
+            } else {
                 if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
                     buildTowardsLowRubble(rc, RobotType.SOLDIER);
                 }
             }
         }
-        rc.setIndicatorString(Communications.decode(rc.readSharedArray(Communications.TURN_INFO), 2)+" ");
+
     }
 
     static void rushArchon(RobotController rc) throws GameActionException {

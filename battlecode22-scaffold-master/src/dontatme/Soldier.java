@@ -67,12 +67,14 @@ public strictfp class Soldier {
             y = Math.max(0, Math.min(y, rc.getMapHeight()-1));
 
             curTarget = new MapLocation(x, y);
+            rc.setIndicatorString(curTarget.toString());
 
             state = 5;
         }
     }
 
     public void run() throws GameActionException {
+        Communications.runStart(rc);
         if(commandTimer <= 0){
             curPrio = -1;
         } else{
@@ -85,26 +87,33 @@ public strictfp class Soldier {
         allies = rc.senseNearbyRobots(20, rc.getTeam());
 
         if(command != null && curPrio != -1){
-            curTarget = command.location;
-            if(command.type == RobotType.ARCHON){
-                if(attacking){
-                    state = 0;
-                } else{
+            if(commandTimer < 0){
+                command = null;
+                curPrio = -1;
+                if(rusher){
                     state = 5;
+                } else{
+                    state = 2;
                 }
-            } else {
-                if(attacking){
-                    state = 3;
-                } else {
-                    state = 1;
-                }
-            }
-        } else{
-            if(rusher){
-                state = 5;
             } else{
-                state = 2;
+                curTarget = command.location;
+                if(command.type == RobotType.ARCHON){
+                    if(attacking){
+                        state = 0;
+                    } else{
+                        state = 5;
+                    }
+                } else {
+                    if(attacking){
+                        state = 3;
+                    } else {
+                        state = 1;
+                    }
+                }
             }
+
+
+
         }
 
 
@@ -140,24 +149,26 @@ public strictfp class Soldier {
         int index;
         for(index = 0; index<attackCommands.length; index++){
             Communications.Command ac = attackCommands[index];
+            if(ac.location.x != 61){
+                if(ac.type == null && ac.location.equals(curTarget) && attacking){
+                    curPrio = -1;
+                    curFollow = -1;
+                    attacking = false;
+                    commandTimer = 0;
+                    return;
+                } else{
+                    int priority = Communications.getCommandPrio(ac.type, true);
+                    if(priority >= maxPrio && Communications.inCommandRadius(rc, ac.type, ac.location, true)){
 
-            if(ac.type == null && ac.location.equals(curTarget) && attacking){
-                curPrio = -1;
-                curFollow = -1;
-                attacking = false;
-                commandTimer = 0;
-                return;
-            } else{
-                int priority = Communications.getCommandPrio(ac.type, true);
-                if(priority >= maxPrio && Communications.inCommandRadius(rc, ac.type, ac.location, true)){
+                        if((rusher && ac.type != RobotType.MINER )|| !rusher){
+                            maxPrio = priority;
+                            index = priority;
+                        }
 
-                    if((rusher && ac.type != RobotType.MINER )|| !rusher){
-                        maxPrio = priority;
-                        index = priority;
                     }
-
                 }
             }
+
 
         }
 
@@ -165,18 +176,20 @@ public strictfp class Soldier {
 
         for(; index<defendCommands.length + attackCommands.length; index++){
             Communications.Command dc = defendCommands[index - attackCommands.length];
-            if(dc.type == null && dc.location.equals(curTarget) && !attacking){
-                curPrio = -1;
-                curFollow = -1;
-                attacking = false;
-                commandTimer = 0;
-                return;
-            } else{
-                int priority = Communications.getCommandPrio(dc.type, false);
+            if(dc.location.x != 61) {
+                if (dc.type == null && dc.location.equals(curTarget) && !attacking) {
+                    curPrio = -1;
+                    curFollow = -1;
+                    attacking = false;
+                    commandTimer = 0;
+                    return;
+                } else {
+                    int priority = Communications.getCommandPrio(dc.type, false);
 
-                if(priority >= maxPrio && Communications.inCommandRadius(rc, dc.type, dc.location, false)){
-                    maxPrio = priority;
-                    curFollow = index;
+                    if (priority >= maxPrio && Communications.inCommandRadius(rc, dc.type, dc.location, false)) {
+                        maxPrio = priority;
+                        curFollow = index;
+                    }
                 }
             }
 
@@ -207,7 +220,6 @@ public strictfp class Soldier {
 
     }
     static void offense(MapLocation target, int attackType) throws GameActionException {
-        rc.setIndicatorString("offense"+Clock.getBytecodesLeft());
         int enemyCount = 0;
         int allyCount = 0;
 
@@ -226,7 +238,7 @@ public strictfp class Soldier {
                 allyCount++;
             }
         }
-        if(enemyCount >= 2 * (allyCount + 1) && enemyCount != 0){
+        if(enemyCount >= 2 * (allyCount + 1) && enemyCount > 1){
             move(pathfinder.pathAwayFrom(enemyPos));
             attack(attackType);
         }
@@ -241,6 +253,7 @@ public strictfp class Soldier {
 
                 curTarget = ml;
             } else{
+                attacking = false;
                 state = 2;
             }
         }
@@ -249,14 +262,22 @@ public strictfp class Soldier {
     }
 
     static void defense(MapLocation target, int minDistance) throws GameActionException {
-        rc.setIndicatorString("defense "+Clock.getBytecodesLeft());
+        rc.setIndicatorString(state + " defense "+ curTarget.toString());
         if(target != null && !pathfinder.targetWithinRadius(target, minDistance)){
             move(pathfinder.pathToTarget(target, false));
         } else{
-            Direction dir = directions[(int)(Math.random() * 8)];
-            if(rc.canMove(dir)){
-                rc.move(dir);
+            int start = (int)(8 * Math.random());
+            Direction dir = Direction.CENTER;
+            for(int i = 0 ; i < 8 && dir == Direction.CENTER; i++){
+                if(rc.canMove(directions[(start+i) % 8])) {
+                    if (rc.senseRubble(rc.getLocation().add(directions[(start+i) % 8])) -
+                            rc.senseRubble(rc.getLocation()) < 10) {
+                        dir = directions[(start+i) % 8];
+                    }
+                }
             }
+            move(dir);
+
             MapLocation ml = attack(1);
             if(ml== null && !rusher){
                 state = 2;
@@ -266,7 +287,7 @@ public strictfp class Soldier {
 
 
     static void explore() throws GameActionException {
-        rc.setIndicatorString("explore "+Clock.getBytecodesLeft());
+
 
         if(!pathfinder.exploring){
             curTarget = null;
@@ -278,6 +299,7 @@ public strictfp class Soldier {
         MapLocation ml = attack(1);
 
         if(ml != null){
+            rc.setIndicatorString("explore "+ (command == null)+" "+state);
             curTarget = ml;
             state = 3;
         }
