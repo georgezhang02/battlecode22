@@ -37,7 +37,7 @@ public class Communications {
                 wipeBuildCommands(rc);
                 wipeNextIndex(rc);
                 wipeArchonOrder(rc);
-            break;
+                break;
             case MINER:
                 incrementMinerCount(rc);
                 break;
@@ -46,6 +46,8 @@ public class Communications {
                 break;
             case BUILDER:
                 incrementBuilderCount(rc);
+                break;
+            default:
                 break;
         }
     }
@@ -154,7 +156,7 @@ public class Communications {
         for(int i = 0; i< GameConstants.MAX_STARTING_ARCHONS; i++){
             int arrayValue = rc.readSharedArray(i + FRIENDLY_ARCHON_OFFSET);
             int arrID = decode(arrayValue,2);
-            int arrX = decode(arrayValue,1);
+            int arrX = decode(arrayValue,0);
 
             if(arrID == archonID || arrX > 60){
                 rc.writeSharedArray(i+FRIENDLY_ARCHON_OFFSET, writeValue);
@@ -168,8 +170,8 @@ public class Communications {
         for(int i = 0; i < GameConstants.MAX_STARTING_ARCHONS; i++) {
             int arrayValue = rc.readSharedArray(i + FRIENDLY_ARCHON_OFFSET);
             int arrID = decode(arrayValue,2);
-            int arrX = decode(arrayValue,1);
-            if(arrID == archonID ||arrX <= 60 ){
+            int arrX = decode(arrayValue,0);
+            if(arrID == archonID && arrX <= 60){
                 return i;
             }
         }
@@ -209,7 +211,7 @@ public class Communications {
         for(int i = 0; i< GameConstants.MAX_STARTING_ARCHONS; i++){
             int arrayValue = rc.readSharedArray(i + ENEMY_ARCHON_OFFSET);
             int arrID = decode(arrayValue,2);
-            int arrX = decode(arrayValue,1);
+            int arrX = decode(arrayValue,0);
             if(arrID == archonID || arrX > 60){
                 rc.writeSharedArray(i + ENEMY_ARCHON_OFFSET, writeValue);
                 return;
@@ -231,9 +233,9 @@ public class Communications {
         for(int i = 0; i < GameConstants.MAX_STARTING_ARCHONS; i++) {
             int arrayValue = rc.readSharedArray(i + ENEMY_ARCHON_OFFSET);
             int arrID = decode(arrayValue,2);
-            int arrX = decode(arrayValue,1);
+            int arrX = decode(arrayValue,0);
 
-            if(arrX <= 60 && decode(arrayValue, 2) == archonID){
+            if(arrX <= 60 && arrID == archonID){
                 return i;
             }
         }
@@ -281,7 +283,6 @@ public class Communications {
     public static boolean sendAttackCommand(RobotController rc, MapLocation location, RobotType t) throws GameActionException {
         int offset = (rc.getRoundNum() % 2 == 0) ? ATTACK_EVEN_OFFSET : ATTACK_ODD_OFFSET;
         int newCommand = encode(location.x, location.y, t.ordinal());
-        Command[] currentCommands = getAttackCommands(rc);
 
         int nextIndex = getNextAttackIndex(rc) + offset;
         int readVal = rc.readSharedArray(nextIndex);
@@ -322,7 +323,6 @@ public class Communications {
     public static boolean sendDefenseCommand(RobotController rc, MapLocation location, RobotType t) throws GameActionException {
         int offset = (rc.getRoundNum() % 2 == 0) ? DEFENSE_EVEN_OFFSET : DEFENSE_ODD_OFFSET;
         int newCommand = encode(location.x, location.y, t.ordinal());
-        Command[] currentCommands = getAttackCommands(rc);
 
         int nextIndex = getNextAttackIndex(rc) + offset;
         int readVal = rc.readSharedArray(nextIndex);
@@ -374,6 +374,8 @@ public class Communications {
                 } else{
                     return 7;
                 }
+            default:
+                break;
         }
 
         switch(type){
@@ -389,6 +391,8 @@ public class Communications {
                 } else{
                     return 7;
                 }
+            default:
+                break;
         }
         return -1;
     }
@@ -417,6 +421,8 @@ public class Communications {
                 } else{
                     return 50;
                 }
+            default:
+                break;
 
 
         }
@@ -447,6 +453,8 @@ public class Communications {
                 } else{
                     return rc.getLocation().distanceSquaredTo(ml) <= 3600;
                 }
+            default:
+                break;
         }
         return false;
     }
