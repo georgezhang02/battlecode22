@@ -423,9 +423,17 @@ public class Communications {
                     return 9;
                 }
             case MINER:
-                return 5;
+                if(attacking){
+                    return 5;
+                } else{
+                    return 4;
+                }
             case SOLDIER:
-                return 5;
+                if(attacking){
+                    return 7;
+                } else{
+                    return 6;
+                }
 
             case WATCHTOWER:
                 if(attacking){

@@ -226,10 +226,11 @@ public strictfp class Soldier {
 
         for(RobotInfo robot:enemies){
             if(robot.getType() == RobotType.SOLDIER || robot.getType() == RobotType.WATCHTOWER){
-                enemyCount++;
+
                 if(enemyCount < 5){
                     enemyPos[enemyCount] = robot.getLocation();
                 }
+                enemyCount++;
             }
         }
         for(RobotInfo robot: allies){
@@ -241,7 +242,8 @@ public strictfp class Soldier {
         MapLocation ml = attack(attackType);
 
         if(enemyCount > 0){
-            Communications.sendAttackCommand(rc, rc.getLocation(), RobotType.SOLDIER);
+
+            Communications.sendAttackCommand(rc, enemyPos[0], RobotType.SOLDIER);
         }
         if(enemyCount >= 1 && ml != null){
             move(pathfinder.pathAwayFrom(enemyPos));
@@ -318,13 +320,16 @@ public strictfp class Soldier {
             }
         }
 
+        MapLocation ml =attack(1);
 
         if(enemyCount >=1){
-            attack(1);
-            move(pathfinder.pathAwayFrom(enemyPos));
-        } else{
-            MapLocation ml = attack(1);
 
+            move(pathfinder.pathAwayFrom(enemyPos));
+            if(ml != null){
+                curTarget = ml;
+                state = 3;
+            }
+        } else{
             move(pathfinder.pathToExplore());
             rc.setIndicatorLine(rc.getLocation(), pathfinder.explorer.target, 255,255,0);
 
