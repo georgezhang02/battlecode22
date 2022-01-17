@@ -236,7 +236,8 @@ public strictfp class Soldier {
     static void offense(MapLocation target, int attackType) throws GameActionException {
         //rc.setIndicatorString(state+" Offense");
 
-        if(command != null && rc.canSenseLocation(command.location) && attacking && command.type.isBuilding() ){
+        if(command != null && command.type != null &&
+        rc.canSenseLocation(command.location) && attacking && command.type.isBuilding() ){
 
             RobotInfo robot = rc.senseRobotAtLocation(command.location);
             if(robot == null || (robot.getType() != command.type &&
