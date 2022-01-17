@@ -258,6 +258,9 @@ public strictfp class Soldier {
                 state = 2;
             }
         }
+        if(rc.isActionReady()){
+            ml = attack(attackType);
+        }
     }
 
     static void defense(MapLocation target, int minDistance) throws GameActionException {
@@ -290,6 +293,10 @@ public strictfp class Soldier {
             if(ml== null){
                 state = 2;
             }
+        }
+
+        if(rc.isActionReady()){
+            ml = attack(1);
         }
     }
 
