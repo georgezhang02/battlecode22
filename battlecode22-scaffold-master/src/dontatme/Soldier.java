@@ -238,19 +238,17 @@ public strictfp class Soldier {
             }
         }
 
+        MapLocation ml = attack(attackType);
+
         if(enemyCount > 0){
             Communications.sendAttackCommand(rc, rc.getLocation(), RobotType.SOLDIER);
         }
-        if(2 * enemyCount >= 3 * allyCount){
-            attack(attackType);
+        if(enemyCount >= 1 && ml != null){
             move(pathfinder.pathAwayFrom(enemyPos));
         }
         else if(target != null && !pathfinder.targetWithinRadius(target, 6)){
             move(pathfinder.pathToTarget(target, false));
-            attack(attackType);
-
         }  else{
-            MapLocation ml = attack(attackType);
             if(ml!= null){
                 curTarget = ml;
             } else{
@@ -279,16 +277,14 @@ public strictfp class Soldier {
                 allyCount++;
             }
         }
+        MapLocation ml = attack(1);
         ///rc.setIndicatorString(state + " defense "+ curTarget.toString());
         if(2 * enemyCount >= 3 * allyCount){
-            attack(1);
             move(pathfinder.pathAwayFrom(enemyPos));
         }
         else if(target != null && !pathfinder.targetWithinRadius(target, minDistance)){
-            MapLocation ml = attack(1);
             move(pathfinder.pathToTarget(target, false));
         } else{
-            MapLocation ml = attack(1);
             if(ml== null){
                 state = 2;
             }
@@ -323,16 +319,21 @@ public strictfp class Soldier {
         }
 
 
+        if(enemyCount >=1){
+            attack(1);
+            move(pathfinder.pathAwayFrom(enemyPos));
+        } else{
+            MapLocation ml = attack(1);
 
-        MapLocation ml = attack(1);
+            move(pathfinder.pathToExplore());
+            rc.setIndicatorLine(rc.getLocation(), pathfinder.explorer.target, 255,255,0);
 
-        move(pathfinder.pathToExplore());
-        rc.setIndicatorLine(rc.getLocation(), pathfinder.explorer.target, 255,255,0);
-
-        if(ml != null){
-            curTarget = ml;
-            state = 3;
+            if(ml != null){
+                curTarget = ml;
+                state = 3;
+            }
         }
+
     }
 
     static MapLocation attack(int attackType) throws GameActionException {
