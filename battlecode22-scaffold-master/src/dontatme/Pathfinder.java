@@ -1,9 +1,6 @@
 package dontatme;
 
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotController;
+import battlecode.common.*;
 
 
 public abstract class Pathfinder {
@@ -16,7 +13,7 @@ public abstract class Pathfinder {
 
     public Pathfinder(RobotController rc) throws GameActionException{
         this.rc = rc;
-        this.explorer = new Explorer(rc);
+        this.explorer = new Explorer(rc, rc.getType().equals(RobotType.MINER));
         lastPos = rc.getLocation();
     }
 

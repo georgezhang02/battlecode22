@@ -61,15 +61,6 @@ public strictfp class Helper {
         }
 
 
-        String str = "";
-        for(int i = 0; i< 4; i++){
-            MapLocation ml = Communications.getEnemyArchonLocationByIndex(rc, i);
-
-            str += ml.toString()+" ";
-
-        }
-        rc.setIndicatorString(str);
-
         return nearbyEnemies;
 
         // TODO: check archon location with current location and clear if necessary

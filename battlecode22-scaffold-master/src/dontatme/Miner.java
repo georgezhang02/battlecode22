@@ -103,7 +103,7 @@ public strictfp class Miner {
                                 baseMiner(rc, me);
                                 break;
                             case ExploreMiner:
-                                rc.setIndicatorString("Explore Miner");
+                                //rc.setIndicatorString("Explore Miner");
                                 exploreMiner(rc, me);
                                 break;
                             default:

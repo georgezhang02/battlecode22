@@ -337,7 +337,6 @@ public strictfp class Soldier {
             }
         } else{
             move(pathfinder.pathToExplore());
-            rc.setIndicatorLine(rc.getLocation(), pathfinder.explorer.target, 255,255,0);
 
             if(ml != null){
                 curTarget = ml;

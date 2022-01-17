@@ -145,7 +145,6 @@ public strictfp class Miner {
         Direction exploreDir = pathfinder.pathToExplore();
         if (rc.canMove(exploreDir)) {
             rc.move(exploreDir);
-            rc.setIndicatorLine(me.add(exploreDir), pathfinder.explorer.target, 0, 0, 255);
         }
     }
 

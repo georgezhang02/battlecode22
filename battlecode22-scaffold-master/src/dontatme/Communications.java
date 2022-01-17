@@ -136,7 +136,6 @@ public class Communications {
         int archonIndex = getTeamArchonIndexFromID(rc, archonID);
         int arrayValue = rc.readSharedArray(archonIndex + LEAD_OFFSET);
         int currentMinerCount = decode(arrayValue, 2);
-        // rc.setIndicatorString(decode(arrayValue, 0)+" "+decode(arrayValue, 1)+"
         // "+currentMinerCount + " ");
         rc.writeSharedArray(archonIndex + LEAD_OFFSET,
                 encode(decode(arrayValue, 0), decode(arrayValue, 1), currentMinerCount + 1));
@@ -172,7 +171,6 @@ public class Communications {
             throws GameActionException {
         int writeValue = encode(archonLocation.x, archonLocation.y, archonID);
 
-        rc.setIndicatorString(archonLocation.x + " " + archonLocation.y + " " + archonID);
 
         for (int i = 0; i < GameConstants.MAX_STARTING_ARCHONS; i++) {
             int arrayValue = rc.readSharedArray(i + FRIENDLY_ARCHON_OFFSET);
