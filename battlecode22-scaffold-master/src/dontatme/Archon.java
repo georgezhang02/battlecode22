@@ -103,7 +103,7 @@ public strictfp class Archon {
         }
 
         rc.setIndicatorString(enemyCount + " "+ commandCooldown[1]);
-        if( ((enemyCount >= allyCount && enemyCount > 1)  || (enemyCount > 2)) && commandCooldown[1] <= 0){
+        if( ((enemyCount >= allyCount && enemyCount >= 1)  || (enemyCount > 2)) && commandCooldown[1] <= 0){
             Communications.sendDefenseCommand(rc, rc.getLocation(), RobotType.ARCHON);
             commandCooldown[1] = Communications.getCommandCooldown(rc, RobotType.ARCHON, false);
         }
@@ -154,7 +154,8 @@ public strictfp class Archon {
         int minerCount = units[0];
         int soldierCount = units[1];
         if(gameState == 0){
-            if(commandCooldown[0] < 0 && soldierCount / rc.getArchonCount() >= 15 * MAP_SCALER){
+            rc.setIndicatorString(5 * MAP_SCALER+" "+ (double)soldierCount / rc.getArchonCount());
+            if(commandCooldown[0] < 0 && (double)soldierCount / rc.getArchonCount() >= 5 * MAP_SCALER){
                 rushArchon(rc);
             }
         } else if (gameState == 1){
@@ -206,8 +207,6 @@ public strictfp class Archon {
                     buildTowardsLowRubble(rc, RobotType.SOLDIER);
                 }
             }
-
-
 
         }
 

@@ -56,31 +56,6 @@ public strictfp class Soldier {
         if(d > 0){
             rusher = false;
             state = 2;
-        } else{
-            /*
-            rusher = true;
-            int x = (int) (2 * Math.random()) ;
-            int y = (int) (2 * Math.random()) ;
-
-            if(2 * Math.random() >= 1){
-                x = -x;
-            }
-            if(2 * Math.random() >= 1){
-                y = -y;
-            }
-            x = rc.getLocation().x + x;
-            y = rc.getLocation().y + y;
-
-            x = Math.max(0, Math.min(x, rc.getMapWidth()-1));
-            y = Math.max(0, Math.min(y, rc.getMapHeight()-1));
-
-            curTarget = new MapLocation(x, y);
-
-
-
-            state = 5;
-            */
-
         }
     }
 
@@ -168,11 +143,8 @@ public strictfp class Soldier {
                 } else{
                     int priority = Communications.getCommandPrio(ac.type, true);
                     if(priority > maxPrio && Communications.inCommandRadius(rc, ac.type, ac.location, true)){
-
-                            maxPrio = priority;
-                            curFollow = index;
-
-
+                        maxPrio = priority;
+                        curFollow = index;
                     }
                 }
             }
@@ -248,7 +220,7 @@ public strictfp class Soldier {
         }
 
         int enemyCount = 0;
-        int allyCount = 0;
+        int allyCount = 1;
 
         MapLocation[] enemyPos = new MapLocation[5];
 
@@ -265,10 +237,15 @@ public strictfp class Soldier {
                 allyCount++;
             }
         }
+
         if(enemyCount > 0){
-            Communications.sendDefenseCommand(rc, rc.getLocation(), RobotType.SOLDIER);
+            Communications.sendAttackCommand(rc, rc.getLocation(), RobotType.SOLDIER);
         }
-        if(target != null && !pathfinder.targetWithinRadius(target, 6)){
+        if(2 * enemyCount >= 3 * allyCount){
+            attack(attackType);
+            move(pathfinder.pathAwayFrom(enemyPos));
+        }
+        else if(target != null && !pathfinder.targetWithinRadius(target, 6)){
             move(pathfinder.pathToTarget(target, false));
             attack(attackType);
 
@@ -284,26 +261,33 @@ public strictfp class Soldier {
     }
 
     static void defense(MapLocation target, int minDistance) throws GameActionException {
-        ///rc.setIndicatorString(state + " defense "+ curTarget.toString());
-        if(target != null && !pathfinder.targetWithinRadius(target, minDistance)){
-            move(pathfinder.pathToTarget(target, false));
-            MapLocation ml = attack(1);
-        } else{
-            if(rusher){
-                int start = (int)(8 * Math.random());
-                Direction dir = Direction.CENTER;
-                for(int i = 0 ; i < 8 && dir == Direction.CENTER; i++){
-                    if(rc.canMove(directions[(start+i) % 8])) {
-                        if (rc.senseRubble(rc.getLocation().add(directions[(start+i) % 8])) -
-                                rc.senseRubble(rc.getLocation()) < 10) {
-                            dir = directions[(start+i) % 8];
-                        }
-                    }
+        int enemyCount = 0;
+        int allyCount = 1;
+
+        MapLocation[] enemyPos = new MapLocation[5];
+
+        for(RobotInfo robot:enemies){
+            if(robot.getType() == RobotType.SOLDIER || robot.getType() == RobotType.WATCHTOWER){
+                enemyCount++;
+                if(enemyCount < 5){
+                    enemyPos[enemyCount] = robot.getLocation();
                 }
-                move(dir);
             }
-
-
+        }
+        for(RobotInfo robot: allies){
+            if(robot.getType() == RobotType.SOLDIER){
+                allyCount++;
+            }
+        }
+        ///rc.setIndicatorString(state + " defense "+ curTarget.toString());
+        if(2 * enemyCount >= 3 * allyCount){
+            attack(1);
+            move(pathfinder.pathAwayFrom(enemyPos));
+        }
+        else if(target != null && !pathfinder.targetWithinRadius(target, minDistance)){
+            MapLocation ml = attack(1);
+            move(pathfinder.pathToTarget(target, false));
+        } else{
             MapLocation ml = attack(1);
             if(ml== null){
                 state = 2;
@@ -319,10 +303,31 @@ public strictfp class Soldier {
             curTarget = null;
         }
 
-        move(pathfinder.pathToExplore());
-        rc.setIndicatorLine(rc.getLocation(), pathfinder.explorer.target, 255,255,0);
+        int enemyCount = 0;
+        int allyCount = 1;
+
+        MapLocation[] enemyPos = new MapLocation[5];
+
+        for(RobotInfo robot:enemies){
+            if(robot.getType() == RobotType.SOLDIER || robot.getType() == RobotType.WATCHTOWER){
+                enemyCount++;
+                if(enemyCount < 5){
+                    enemyPos[enemyCount] = robot.getLocation();
+                }
+            }
+        }
+        for(RobotInfo robot: allies){
+            if(robot.getType() == RobotType.SOLDIER){
+                allyCount++;
+            }
+        }
+
+
 
         MapLocation ml = attack(1);
+
+        move(pathfinder.pathToExplore());
+        rc.setIndicatorLine(rc.getLocation(), pathfinder.explorer.target, 255,255,0);
 
         if(ml != null){
             curTarget = ml;

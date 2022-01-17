@@ -506,9 +506,9 @@ public class Communications {
                     return Math.sqrt(rc.getLocation().distanceSquaredTo(ml)) <= (rc.getMapWidth() + rc.getMapHeight())/4;
                 }
             case MINER:
-                return Math.sqrt(rc.getLocation().distanceSquaredTo(ml)) <=  20 * (.25 + .75 *(rc.getMapWidth() + rc.getMapHeight()))/120;
+                return Math.sqrt(rc.getLocation().distanceSquaredTo(ml)) <=  20 * (.5 + .5 *(rc.getMapWidth() + rc.getMapHeight())/120);
             case SOLDIER:
-                return Math.sqrt(rc.getLocation().distanceSquaredTo(ml)) <=  20 * (.25 + .75 *(rc.getMapWidth() + rc.getMapHeight()))/120;
+                return Math.sqrt(rc.getLocation().distanceSquaredTo(ml)) <=  20 * (.5 + .5 *(rc.getMapWidth() + rc.getMapHeight())/120);
             case WATCHTOWER:
                 if(attacking) {
                     return Math.sqrt(rc.getLocation().distanceSquaredTo(ml)) <= 120;
