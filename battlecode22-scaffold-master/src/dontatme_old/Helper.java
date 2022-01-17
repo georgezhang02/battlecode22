@@ -1,6 +1,7 @@
 package dontatme_old;
 
 import battlecode.common.*;
+
 import java.util.Random;
 
 public strictfp class Helper {
@@ -24,4 +25,54 @@ public strictfp class Helper {
      * we get the same sequence of numbers every time this code is run. This is very useful for debugging!
      */
     public static final Random rng = new Random(6147);
+
+    // Updates enemy location (should be called each turn)
+    public static MapLocation[] updateEnemyLocations(RobotController rc, RobotInfo[] robotsDetected) throws GameActionException {
+
+        MapLocation[] nearbyEnemies = new MapLocation[10];
+        int index = 0;
+        for (RobotInfo robot : robotsDetected){
+            if (robot.getTeam() != rc.getTeam()) {
+                if (robot.getType().equals(RobotType.ARCHON)) {
+                    // get id and location
+                    int enemyArchonId = robot.ID;
+                    MapLocation enemyArchonLocation = robot.location;
+
+                    Communications.setEnemyArchonLocation(rc, enemyArchonId, enemyArchonLocation);
+
+                } else if (index < 10 && (robot.getType() == RobotType.SOLDIER || robot.getType() == RobotType.SAGE
+                        || robot.getType() == RobotType.WATCHTOWER)){
+                    nearbyEnemies[index] = robot.getLocation();
+                    index++;
+                }
+            }
+        }
+
+        for(int i = 0; i< 4; i++){
+            MapLocation archLocation = Communications.getEnemyArchonLocationByIndex(rc, i);
+            if(rc.canSenseLocation(archLocation)){
+                if(rc.canSenseRobotAtLocation(archLocation)){
+                    if(rc.senseRobotAtLocation(archLocation).getType() != RobotType.ARCHON){
+                        Communications.setEnemyArchonLocationByIndex(rc, 15, i, new MapLocation(60,60));
+                    }
+                } else{
+                    Communications.setEnemyArchonLocationByIndex(rc, 15, i, new MapLocation(60,60));
+                }
+            }
+        }
+
+
+        String str = "";
+        for(int i = 0; i< 4; i++){
+            MapLocation ml = Communications.getEnemyArchonLocationByIndex(rc, i);
+
+            str += ml.toString()+" ";
+
+        }
+        rc.setIndicatorString(str);
+
+        return nearbyEnemies;
+
+        // TODO: check archon location with current location and clear if necessary
+    }
 }

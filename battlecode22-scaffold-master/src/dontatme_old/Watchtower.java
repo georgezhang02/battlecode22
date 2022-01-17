@@ -10,8 +10,10 @@ public strictfp class Watchtower {
 
     //number of droids killed by watchtower
     static RobotController rc;
-    static int attackCount = 0;
     static int turnCount = 0;
+    static int attacks = 0;
+    static final int TURNS_CHECKED = 20;
+    static boolean [] attack = new boolean[TURNS_CHECKED];
     static RobotInfo[] enemies;
 
     public static void run(RobotController robotController) throws GameActionException {
@@ -23,12 +25,18 @@ public strictfp class Watchtower {
         if (rc.isActionReady()) {
             RobotInfo ri= getAttack(3, 1, 0, 2); //droids, buildings, archons miner prio
             if (ri != null) {
-                attackCount++;
+                if (!attack[turnCount])
+                    attacks = (attacks + 1) % TURNS_CHECKED;
                 rc.attack(ri.location);
+            }
+            else {
+                if (attack[turnCount])
+                    attacks = (attacks - 1) % TURNS_CHECKED;
+                attack[turnCount] = false;
             }
         }
 
-        turnCount++;
+        turnCount = (turnCount + 1) % TURNS_CHECKED;
     }
 
     static RobotInfo getAttack(int prio1, int prio2, int prio3, int prio4) throws GameActionException {

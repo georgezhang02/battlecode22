@@ -15,7 +15,6 @@ public strictfp class Builder {
     public static void run(RobotController rc) throws GameActionException {
         //part 1: see if there are any nearby buildings that are in prototype mode
         searchNonMoveActions(rc);
-        //need to implement mutations for watchtowers
 
         //now just explore
         Direction dir = pathfinder.pathToExplore();
@@ -23,6 +22,22 @@ public strictfp class Builder {
             rc.move(dir);
             searchNonMoveActions(rc);
         }
+    }
+    static void detonate(RobotController rc) throws GameActionException {
+        //search areas near me in cardinal directions
+        int lowestRubble = Integer.MAX_VALUE;
+        int lowestIndex = Integer.MAX_VALUE;
+        for (int i = 0; i < Helper.directions.length; i++) {
+            int amountRubble = rc.senseRubble(rc.getLocation().add(Helper.directions[i]));
+            if (amountRubble < lowestRubble && rc.canMove(Helper.directions[i])) {
+                lowestRubble = amountRubble;
+                lowestIndex = i;
+            }
+        }
+        Direction dir = Helper.directions[lowestIndex];
+        rc.move(dir);
+        rc.disintegrate();
+
     }
     static void searchNonMoveActions(RobotController rc) throws GameActionException {
         RobotInfo [] buildings = getNearbyTowers(rc);
@@ -33,10 +48,24 @@ public strictfp class Builder {
             int counter = 0;
             repairBuild(rc, protoBuildings);
         }
+        //check if there's a level 1 building that can be mutated
+        if (buildings[0] != null ) {
+            seeBuildingMutation(rc, buildings);
+        }
         //means that there is a nearby building
         //check if it can be repaired
         if (buildings[0] != null) {
             repairBuild(rc, buildings);
+        }
+    }
+    static void seeBuildingMutation(RobotController rc, RobotInfo [] buildings) throws GameActionException {
+        int counter = 0;
+        while (counter < buildings.length && buildings[counter] != null ) {
+            if (buildings[counter].getLevel() == 1 && buildings[counter].getType().equals(RobotType.WATCHTOWER)) {
+                if (rc.canMutate(buildings[counter].getLocation()))//also implement watchtower analysis
+                    rc.mutate(buildings[counter].getLocation());
+            }
+            counter++;
         }
     }
     static void repairBuild(RobotController rc, RobotInfo [] buildings) throws GameActionException{
@@ -69,19 +98,36 @@ public strictfp class Builder {
         }
     }
 
-    static Direction findPlaceToBuildTower(RobotController rc) {
+    static Direction findPlaceToBuildTower(RobotController rc) throws GameActionException {
         Direction dir = Helper.directions[0];
         int counter = 1;
         boolean canBuildTower = rc.canBuildRobot(RobotType.WATCHTOWER, dir);
-        while (!canBuildTower && counter < Helper.directions.length) {
+        int lowestRubble = Integer.MAX_VALUE;
+        int bestIndex = Integer.MAX_VALUE;
+
+        while (counter < Helper.directions.length) {
             dir = Helper.directions[counter];
-            canBuildTower = rc.canBuildRobot(RobotType.WATCHTOWER, dir);
+            //find the rubble count on all squares that a watchtower can be built
+            if (rc.canBuildRobot(RobotType.WATCHTOWER, dir)) {
+                //finds new position
+                MapLocation location = new MapLocation(rc.getLocation().x +
+                        Helper.directions[counter].dx, rc.getLocation().y +
+                        Helper.directions[counter].dy);
+                int rubbleCount = rc.senseRubble(location);
+                if (rubbleCount < lowestRubble) {
+                    lowestRubble = rubbleCount;
+                    bestIndex = counter;
+                }
+            }
             counter++;
         }
 
         //if there were no towers that could be built
-        if (!canBuildTower) {
+        if (bestIndex == Integer.MAX_VALUE) {
             dir = null;
+        }
+        else {
+            dir = Helper.directions[bestIndex];
         }
         return dir;
     }

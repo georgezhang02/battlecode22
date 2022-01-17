@@ -1,6 +1,7 @@
 package dontatme_old;
 
-import battlecode.common.*;
+import battlecode.common.GameActionException;
+import battlecode.common.RobotController;
 
 public strictfp class Sage {
     /**

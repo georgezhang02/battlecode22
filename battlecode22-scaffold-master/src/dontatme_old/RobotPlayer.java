@@ -1,6 +1,9 @@
 package dontatme_old;
 
-import battlecode.common.*;
+import battlecode.common.Clock;
+import battlecode.common.GameActionException;
+import battlecode.common.RobotController;
+import battlecode.common.RobotType;
 
 /**
  * RobotPlayer is the class that describes your main robot strategy.
