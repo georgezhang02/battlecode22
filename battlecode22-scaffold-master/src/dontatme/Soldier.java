@@ -219,20 +219,19 @@ public strictfp class Soldier {
 
 
         Direction dir = Direction.CENTER;
-        if(combatCooldown > 0){
-            dir = lookForBetterSquare();
-            if(dir == Direction.CENTER ){
-                if(!rc.isActionReady() || enemyCount > allyCount){
-                    dir = pathfinder.pathAwayFrom(enemyPos);
-                } else if(pathfinder.targetWithinRadius(target, 20)){
-                    dir = pathfinder.pathToTargetGreedy(target, 1);
-                }
+
+        if(enemyCount >= 1 && ml != null){
+            move(pathfinder.pathAwayFrom(enemyPos));
+        }
+        else if(target != null && !pathfinder.targetWithinRadius(target, 6)){
+            move(pathfinder.pathToTarget(target, false));
+        }  else{
+            if(ml!= null){
+                currentTarget = ml;
+            } else{
+                currentState = SoldierState.Exploring;
+                
             }
-        } else if (currentTarget!= null && !pathfinder.targetWithinRadius(target, 6)){
-            dir = pathfinder.pathToTarget(target, false);
-            rc.setIndicatorString("Attacking "+ target.toString());
-        } else{
-            currentState = SoldierState.Exploring;
         }
 
         move(dir);
