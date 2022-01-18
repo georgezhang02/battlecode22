@@ -66,7 +66,7 @@ public strictfp class Miner {
 
             if(currentEnemies[0] != null){
                 runAwayTimer = 3;
-                Communications.sendAttackCommand(rc, rc.getLocation(), RobotType.MINER);
+                Communications.sendAttackCommand(rc, currentEnemies[0], RobotType.MINER);
                 rc.setIndicatorString("Help me");
             }
 

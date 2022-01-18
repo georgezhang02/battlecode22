@@ -52,74 +52,8 @@ public class Explorer {
 
     // returns random target towards the edges a larger distance away
     public void getExploreTargetRandom(int mapWidth, int mapHeight){
-        MapLocation curPos = rc.getLocation();
-
-        int closeLeft = curPos.x;
-        int closeBot = curPos.y;
-        int closeRight = mapWidth - curPos.x ;
-        int  closeTop = mapHeight - curPos.y;
-
-        int closeDist = 61;
-
-        int exploreTo = 0;
-
-        boolean vert = true;
-        if(closeTop< closeDist){
-            exploreTo = 1;
-            closeDist = closeTop;
-
-        }
-        if(closeBot< closeDist){
-            exploreTo = 2;
-            closeDist = closeBot;
-        }
-
-        if(closeLeft< closeDist){
-            exploreTo = 3;
-            closeDist = closeLeft;
-            vert = false;
-        }
-        if(closeRight< closeDist){
-            exploreTo = 4;
-            closeDist = closeRight;
-            vert = false;
-        }
-
-        if(vert){
-            if(closeDist > mapHeight / 10){
-                exploreTo = 0;
-            }
-        } else {
-            if(closeDist > mapWidth / 10){
-                exploreTo = 0;
-            }
-        }
-
-        int angle;
-        if(exploreTo == 0){
-            angle = (int)((Math.random() * 10000)) % 360;
-            rc.setIndicatorString("Not Close");
-
-        }
-        else if (exploreTo == 1){
-            angle = (int)((Math.random() * 10000)) % 180  + 180 ;
-            rc.setIndicatorString("Close TOp " + closeDist+" "+angle);
-        } else if(exploreTo == 2){
-            angle = (int)((Math.random() * 10000)) % 180 ;
-            rc.setIndicatorString("Close Bot " + closeDist+" "+angle);
-        }else if(exploreTo == 3){
-            angle = (int) ((Math.random() * 10000)) % 180 + 270;
-            rc.setIndicatorString("Close Left " + closeDist+" "+angle);
-        }
-        else {
-
-            angle = (int)((Math.random() * 10000)) % 180  + 90 ;
-            rc.setIndicatorString("Close Right " + closeDist+" "+angle);
-        }
-
-        
-        int x = Math.max(Math.min(curPos.x + (int) (mapWidth / 2 * Math.cos(angle/180.0 * 3.1415926)), mapWidth -1), 0);
-        int y = Math.max(Math.min(curPos.y + (int) (mapHeight /2 * Math.sin(angle/180.0 * 3.1415926)), mapHeight -1), 0);
+        int x = (int) (mapWidth * Math.random());
+        int y = (int) (mapHeight * Math.random());
 
         target = new MapLocation(x, y);
 
