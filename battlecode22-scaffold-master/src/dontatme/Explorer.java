@@ -35,8 +35,8 @@ public class Explorer {
             int count = tries;
             MapLocation ml = null;
             while(ml == null && count > 0) {
-                int x = (int) (mapWidth * Math.random());
-                int y = (int) (mapHeight * Math.random());
+                int x = (int) (10000* Math.random()) %mapWidth;
+                int y = (int) (10000 * Math.random()) % mapHeight;
                 if(!visited[x][y]){
                     target = new MapLocation(x, y);
                 }
@@ -52,8 +52,8 @@ public class Explorer {
 
     // returns random target towards the edges a larger distance away
     public void getExploreTargetRandom(int mapWidth, int mapHeight){
-        int x = (int) (mapWidth * Math.random());
-        int y = (int) (mapHeight * Math.random());
+        int x = (int) (10000* Math.random()) %mapWidth;
+        int y = (int) (10000 * Math.random()) % mapHeight;
 
         target = new MapLocation(x, y);
 
