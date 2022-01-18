@@ -64,21 +64,27 @@ public strictfp class Soldier {
         switch (currentState){
             case Rushing:
                 offense(currentTarget, 0);
+                rc.setIndicatorString("Rushing");
                 break;
             case PURSUING:
                 offense(currentTarget, 1);
+                rc.setIndicatorString("Pursuing");
                 break;
             case Defending:
                 defense(currentTarget, 6);
+                rc.setIndicatorString("Defending");
                 break;
             case Exploring:
                 explore();
+                rc.setIndicatorString("Exploring");
                 break;
             case ArchonDefense:
                 defense(currentTarget, 10);
+                rc.setIndicatorString("ArchonDefense");
                 break;
             case Anomaly:
                 prepForAnomaly(AnomalyType.ABYSS);
+                rc.setIndicatorString("Anomaly");
                 break;
 
         }
@@ -183,7 +189,6 @@ public strictfp class Soldier {
 
 
     static void offense(MapLocation target, int attackType) throws GameActionException {
-        rc.setIndicatorString("Attacking");
         checkCurrentAttackingTarget();
 
         // check everything that you can see
@@ -250,7 +255,6 @@ public strictfp class Soldier {
     }
 
     static void defense(MapLocation target, int minDistance) throws GameActionException {
-        rc.setIndicatorString("Defense");
         int enemyCount = 0;
         int allyCount = 1;
 
@@ -290,7 +294,6 @@ public strictfp class Soldier {
 
 
     static void explore() throws GameActionException {
-        rc.setIndicatorString("Explore");
         if(!pathfinder.exploring){
             currentTarget = null;
         }
