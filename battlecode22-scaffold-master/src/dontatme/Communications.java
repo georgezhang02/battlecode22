@@ -278,10 +278,12 @@ public class Communications {
     public static class Command {
         public MapLocation location;
         public RobotType type;
+        public boolean isAttack;
 
-        public Command(MapLocation location, RobotType type) {
+        public Command(MapLocation location, RobotType type, boolean isAttack) {
             this.location = location;
             this.type = type;
+            this.isAttack = isAttack;
         }
 
         @Override
@@ -295,6 +297,10 @@ public class Communications {
         @Override
         public int hashCode() {
             return Objects.hash(location, type);
+        }
+
+        public int priority() {
+            return getCommandPrio(type, isAttack);
         }
     };
 
@@ -413,7 +419,7 @@ public class Communications {
     /**
      * Returns the priority of the command
      */
-    public static int getCommandPrio(RobotType type, boolean attacking) {
+    private static int getCommandPrio(RobotType type, boolean attacking) {
         if (type == null) {
             return 100;
         }
@@ -534,36 +540,6 @@ public class Communications {
         return false;
     }
 
-    /**
-     * Decodes array value into suedo bytes
-     * 
-     * could be hardcoded to save slight bytecode
-     * 
-     * index 0:
-     * number % 64 / 1
-     * index 1:
-     * number % 64^2 / 64
-     * ...
-     */
-    static int decode(int number, int index) {
-        if (index < 0) {
-            throw new IllegalArgumentException();
-        } else {
-            return (number % (int) Math.pow(64, index + 1) / (int) Math.pow(64, index));
-        }
-    }
-
-    /**
-     * Encodes a variable number of values into a single array value ready to be
-     * written
-     */
-    private static int encode(int... fields) {
-        int result = 0;
-        for (int i = 0; i < fields.length; i++) {
-            result += fields[i] * Math.pow(64, i);
-        }
-        return result;
-    }
 
     /**
      * Gets the command at the given index in the shared array.
@@ -574,12 +550,14 @@ public class Communications {
         MapLocation location = new MapLocation(decode(arrayValue, 0), decode(arrayValue, 1));
 
         int targetTypeOrdinal = decode(arrayValue, 2);
+        
         RobotType targetType = null;
+        
         if (targetTypeOrdinal <= 6) {
             targetType = RobotType.values()[targetTypeOrdinal];
         }
 
-        return new Command(location, targetType);
+        return new Command(location, targetType, index < DEFENSE_EVEN_OFFSET);
     }
 
     /**
@@ -898,5 +876,45 @@ public class Communications {
         for (int i = 0; i < 5; i++) {
             rc.writeSharedArray(i + offset, NULL_LOCATION);
         }
+    }
+
+
+
+
+
+
+
+
+
+
+    /**
+     * Decodes array value into suedo bytes
+     * 
+     * could be hardcoded to save slight bytecode
+     * 
+     * index 0:
+     * number % 64 / 1
+     * index 1:
+     * number % 64^2 / 64
+     * ...
+     */
+    static int decode(int number, int index) {
+        if (index < 0) {
+            throw new IllegalArgumentException();
+        } else {
+            return (number % (int) Math.pow(64, index + 1) / (int) Math.pow(64, index));
+        }
+    }
+
+    /**
+     * Encodes a variable number of values into a single array value ready to be
+     * written
+     */
+    private static int encode(int... fields) {
+        int result = 0;
+        for (int i = 0; i < fields.length; i++) {
+            result += fields[i] * Math.pow(64, i);
+        }
+        return result;
     }
 }

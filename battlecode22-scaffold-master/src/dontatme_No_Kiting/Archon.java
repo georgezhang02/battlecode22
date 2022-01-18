@@ -3,8 +3,6 @@ package dontatme_No_Kiting;
 import java.util.Arrays;
 
 import battlecode.common.*;
-import dontatme.Communications;
-import dontatme.Helper;
 
 public strictfp class Archon {
 

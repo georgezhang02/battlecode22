@@ -2,222 +2,174 @@ package dontatme;
 
 import battlecode.common.*;
 
-import java.awt.*;
-import java.util.Random;
-
 public strictfp class Soldier {
-    /**
-     * Run a single turn for a Soldier.
-     * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
-     */
+
+    public enum SoldierState {
+        Rushing, Defending, Exploring, Pursuing, ArchonDefense, Anomaly
+    }
+
+    static SoldierState currentState = SoldierState.Exploring;
 
     static Pathfinder pathfinder;
 
-    static int state = -1;
     static RobotInfo[] enemies;
     static RobotInfo[] allies;
 
-    static MapLocation curTarget;
-    static MapLocation archonDef;
-
     static RobotController rc;
 
-    static boolean rusher;
-
     static Communications.Command command;
-    static boolean attacking;
     static int commandTimer = 0;
-    static int curPrio = -1;
-
-    static Random random = new Random();
-
-
-
-    static Direction[] directions = {
-            Direction.NORTH,
-            Direction.WEST,
-            Direction.EAST,
-            Direction.SOUTH,
-            Direction.NORTHWEST,
-            Direction.NORTHEAST,
-            Direction.SOUTHWEST,
-            Direction.SOUTHEAST
-
-    };
-
+    static int currentPriority = 0;
+    static MapLocation currentTarget;
+    
+    static MapLocation archonDef;
 
     public Soldier (RobotController rc) throws GameActionException {
         this.rc = rc;
         pathfinder = new BFPathing20(rc);
-
-        double d = Math.random();
-
-
-        if(d > 0){
-            rusher = false;
-            state = 2;
-        }
     }
 
     public void run() throws GameActionException {
         Communications.runStart(rc);
+
+        Team opponent = rc.getTeam().opponent();
+        enemies = rc.senseNearbyRobots(20, opponent);
+        allies = rc.senseNearbyRobots(20, rc.getTeam());
+
         if(commandTimer <= 0){
-            curPrio = -1;
-            command = null;
+            clearCommand();
         } else{
             commandTimer--;
         }
 
         readComms();
-        Team opponent = rc.getTeam().opponent();
-        enemies = rc.senseNearbyRobots(20, opponent);
-        allies = rc.senseNearbyRobots(20, rc.getTeam());
 
         Helper.updateEnemyLocations(rc, enemies);
 
-        if(command != null && curPrio != -1){
-
-            curTarget = command.location;
-            if(command.type == RobotType.ARCHON){
-                if(attacking){
-                    state = 0;
-                    rusher = false;
-                } else{
-                    state = 5;
-                }
+        if(command != null){
+            if(command.type == RobotType.ARCHON){  
+                currentState = command.isAttack ? SoldierState.Rushing : SoldierState.ArchonDefense;
             } else {
-                if(attacking){
-                    state = 3;
-                } else {
-                    state = 1;
-                }
+                currentState = command.isAttack ? SoldierState.Pursuing : SoldierState.Defending;
             }
+        } else {
+            currentState = SoldierState.Exploring;
         }
 
 
-        switch (state){
-            case 0: // Rushing Enemy Archon
-                offense(curTarget, 0);
+        switch (currentState){
+            case Rushing:
+                offense(currentTarget, 0);
                 break;
-            case 1: //Defending
-                defense(curTarget, 6);
+            case Pursuing:
+                offense(currentTarget, 1);
                 break;
-            case 2: //Exploring
+            case Defending:
+                defense(currentTarget, 6);
+                break;
+            case Exploring:
                 explore();
                 break;
-            case 3: //Pursuing
-                offense(curTarget, 1);
+            case ArchonDefense:
+                defense(currentTarget, 10);
                 break;
-
-            case 5: // Defending Own Archon
-                defense(curTarget, 10);
-                break;
-            case 6: //Prep for anomaly
+            case Anomaly:
                 prepForAnomaly(AnomalyType.ABYSS);
                 break;
 
         }
     }
+        
+    public static boolean currentlyAttacking() {
+        if (command != null) {
+            return command.isAttack;
+        }
+        return false;
+    }
 
+    static void clearCommand() {
+        command = null;
+        commandTimer = 0;
+        currentPriority = 0;
+        currentTarget = null;
+    }
 
+    static void setCommand(Communications.Command c) {
+        command = c;
+        commandTimer = Communications.getCommandCooldown(rc, c.type, c.isAttack);
+        currentPriority = c.priority();
+        currentTarget = c.location;
+    }
 
     static void readComms() throws GameActionException {
+        // find command with the highest priority (including current command)
+        int maxPrio = currentPriority;
+        
         Communications.Command[] attackCommands = Communications.getAttackCommands(rc);
-
-        int count = 0;
-
-        int maxPrio = curPrio;
-        int curFollow = -1;
-        int index;
-        for(index = 0; index<attackCommands.length; index++){
-            Communications.Command ac = attackCommands[index];
-            if(ac.location.x < 60){
-
-                if(ac.type == null && ac.location.equals(curTarget) && attacking){
-                    System.out.println("stop");
-                    curPrio = -1;
-                    commandTimer = 0;
-                    curTarget = null;
-                    command = null;
-                    return;
-                } else{
-                    int priority = Communications.getCommandPrio(ac.type, true);
-                    if(priority > maxPrio && Communications.inCommandRadius(rc, ac.type, ac.location, true)){
-                        maxPrio = priority;
-                        curFollow = index;
-                    }
-                }
-            }
-
-
-        }
-
         Communications.Command[] defendCommands = Communications.getDefenseCommand(rc);
 
-        for(; index<defendCommands.length + attackCommands.length; index++){
-            Communications.Command dc = defendCommands[index - attackCommands.length];
-            if(dc.location.x != 61) {
-                count ++;
-                if (dc.type == null && dc.location.equals(curTarget) && !attacking) {
-                    curPrio = -1;
-                    commandTimer = 0;
-                    curTarget = null;
-                    command = null;
+        // for all attack commands
+        for(int i = 0; i < attackCommands.length; i++){
+            Communications.Command ac = attackCommands[i];
+            // if location is valid
+            if(ac.location.x < 60){
+                // if command is a stop attacking command
+                if(ac.type == null && ac.location.equals(currentTarget) && currentlyAttacking()){
+                    // stop doing whatever we are oding
+                    clearCommand();
                     return;
-                } else {
-                    int priority = Communications.getCommandPrio(dc.type, false);
-                    if( true){
+                // if its not a stop attacking command
+                } else{
+                    // get the command with the highest priority that is within our range
+                    if(ac.priority() > maxPrio && Communications.inCommandRadius(rc, ac.type, ac.location, true)){
+                        maxPrio = ac.priority();
 
-                        if (priority > maxPrio && Communications.inCommandRadius(rc, dc.type, dc.location, false)) {
-                            maxPrio = priority;
-                            curFollow = index;
-                        }
+                        // get priority command
+                        setCommand(ac);
                     }
-
                 }
             }
-
         }
 
-        if(curFollow != -1 && curFollow < attackCommands.length){
-            command = attackCommands[curFollow];
-            attacking = true;
-            commandTimer = Communications.getCommandCooldown(rc, command.type, true);
-            curPrio = maxPrio;
+        // for all defend commmand
+        for(int i = 0; i < defendCommands.length; i++){
+            Communications.Command dc = defendCommands[i];
+            // if location is valid
+            if(dc.location.x < 60){
+                // if command is a stop defending command and we're defending
+                if(dc.type == null && dc.location.equals(currentTarget) && !currentlyAttacking()){
+                    // stop doing whatever we are doing
+                    clearCommand();
+                    return;
+                // if its not a stop defending command
+                } else{
+                    // get the command with the highest priority that is within our range
+                    if(dc.priority() > maxPrio && Communications.inCommandRadius(rc, dc.type, dc.location, false)){
+                        maxPrio = dc.priority();
 
-        } else if (curFollow != -1){
-
-            curFollow -= attackCommands.length;
-            command = defendCommands[curFollow];
-            attacking = false;
-            commandTimer = Communications.getCommandCooldown(rc, command.type, false);
-            curPrio = maxPrio;
-
+                        setCommand(dc);
+                    }
+                }
+            }
         }
-
     }
 
-
-
-
-
-    static void prepForAnomaly(AnomalyType anomalyType)
-    {
-
-    }
-    static void offense(MapLocation target, int attackType) throws GameActionException {
-        //rc.setIndicatorString(state+" Offense");
-
-        if(command != null && command.type != null &&
-        rc.canSenseLocation(command.location) && attacking && command.type.isBuilding() ){
+    static void checkCurrentAttackingTarget() throws GameActionException {
+        if(command != null && 
+            command.type != null &&
+            rc.canSenseLocation(command.location) && 
+            currentlyAttacking() && 
+            command.type.isBuilding()) {
 
             RobotInfo robot = rc.senseRobotAtLocation(command.location);
-            if(robot == null || (robot.getType() != command.type &&
-                    !robot.getTeam().isPlayer())){
+            if(robot == null || (robot.getType() != command.type && !robot.getTeam().isPlayer())){
                 Communications.sendStopAttackCommand(rc, command.location);
             }
-
         }
+    }
+
+    static void offense(MapLocation target, int attackType) throws GameActionException {
+        checkCurrentAttackingTarget();
 
         int enemyCount = 0;
         int allyCount = 1;
@@ -226,7 +178,6 @@ public strictfp class Soldier {
 
         for(RobotInfo robot:enemies){
             if(robot.getType() == RobotType.SOLDIER || robot.getType() == RobotType.WATCHTOWER){
-
                 if(enemyCount < 5){
                     enemyPos[enemyCount] = robot.getLocation();
                 }
@@ -242,7 +193,6 @@ public strictfp class Soldier {
         MapLocation ml = attack(attackType);
 
         if(enemyCount > 0){
-
             Communications.sendAttackCommand(rc, enemyPos[0], RobotType.SOLDIER);
         }
         if(enemyCount >= 1 && ml != null){
@@ -250,14 +200,15 @@ public strictfp class Soldier {
         }
         else if(target != null && !pathfinder.targetWithinRadius(target, 6)){
             move(pathfinder.pathToTarget(target, false));
-        }  else{
+        } 
+        else {
             if(ml!= null){
-                curTarget = ml;
-            } else{
-                attacking = false;
-                state = 2;
+                currentTarget = ml;
+            } else {
+                clearCommand();
             }
         }
+
         if(rc.isActionReady()){
             ml = attack(attackType);
         }
@@ -282,8 +233,9 @@ public strictfp class Soldier {
                 allyCount++;
             }
         }
+
         MapLocation ml = attack(1);
-        ///rc.setIndicatorString(state + " defense "+ curTarget.toString());
+
         if(2 * enemyCount >= 3 * allyCount){
             move(pathfinder.pathAwayFrom(enemyPos));
         }
@@ -291,7 +243,7 @@ public strictfp class Soldier {
             move(pathfinder.pathToTarget(target, false));
         } else{
             if(ml== null){
-                state = 2;
+                clearCommand();
             }
         }
 
@@ -302,10 +254,8 @@ public strictfp class Soldier {
 
 
     static void explore() throws GameActionException {
-
-
         if(!pathfinder.exploring){
-            curTarget = null;
+            currentTarget = null;
         }
 
         int enemyCount = 0;
@@ -327,22 +277,21 @@ public strictfp class Soldier {
             }
         }
 
-        MapLocation ml =attack(1);
+        MapLocation ml = attack(1);
 
         if(enemyCount >=1){
-
             move(pathfinder.pathAwayFrom(enemyPos));
             if(ml != null){
-                curTarget = ml;
-                state = 3;
+                currentTarget = ml;
+                currentState = SoldierState.Pursuing;
             }
         } else{
             move(pathfinder.pathToExplore());
             rc.setIndicatorLine(rc.getLocation(), pathfinder.explorer.target, 255,255,0);
 
             if(ml != null){
-                curTarget = ml;
-                state = 3;
+                currentTarget = ml;
+                currentState = SoldierState.Pursuing;
             }
         }
 
@@ -360,9 +309,8 @@ public strictfp class Soldier {
         }  else { // attack eco (miners, buildings, droids, archons)
             attackLoc = getAttack(2, 1, 3, 0);
         }
-        if(attackLoc!= null && rc.canAttack(attackLoc.getLocation())){
+        if(attackLoc != null && rc.canAttack(attackLoc.getLocation())){
             rc.attack(attackLoc.getLocation());
-
         }
         if(attackLoc != null){
             return attackLoc.getLocation();
@@ -440,5 +388,8 @@ public strictfp class Soldier {
         }
     }
 
+    static void prepForAnomaly(AnomalyType anomalyType)
+    {
 
+    }
 }

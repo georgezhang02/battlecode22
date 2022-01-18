@@ -1,7 +1,6 @@
 package dontatme_No_Kiting;
 
 import battlecode.common.*;
-import dontatme.Communications;
 
 import java.util.Random;
 

@@ -222,7 +222,7 @@ public strictfp class Archon {
                 attackingArchon = i;
 
                 commandCooldown[0] = 100 * (rc.getMapHeight() + rc.getMapWidth()) / 120;
-                commands[0] = new Communications.Command(Communications.getEnemyArchonLocationByIndex(rc, i), RobotType.ARCHON);
+                commands[0] = new Communications.Command(Communications.getEnemyArchonLocationByIndex(rc, i), RobotType.ARCHON, true);
                 gameState = 1;
             }
         }

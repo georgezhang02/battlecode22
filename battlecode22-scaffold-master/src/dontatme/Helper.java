@@ -60,9 +60,6 @@ public strictfp class Helper {
             }
         }
 
-
         return nearbyEnemies;
-
-        // TODO: check archon location with current location and clear if necessary
     }
 }
