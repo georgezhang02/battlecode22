@@ -184,7 +184,10 @@ public strictfp class Soldier {
 
 
     static void offense(MapLocation target, int attackType) throws GameActionException {
+        rc.setIndicatorString("Attacking");
         checkCurrentAttackingTarget();
+
+        // check everything that you can see
 
         int enemyCount = 0;
         int allyCount = 1;
@@ -219,16 +222,20 @@ public strictfp class Soldier {
             if(dir == Direction.CENTER ){
                 if(!rc.isActionReady() || enemyCount > allyCount){
                     dir = pathfinder.pathAwayFrom(enemyPos);
+                } else if(pathfinder.targetWithinRadius(target, 20)){
+                    dir = pathfinder.pathToTargetGreedy(target, 1);
                 } else{
-
+                    dir = pathfinder.pathToTarget(target, false);
                 }
             }
         } else{
             currentState = SoldierState.Exploring;
         }
 
+        if(rc.canMove(dir) &&  rc.senseRubble(rc.getLocation().add(dir)) <= 1.2 * rc.senseRubble(rc.getLocation().add(dir))){
+            move(dir);
+        }
 
-        move(dir);
 
         if(rc.isActionReady()){
             ml = attack(attackType);
@@ -240,6 +247,7 @@ public strictfp class Soldier {
     }
 
     static void defense(MapLocation target, int minDistance) throws GameActionException {
+        rc.setIndicatorString("Defense");
         int enemyCount = 0;
         int allyCount = 1;
 
@@ -279,6 +287,7 @@ public strictfp class Soldier {
 
 
     static void explore() throws GameActionException {
+        rc.setIndicatorString("Explore");
         if(!pathfinder.exploring){
             currentTarget = null;
         }
