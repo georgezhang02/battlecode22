@@ -13,17 +13,20 @@ public class Communications {
     private static final int ENEMY_ARCHON_OFFSET = 5;
     private static final int LEAD_OFFSET = 9;
     public static final int ATTACK_EVEN_OFFSET = 13;
-    public static final int ATTACK_ODD_OFFSET = 18;
-    public static final int DEFENSE_EVEN_OFFSET = 23;
-    public static final int DEFENSE_ODD_OFFSET = 28;
-    public static final int BUILD_EVEN_OFFSET = 33;
-    public static final int BUILD_ODD_OFFSET = 35;
-    private static final int LEAD_EVEN_OFFSET = 37;
-    private static final int LEAD_ODD_OFFSET = 40;
-    private static final int ANOMOLY = 43;
+    public static final int ATTACK_ODD_OFFSET = 23;
+    public static final int DEFENSE_EVEN_OFFSET = 33;
+    public static final int DEFENSE_ODD_OFFSET = 38;
+    public static final int BUILD_EVEN_OFFSET = 43;
+    public static final int BUILD_ODD_OFFSET = 45;
+    private static final int LEAD_EVEN_OFFSET = 47;
+    private static final int LEAD_ODD_OFFSET = 50;
+    private static final int ANOMOLY = 53;
     private static final int HAS_WIPED = 60;
     private static final int NEXT_INDICES = 61;
     private static final int UNIT_COUNT_OFFSET = 62;
+
+    private static final int ATTACK_SIZE = ATTACK_ODD_OFFSET - ATTACK_EVEN_OFFSET;
+    private static final int DEFENSE_SIZE = DEFENSE_ODD_OFFSET - DEFENSE_EVEN_OFFSET;
 
     private static final int NULL_LOCATION = 61;
 
@@ -326,6 +329,7 @@ public class Communications {
 
             return true;
         }
+        System.out.println("UGH OH TOO MANY ATTACK COMMANDS!: " + nextIndex);
         return false;
     }
 
@@ -351,8 +355,8 @@ public class Communications {
      */
     public static Command[] getAttackCommands(RobotController rc) throws GameActionException {
         int offset = (rc.getRoundNum() % 2 == 0) ? ATTACK_ODD_OFFSET : ATTACK_EVEN_OFFSET;
-        Command[] commands = new Command[5];
-        for (int i = 0; i < 5; i++) {
+        Command[] commands = new Command[ATTACK_SIZE];
+        for (int i = 0; i < ATTACK_SIZE; i++) {
 
             commands[i] = getCommandFromArray(rc, i + offset);
         }
@@ -408,8 +412,8 @@ public class Communications {
      */
     public static Command[] getDefenseCommand(RobotController rc) throws GameActionException {
         int offset = (rc.getRoundNum() % 2 == 0) ? DEFENSE_ODD_OFFSET : DEFENSE_EVEN_OFFSET;
-        Command[] commands = new Command[5];
-        for (int i = 0; i < 5; i++) {
+        Command[] commands = new Command[DEFENSE_SIZE];
+        for (int i = 0; i < DEFENSE_SIZE; i++) {
             commands[i] = getCommandFromArray(rc, i + offset);
         }
 
@@ -699,7 +703,7 @@ public class Communications {
      */
     public static void wipeAttackCommands(RobotController rc) throws GameActionException {
         int offset = (rc.getRoundNum() % 2 == 0) ? ATTACK_EVEN_OFFSET : ATTACK_ODD_OFFSET;
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < ATTACK_SIZE; i++) {
             rc.writeSharedArray(i + offset, NULL_LOCATION);
         }
     }
@@ -709,7 +713,7 @@ public class Communications {
      */
     public static void wipeDefCommands(RobotController rc) throws GameActionException {
         int offset = (rc.getRoundNum() % 2 == 0) ? DEFENSE_EVEN_OFFSET : DEFENSE_ODD_OFFSET;
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < DEFENSE_SIZE; i++) {
             rc.writeSharedArray(i + offset, NULL_LOCATION);
         }
     }
@@ -778,7 +782,7 @@ public class Communications {
         int attackIndex = decode(readVal, 0);
         int defIndex = decode(readVal, 1);
         int buildIndex = decode(readVal, 2);
-        rc.writeSharedArray(NEXT_INDICES, encode((attackIndex + 1) % 5, defIndex, buildIndex));
+        rc.writeSharedArray(NEXT_INDICES, encode((attackIndex + 1) % ATTACK_SIZE, defIndex, buildIndex));
     }
 
     /**
@@ -801,7 +805,7 @@ public class Communications {
         int attackIndex = decode(readVal, 0);
         int defIndex = decode(readVal, 1);
         int buildIndex = decode(readVal, 2);
-        rc.writeSharedArray(NEXT_INDICES, encode(attackIndex, (defIndex + 1) % 5, buildIndex));
+        rc.writeSharedArray(NEXT_INDICES, encode(attackIndex, (defIndex + 1) % DEFENSE_SIZE, buildIndex));
     }
 
     /**
