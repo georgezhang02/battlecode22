@@ -95,7 +95,6 @@ public strictfp class Soldier {
         command = null;
         commandTimer = 0;
         currentPriority = 0;
-        currentTarget = null;
     }
 
     static void setCommand(Communications.Command c) {
@@ -217,30 +216,35 @@ public strictfp class Soldier {
         MapLocation ml = attack(attackType);
 
         // looking for best movement
-        Direction dir = lookForBetterSquare();
+
+
+        Direction dir = Direction.CENTER;
         if(combatCooldown > 0){
+            dir = lookForBetterSquare();
             if(dir == Direction.CENTER ){
                 if(!rc.isActionReady() || enemyCount > allyCount){
                     dir = pathfinder.pathAwayFrom(enemyPos);
                 } else if(pathfinder.targetWithinRadius(target, 20)){
                     dir = pathfinder.pathToTargetGreedy(target, 1);
-                } else{
-                    dir = pathfinder.pathToTarget(target, false);
                 }
             }
+        } else if (currentTarget!= null && !pathfinder.targetWithinRadius(target, 6)){
+            dir = pathfinder.pathToTarget(target, false);
+            rc.setIndicatorString("Attacking "+ target.toString());
         } else{
             currentState = SoldierState.Exploring;
         }
 
-        if(rc.canMove(dir) &&  rc.senseRubble(rc.getLocation().add(dir)) <= 1.2 * rc.senseRubble(rc.getLocation().add(dir))){
-            move(dir);
-        }
+        move(dir);
 
 
         if(rc.isActionReady()){
             ml = attack(attackType);
 
             if(ml != null){
+                Communications.sendAttackCommand(rc, ml, RobotType.SOLDIER);
+                currentTarget = ml;
+                currentState = SoldierState.PURSUING;
                 combatCooldown = 3;
             }
         }
