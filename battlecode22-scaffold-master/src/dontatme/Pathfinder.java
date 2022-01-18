@@ -57,6 +57,26 @@ public abstract class Pathfinder {
         return pathToTargetGreedy(target);
     }
 
+    Direction pathAwayFrom(MapLocation[]mapLocations, int depth) throws GameActionException {
+        exploring = false;
+        MapLocation curPos = rc.getLocation();
+        int x = curPos.x;
+        int y = curPos.y;
+        for(MapLocation ml : mapLocations){
+            if(ml != null){
+                double vect = 10/Math.sqrt(curPos.distanceSquaredTo(ml));
+                int xdiff = curPos.x - ml.x;
+                int ydiff = curPos.y - ml.y;
+
+                x += (int)(xdiff * vect);
+                y += (int)(ydiff * vect);
+            }
+
+        }
+        MapLocation target = new MapLocation(x, y);
+        return pathToTargetGreedy(target, depth);
+    }
+
     //Sets last location visited with bf so that you can't go there, then paths to location with chosen alg
     Direction pathToTarget(MapLocation target, boolean useGreedy) throws GameActionException {
         exploring = false;

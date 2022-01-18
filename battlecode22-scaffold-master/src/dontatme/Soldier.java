@@ -21,7 +21,7 @@ public strictfp class Soldier {
     static int commandTimer = 0;
     static int currentPriority = 0;
     static MapLocation currentTarget;
-    
+
     static MapLocation archonDef;
 
     static int combatCooldown = 0;
@@ -51,7 +51,7 @@ public strictfp class Soldier {
         Helper.updateEnemyLocations(rc, enemies);
 
         if(command != null){
-            if(command.type == RobotType.ARCHON){  
+            if(command.type == RobotType.ARCHON){
                 currentState = command.isAttack ? SoldierState.Rushing : SoldierState.ArchonDefense;
             } else {
                 currentState = command.isAttack ? SoldierState.PURSUING : SoldierState.Defending;
@@ -89,7 +89,7 @@ public strictfp class Soldier {
 
         }
     }
-        
+
     public static boolean currentlyAttacking() {
         if (command != null) {
             return command.isAttack;
@@ -101,6 +101,7 @@ public strictfp class Soldier {
         command = null;
         commandTimer = 0;
         currentPriority = 0;
+        currentState = SoldierState.Exploring;
     }
 
     static void setCommand(Communications.Command c) {
@@ -113,7 +114,7 @@ public strictfp class Soldier {
     static void readComms() throws GameActionException {
         // find command with the highest priority (including current command)
         int maxPrio = currentPriority;
-        
+
         Communications.Command[] attackCommands = Communications.getAttackCommands(rc);
         Communications.Command[] defendCommands = Communications.getDefenseCommand(rc);
 
@@ -127,7 +128,7 @@ public strictfp class Soldier {
                     // stop doing whatever we are oding
                     clearCommand();
                     return;
-                // if its not a stop attacking command
+                    // if its not a stop attacking command
                 } else{
                     // get the command with the highest priority that is within our range
                     if(ac.priority() > maxPrio && Communications.inCommandRadius(rc, ac.type, ac.location, true)){
@@ -150,7 +151,7 @@ public strictfp class Soldier {
                     // stop doing whatever we are doing
                     clearCommand();
                     return;
-                // if its not a stop defending command
+                    // if its not a stop defending command
                 } else{
                     // get the command with the highest priority that is within our range
                     if(dc.priority() > maxPrio && Communications.inCommandRadius(rc, dc.type, dc.location, false)){
@@ -164,23 +165,24 @@ public strictfp class Soldier {
     }
 
     static void checkCurrentAttackingTarget() throws GameActionException {
-        if(command != null && 
-            command.type != null &&
-            rc.canSenseLocation(command.location) && 
-            currentlyAttacking() && 
-            command.type.isBuilding()) {
+        if(command != null &&
+                command.type != null &&
+                rc.canSenseLocation(command.location) &&
+                currentlyAttacking() &&
+                command.type.isBuilding()) {
 
             RobotInfo robot = rc.senseRobotAtLocation(command.location);
             if(robot == null || (robot.getType() != command.type && !robot.getTeam().isPlayer())){
                 Communications.sendStopAttackCommand(rc, command.location);
+                clearCommand();
             }
         }
     }
 
     static Direction lookForBetterSquare() throws GameActionException{
         for(Direction dir: Direction.allDirections()){
-            if(rc.canMove(dir) && 1.5 * rc.senseRubble(rc.getLocation().add(dir))
-                    <= rc.senseRubble(rc.getLocation().add(dir))){
+            if(rc.canMove(dir) && 1.5 * (rc.senseRubble(rc.getLocation().add(dir) ) + 10)
+                    <= rc.senseRubble(rc.getLocation())+ 10){
                 return dir;
             }
         }
@@ -198,10 +200,14 @@ public strictfp class Soldier {
 
         MapLocation[] enemyPos = new MapLocation[5];
 
+        int closestEnemy = 21;
+
         for(RobotInfo robot:enemies){
             if(robot.getType() == RobotType.SOLDIER || robot.getType() == RobotType.WATCHTOWER){
-                if(enemyCount < 5){
-                    enemyPos[enemyCount] = robot.getLocation();
+                int dist =  robot.getLocation().distanceSquaredTo(rc.getLocation());
+                if(dist < closestEnemy){
+                    closestEnemy = dist;
+                    enemyPos[0] = robot.getLocation();
                 }
                 enemyCount++;
             }
@@ -213,8 +219,15 @@ public strictfp class Soldier {
         }
 
         if(enemyCount > 0){
-            Communications.sendAttackCommand(rc, enemyPos[0], RobotType.SOLDIER);
-            combatCooldown = 3;
+            if(commandTimer <= 0){
+                if(commandTimer <= 0){
+                    Communications.sendAttackCommand(rc, enemyPos[0], RobotType.SOLDIER);
+                    commandTimer = Communications.getCommandCooldown(rc, RobotType.SOLDIER, true);
+                }
+                commandTimer = Communications.getCommandCooldown(rc, RobotType.SOLDIER, true);
+            }
+
+            currentTarget = enemyPos[0];
         }
 
         // initial attack
@@ -225,21 +238,29 @@ public strictfp class Soldier {
 
         Direction dir = Direction.CENTER;
 
-        if(enemyCount >= 1 && ml != null){
-            move(pathfinder.pathAwayFrom(enemyPos));
-        }
-        else if(target != null && !pathfinder.targetWithinRadius(target, 6)){
-            move(pathfinder.pathToTarget(target, false));
-        }  else{
-            if(ml!= null){
-                currentTarget = ml;
-            } else{
-                currentState = SoldierState.Exploring;
-                
-            }
-        }
 
-        move(dir);
+
+        if(enemyCount > 0 || !rc.isActionReady()){ // in combat
+            if(!rc.isActionReady() ){ // action not ready
+                dir = pathfinder.pathAwayFrom(enemyPos, 0); // kite
+            } else if(enemyCount >= allyCount){
+                dir = lookForBetterSquare();
+            }  else {
+                //action is ready, but you outnumber all opponents in your attack radius
+                dir = pathfinder.pathToTargetGreedy(target, 0); // path to target close
+            }
+        } // travelling
+        else if(target != null && !pathfinder.targetWithinRadius(target, 34)){
+            move(pathfinder.pathToTarget(target, false)); // path to target from far away
+        } else if(target != null && pathfinder.targetWithinRadius(target, 34)){
+            dir = pathfinder.pathToTargetGreedy(target, 0); // path to target close
+        }else{
+            currentState = SoldierState.Exploring;
+        }
+        if(rc.canMove(dir) && rc.senseRubble(rc.getLocation().add(dir)) + 10
+                <= 1.5 * (rc.senseRubble(rc.getLocation())+ 10) ){
+            move(dir); // path to target from far away
+        }
 
 
         if(rc.isActionReady()){
