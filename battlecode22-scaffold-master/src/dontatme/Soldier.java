@@ -5,7 +5,7 @@ import battlecode.common.*;
 public strictfp class Soldier {
 
     public enum SoldierState {
-        Rushing, Defending, Exploring, Pursuing, ArchonDefense, Anomaly
+        Rushing, Defending, Exploring, PURSUING, ArchonDefense, Anomaly
     }
 
     static SoldierState currentState = SoldierState.Exploring;
@@ -24,6 +24,8 @@ public strictfp class Soldier {
     
     static MapLocation archonDef;
 
+    static int combatCooldown = 0;
+
     public Soldier (RobotController rc) throws GameActionException {
         this.rc = rc;
         pathfinder = new BFPathing20(rc);
@@ -35,6 +37,8 @@ public strictfp class Soldier {
         Team opponent = rc.getTeam().opponent();
         enemies = rc.senseNearbyRobots(20, opponent);
         allies = rc.senseNearbyRobots(20, rc.getTeam());
+
+        combatCooldown--;
 
         if(commandTimer <= 0){
             clearCommand();
@@ -50,7 +54,7 @@ public strictfp class Soldier {
             if(command.type == RobotType.ARCHON){  
                 currentState = command.isAttack ? SoldierState.Rushing : SoldierState.ArchonDefense;
             } else {
-                currentState = command.isAttack ? SoldierState.Pursuing : SoldierState.Defending;
+                currentState = command.isAttack ? SoldierState.PURSUING : SoldierState.Defending;
             }
         } else {
             currentState = SoldierState.Exploring;
@@ -61,7 +65,7 @@ public strictfp class Soldier {
             case Rushing:
                 offense(currentTarget, 0);
                 break;
-            case Pursuing:
+            case PURSUING:
                 offense(currentTarget, 1);
                 break;
             case Defending:
@@ -168,6 +172,17 @@ public strictfp class Soldier {
         }
     }
 
+    static Direction lookForBetterSquare() throws GameActionException{
+        for(Direction dir: Direction.allDirections()){
+            if(rc.canMove(dir) && 1.5 * rc.senseRubble(rc.getLocation().add(dir))
+                    <= rc.senseRubble(rc.getLocation().add(dir))){
+                return dir;
+            }
+        }
+        return Direction.CENTER;
+    }
+
+
     static void offense(MapLocation target, int attackType) throws GameActionException {
         checkCurrentAttackingTarget();
 
@@ -190,27 +205,37 @@ public strictfp class Soldier {
             }
         }
 
-        MapLocation ml = attack(attackType);
-
         if(enemyCount > 0){
             Communications.sendAttackCommand(rc, enemyPos[0], RobotType.SOLDIER);
+            combatCooldown = 3;
         }
-        if(enemyCount >= 1 && ml != null){
-            move(pathfinder.pathAwayFrom(enemyPos));
-        }
-        else if(target != null && !pathfinder.targetWithinRadius(target, 6)){
-            move(pathfinder.pathToTarget(target, false));
-        } 
-        else {
-            if(ml!= null){
-                currentTarget = ml;
-            } else {
-                clearCommand();
+
+        // initial attack
+        MapLocation ml = attack(attackType);
+
+        // looking for best movement
+        Direction dir = lookForBetterSquare();
+        if(combatCooldown > 0){
+            if(dir == Direction.CENTER ){
+                if(!rc.isActionReady() || enemyCount > allyCount){
+                    dir = pathfinder.pathAwayFrom(enemyPos);
+                } else{
+
+                }
             }
+        } else{
+            currentState = SoldierState.Exploring;
         }
+
+
+        move(dir);
 
         if(rc.isActionReady()){
             ml = attack(attackType);
+
+            if(ml != null){
+                combatCooldown = 3;
+            }
         }
     }
 
@@ -265,10 +290,11 @@ public strictfp class Soldier {
 
         for(RobotInfo robot:enemies){
             if(robot.getType() == RobotType.SOLDIER || robot.getType() == RobotType.WATCHTOWER){
-                enemyCount++;
+
                 if(enemyCount < 5){
                     enemyPos[enemyCount] = robot.getLocation();
                 }
+                enemyCount++;
             }
         }
         for(RobotInfo robot: allies){
@@ -279,21 +305,30 @@ public strictfp class Soldier {
 
         MapLocation ml = attack(1);
 
+
         if(enemyCount >=1){
             move(pathfinder.pathAwayFrom(enemyPos));
-            if(ml != null){
-                currentTarget = ml;
-                currentState = SoldierState.Pursuing;
-            }
+            Communications.sendAttackCommand(rc, enemyPos[0], RobotType.SOLDIER);
+            currentTarget = enemyPos[0];
+            currentState = SoldierState.PURSUING;
+            combatCooldown = 3;
         } else{
             move(pathfinder.pathToExplore());
             rc.setIndicatorLine(rc.getLocation(), pathfinder.explorer.target, 255,255,0);
+        }
+
+        if(rc.isActionReady()){
+            ml = attack(1);
 
             if(ml != null){
+                Communications.sendAttackCommand(rc, ml, RobotType.SOLDIER);
                 currentTarget = ml;
-                currentState = SoldierState.Pursuing;
+                currentState = SoldierState.PURSUING;
+                combatCooldown = 3;
             }
         }
+
+
 
     }
 

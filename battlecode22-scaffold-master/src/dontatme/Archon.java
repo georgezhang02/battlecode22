@@ -192,7 +192,13 @@ public strictfp class Archon {
                 if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
                     buildTowardsLowRubble(rc, RobotType.MINER);
                 }
-            } else if (soldierCount / rc.getArchonCount() < 5 ){
+            } if (minerCount / rc.getArchonCount() < 2 *  MAP_SCALER){
+                if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
+                    buildTowardsLowRubble(rc, RobotType.MINER);
+
+                }
+            }
+            else if (soldierCount / rc.getArchonCount() < 4 ){
                 if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
                     buildTowardsLowRubble(rc, RobotType.SOLDIER);
 
