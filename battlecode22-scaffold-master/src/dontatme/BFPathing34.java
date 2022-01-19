@@ -63,6 +63,46 @@ public class BFPathing34 extends Pathfinder {
     static Direction dir66;
     static Direction dir67;
     static Direction dir68;
+    static Direction dir69;
+    static Direction dir70;
+    static Direction dir71;
+    static Direction dir72;
+    static Direction dir73;
+    static Direction dir74;
+    static Direction dir75;
+    static Direction dir76;
+    static Direction dir77;
+    static Direction dir78;
+    static Direction dir79;
+    static Direction dir80;
+    static Direction dir81;
+    static Direction dir82;
+    static Direction dir83;
+    static Direction dir84;
+    static Direction dir85;
+    static Direction dir86;
+    static Direction dir87;
+    static Direction dir88;
+    static Direction dir89;
+    static Direction dir90;
+    static Direction dir91;
+    static Direction dir92;
+    static Direction dir93;
+    static Direction dir94;
+    static Direction dir95;
+    static Direction dir96;
+    static Direction dir97;
+    static Direction dir98;
+    static Direction dir99;
+    static Direction dir100;
+    static Direction dir101;
+    static Direction dir102;
+    static Direction dir103;
+    static Direction dir104;
+    static Direction dir105;
+    static Direction dir106;
+    static Direction dir107;
+    static Direction dir108;
 
     static int dist1;
     static int dist2;
@@ -132,6 +172,46 @@ public class BFPathing34 extends Pathfinder {
     static int dist66;
     static int dist67;
     static int dist68;
+    static int dist69;
+    static int dist70;
+    static int dist71;
+    static int dist72;
+    static int dist73;
+    static int dist74;
+    static int dist75;
+    static int dist76;
+    static int dist77;
+    static int dist78;
+    static int dist79;
+    static int dist80;
+    static int dist81;
+    static int dist82;
+    static int dist83;
+    static int dist84;
+    static int dist85;
+    static int dist86;
+    static int dist87;
+    static int dist88;
+    static int dist89;
+    static int dist90;
+    static int dist91;
+    static int dist92;
+    static int dist93;
+    static int dist94;
+    static int dist95;
+    static int dist96;
+    static int dist97;
+    static int dist98;
+    static int dist99;
+    static int dist100;
+    static int dist101;
+    static int dist102;
+    static int dist103;
+    static int dist104;
+    static int dist105;
+    static int dist106;
+    static int dist107;
+    static int dist108;
 
     static int cost9;
     static int cost10;
@@ -193,6 +273,46 @@ public class BFPathing34 extends Pathfinder {
     static int cost66;
     static int cost67;
     static int cost68;
+    static int cost69;
+    static int cost70;
+    static int cost71;
+    static int cost72;
+    static int cost73;
+    static int cost74;
+    static int cost75;
+    static int cost76;
+    static int cost77;
+    static int cost78;
+    static int cost79;
+    static int cost80;
+    static int cost81;
+    static int cost82;
+    static int cost83;
+    static int cost84;
+    static int cost85;
+    static int cost86;
+    static int cost87;
+    static int cost88;
+    static int cost89;
+    static int cost90;
+    static int cost91;
+    static int cost92;
+    static int cost93;
+    static int cost94;
+    static int cost95;
+    static int cost96;
+    static int cost97;
+    static int cost98;
+    static int cost99;
+    static int cost100;
+    static int cost101;
+    static int cost102;
+    static int cost103;
+    static int cost104;
+    static int cost105;
+    static int cost106;
+    static int cost107;
+    static int cost108;
 
     static MapLocation ml1;
     static MapLocation ml2;
@@ -262,6 +382,156 @@ public class BFPathing34 extends Pathfinder {
     static MapLocation ml66;
     static MapLocation ml67;
     static MapLocation ml68;
+    static MapLocation ml69;
+    static MapLocation ml70;
+    static MapLocation ml71;
+    static MapLocation ml72;
+    static MapLocation ml73;
+    static MapLocation ml74;
+    static MapLocation ml75;
+    static MapLocation ml76;
+    static MapLocation ml77;
+    static MapLocation ml78;
+    static MapLocation ml79;
+    static MapLocation ml80;
+    static MapLocation ml81;
+    static MapLocation ml82;
+    static MapLocation ml83;
+    static MapLocation ml84;
+    static MapLocation ml85;
+    static MapLocation ml86;
+    static MapLocation ml87;
+    static MapLocation ml88;
+    static MapLocation ml89;
+    static MapLocation ml90;
+    static MapLocation ml91;
+    static MapLocation ml92;
+    static MapLocation ml93;
+    static MapLocation ml94;
+    static MapLocation ml95;
+    static MapLocation ml96;
+    static MapLocation ml97;
+    static MapLocation ml98;
+    static MapLocation ml99;
+    static MapLocation ml100;
+    static MapLocation ml101;
+    static MapLocation ml102;
+    static MapLocation ml103;
+    static MapLocation ml104;
+    static MapLocation ml105;
+    static MapLocation ml106;
+    static MapLocation ml107;
+    static MapLocation ml108;
+
+    static boolean onMap1;
+    static boolean onMap2;
+    static boolean onMap3;
+    static boolean onMap4;
+    static boolean onMap5;
+    static boolean onMap6;
+    static boolean onMap7;
+    static boolean onMap8;
+    static boolean onMap9;
+    static boolean onMap10;
+    static boolean onMap11;
+    static boolean onMap12;
+    static boolean onMap13;
+    static boolean onMap14;
+    static boolean onMap15;
+    static boolean onMap16;
+    static boolean onMap17;
+    static boolean onMap18;
+    static boolean onMap19;
+    static boolean onMap20;
+    static boolean onMap21;
+    static boolean onMap22;
+    static boolean onMap23;
+    static boolean onMap24;
+    static boolean onMap25;
+    static boolean onMap26;
+    static boolean onMap27;
+    static boolean onMap28;
+    static boolean onMap29;
+    static boolean onMap30;
+    static boolean onMap31;
+    static boolean onMap32;
+    static boolean onMap33;
+    static boolean onMap34;
+    static boolean onMap35;
+    static boolean onMap36;
+    static boolean onMap37;
+    static boolean onMap38;
+    static boolean onMap39;
+    static boolean onMap40;
+    static boolean onMap41;
+    static boolean onMap42;
+    static boolean onMap43;
+    static boolean onMap44;
+    static boolean onMap45;
+    static boolean onMap46;
+    static boolean onMap47;
+    static boolean onMap48;
+    static boolean onMap49;
+    static boolean onMap50;
+    static boolean onMap51;
+    static boolean onMap52;
+    static boolean onMap53;
+    static boolean onMap54;
+    static boolean onMap55;
+    static boolean onMap56;
+    static boolean onMap57;
+    static boolean onMap58;
+    static boolean onMap59;
+    static boolean onMap60;
+    static boolean onMap61;
+    static boolean onMap62;
+    static boolean onMap63;
+    static boolean onMap64;
+    static boolean onMap65;
+    static boolean onMap66;
+    static boolean onMap67;
+    static boolean onMap68;
+    static boolean onMap69;
+    static boolean onMap70;
+    static boolean onMap71;
+    static boolean onMap72;
+    static boolean onMap73;
+    static boolean onMap74;
+    static boolean onMap75;
+    static boolean onMap76;
+    static boolean onMap77;
+    static boolean onMap78;
+    static boolean onMap79;
+    static boolean onMap80;
+    static boolean onMap81;
+    static boolean onMap82;
+    static boolean onMap83;
+    static boolean onMap84;
+    static boolean onMap85;
+    static boolean onMap86;
+    static boolean onMap87;
+    static boolean onMap88;
+    static boolean onMap89;
+    static boolean onMap90;
+    static boolean onMap91;
+    static boolean onMap92;
+    static boolean onMap93;
+    static boolean onMap94;
+    static boolean onMap95;
+    static boolean onMap96;
+    static boolean onMap97;
+    static boolean onMap98;
+    static boolean onMap99;
+    static boolean onMap100;
+    static boolean onMap101;
+    static boolean onMap102;
+    static boolean onMap103;
+    static boolean onMap104;
+    static boolean onMap105;
+    static boolean onMap106;
+    static boolean onMap107;
+    static boolean onMap108;
+    static boolean onMap109;
 
 
     static Direction dir1 = Direction.SOUTH;
@@ -352,6 +622,46 @@ public class BFPathing34 extends Pathfinder {
         dist66 = 10000;
         dist67 = 10000;
         dist68 = 10000;
+        dist69 = 10000;
+        dist70 = 10000;
+        dist71 = 10000;
+        dist72 = 10000;
+        dist73 = 10000;
+        dist74 = 10000;
+        dist75 = 10000;
+        dist76 = 10000;
+        dist77 = 10000;
+        dist78 = 10000;
+        dist79 = 10000;
+        dist80 = 10000;
+        dist81 = 10000;
+        dist82 = 10000;
+        dist83 = 10000;
+        dist84 = 10000;
+        dist85 = 10000;
+        dist86 = 10000;
+        dist87 = 10000;
+        dist88 = 10000;
+        dist89 = 10000;
+        dist90 = 10000;
+        dist91 = 10000;
+        dist92 = 10000;
+        dist93 = 10000;
+        dist94 = 10000;
+        dist95 = 10000;
+        dist96 = 10000;
+        dist97 = 10000;
+        dist98 = 10000;
+        dist99 = 10000;
+        dist100 = 10000;
+        dist101 = 10000;
+        dist102 = 10000;
+        dist103 = 10000;
+        dist104 = 10000;
+        dist105 = 10000;
+        dist106 = 10000;
+        dist107 = 10000;
+        dist108 = 10000;
 
         ml1 = ml0.add(Direction.SOUTH);
         ml2 = ml1.add(Direction.EAST);
@@ -382,45 +692,85 @@ public class BFPathing34 extends Pathfinder {
         ml27 = ml26.add(Direction.EAST);
         ml28 = ml27.add(Direction.EAST);
         ml29 = ml28.add(Direction.EAST);
-        ml30 = ml29.add(Direction.NORTHEAST);
+        ml30 = ml29.add(Direction.EAST);
         ml31 = ml30.add(Direction.NORTH);
         ml32 = ml31.add(Direction.NORTH);
         ml33 = ml32.add(Direction.NORTH);
         ml34 = ml33.add(Direction.NORTH);
-        ml35 = ml34.add(Direction.NORTHWEST);
-        ml36 = ml35.add(Direction.WEST);
+        ml35 = ml34.add(Direction.NORTH);
+        ml36 = ml35.add(Direction.NORTH);
         ml37 = ml36.add(Direction.WEST);
         ml38 = ml37.add(Direction.WEST);
         ml39 = ml38.add(Direction.WEST);
-        ml40 = ml39.add(Direction.SOUTHWEST);
-        ml41 = ml40.add(Direction.SOUTH);
-        ml42 = ml41.add(Direction.SOUTH);
+        ml40 = ml39.add(Direction.WEST);
+        ml41 = ml40.add(Direction.WEST);
+        ml42 = ml41.add(Direction.WEST);
         ml43 = ml42.add(Direction.SOUTH);
         ml44 = ml43.add(Direction.SOUTH);
         ml45 = ml44.add(Direction.SOUTH);
-        ml46 = ml45.add(Direction.SOUTHEAST);
-        ml47 = ml46.add(Direction.EAST);
-        ml48 = ml47.add(Direction.EAST);
-        ml49 = ml48.add(Direction.EAST);
+        ml46 = ml45.add(Direction.SOUTH);
+        ml47 = ml46.add(Direction.SOUTH);
+        ml48 = ml47.add(Direction.SOUTH);
+        ml49 = ml48.add(Direction.SOUTH);
         ml50 = ml49.add(Direction.EAST);
-        ml51 = ml50.add(Direction.NORTHEAST);
-        ml52 = ml51.add(Direction.NORTHEAST);
-        ml53 = ml52.add(Direction.NORTH);
-        ml54 = ml53.add(Direction.NORTH);
-        ml55 = ml54.add(Direction.NORTH);
-        ml56 = ml55.add(Direction.NORTH);
-        ml57 = ml56.add(Direction.NORTHWEST);
-        ml58 = ml57.add(Direction.NORTHWEST);
-        ml59 = ml58.add(Direction.WEST);
-        ml60 = ml59.add(Direction.WEST);
-        ml61 = ml60.add(Direction.WEST);
-        ml62 = ml61.add(Direction.WEST);
-        ml63 = ml62.add(Direction.SOUTHWEST);
-        ml64 = ml63.add(Direction.SOUTHWEST);
-        ml65 = ml64.add(Direction.SOUTH);
-        ml66 = ml65.add(Direction.SOUTH);
-        ml67 = ml66.add(Direction.SOUTH);
-        ml68 = ml67.add(Direction.SOUTH);
+        ml51 = ml50.add(Direction.EAST);
+        ml52 = ml51.add(Direction.EAST);
+        ml53 = ml52.add(Direction.EAST);
+        ml54 = ml53.add(Direction.EAST);
+        ml55 = ml54.add(Direction.EAST);
+        ml56 = ml55.add(Direction.NORTHEAST);
+        ml57 = ml56.add(Direction.NORTH);
+        ml58 = ml57.add(Direction.NORTH);
+        ml59 = ml58.add(Direction.NORTH);
+        ml60 = ml59.add(Direction.NORTH);
+        ml61 = ml60.add(Direction.NORTH);
+        ml62 = ml61.add(Direction.NORTH);
+        ml63 = ml62.add(Direction.NORTHWEST);
+        ml64 = ml63.add(Direction.WEST);
+        ml65 = ml64.add(Direction.WEST);
+        ml66 = ml65.add(Direction.WEST);
+        ml67 = ml66.add(Direction.WEST);
+        ml68 = ml67.add(Direction.WEST);
+        ml69 = ml68.add(Direction.WEST);
+        ml70 = ml69.add(Direction.SOUTHWEST);
+        ml71 = ml70.add(Direction.SOUTH);
+        ml72 = ml71.add(Direction.SOUTH);
+        ml73 = ml72.add(Direction.SOUTH);
+        ml74 = ml73.add(Direction.SOUTH);
+        ml75 = ml74.add(Direction.SOUTH);
+        ml76 = ml75.add(Direction.SOUTH);
+        ml77 = ml76.add(Direction.SOUTH);
+        ml78 = ml77.add(Direction.SOUTHEAST);
+        ml79 = ml78.add(Direction.EAST);
+        ml80 = ml79.add(Direction.EAST);
+        ml81 = ml80.add(Direction.EAST);
+        ml82 = ml81.add(Direction.EAST);
+        ml83 = ml82.add(Direction.EAST);
+        ml84 = ml83.add(Direction.EAST);
+        ml85 = ml84.add(Direction.NORTHEAST);
+        ml86 = ml85.add(Direction.NORTHEAST);
+        ml87 = ml86.add(Direction.NORTH);
+        ml88 = ml87.add(Direction.NORTH);
+        ml89 = ml88.add(Direction.NORTH);
+        ml90 = ml89.add(Direction.NORTH);
+        ml91 = ml90.add(Direction.NORTH);
+        ml92 = ml91.add(Direction.NORTH);
+        ml93 = ml92.add(Direction.NORTHWEST);
+        ml94 = ml93.add(Direction.NORTHWEST);
+        ml95 = ml94.add(Direction.WEST);
+        ml96 = ml95.add(Direction.WEST);
+        ml97 = ml96.add(Direction.WEST);
+        ml98 = ml97.add(Direction.WEST);
+        ml99 = ml98.add(Direction.WEST);
+        ml100 = ml99.add(Direction.WEST);
+        ml101 = ml100.add(Direction.SOUTHWEST);
+        ml102 = ml101.add(Direction.SOUTHWEST);
+        ml103 = ml102.add(Direction.SOUTH);
+        ml104 = ml103.add(Direction.SOUTH);
+        ml105 = ml104.add(Direction.SOUTH);
+        ml106 = ml105.add(Direction.SOUTH);
+        ml107 = ml106.add(Direction.SOUTH);
+        ml108 = ml107.add(Direction.SOUTH);
 
 
         int time1 = Clock.getBytecodesLeft();
@@ -560,10 +910,6 @@ public class BFPathing34 extends Pathfinder {
 
             if(cost15 + dist3 < dist15){
                 dist15 = cost15 + dist3;
-
-
-
-
                 dir15 = dir3;
             }
 
@@ -902,11 +1248,6 @@ public class BFPathing34 extends Pathfinder {
                 dist30 = cost30 + dist12;
                 dir30 = dir12;
             }
-
-            if(cost30 + dist13 < dist30){
-                dist30 = cost30 + dist13;
-                dir30 = dir13;
-            }
         }
 
         if(rc.onTheMap(ml31)){
@@ -921,15 +1262,15 @@ public class BFPathing34 extends Pathfinder {
                 dist31 = cost31 + dist13;
                 dir31 = dir13;
             }
-
-            if(cost31 + dist14 < dist31){
-                dist31 = cost31 + dist14;
-                dir31 = dir14;
-            }
         }
 
         if(rc.onTheMap(ml32)){
             cost32 = rc.senseRubble(ml32) + 10;
+
+            if(cost32 + dist12 < dist32){
+                dist32 = cost32 + dist12;
+                dir32 = dir12;
+            }
 
             if(cost32 + dist13 < dist32){
                 dist32 = cost32 + dist13;
@@ -940,15 +1281,15 @@ public class BFPathing34 extends Pathfinder {
                 dist32 = cost32 + dist14;
                 dir32 = dir14;
             }
-
-            if(cost32 + dist15 < dist32){
-                dist32 = cost32 + dist15;
-                dir32 = dir15;
-            }
         }
 
         if(rc.onTheMap(ml33)){
             cost33 = rc.senseRubble(ml33) + 10;
+
+            if(cost33 + dist13 < dist33){
+                dist33 = cost33 + dist13;
+                dir33 = dir13;
+            }
 
             if(cost33 + dist14 < dist33){
                 dist33 = cost33 + dist14;
@@ -959,15 +1300,15 @@ public class BFPathing34 extends Pathfinder {
                 dist33 = cost33 + dist15;
                 dir33 = dir15;
             }
-
-            if(cost33 + dist16 < dist33){
-                dist33 = cost33 + dist16;
-                dir33 = dir16;
-            }
         }
 
         if(rc.onTheMap(ml34)){
             cost34 = rc.senseRubble(ml34) + 10;
+
+            if(cost34 + dist14 < dist34){
+                dist34 = cost34 + dist14;
+                dir34 = dir14;
+            }
 
             if(cost34 + dist15 < dist34){
                 dist34 = cost34 + dist15;
@@ -983,9 +1324,9 @@ public class BFPathing34 extends Pathfinder {
         if(rc.onTheMap(ml35)){
             cost35 = rc.senseRubble(ml35) + 10;
 
-            if(cost35 + dist17 < dist35){
-                dist35 = cost35 + dist17;
-                dir35 = dir17;
+            if(cost35 + dist15 < dist35){
+                dist35 = cost35 + dist15;
+                dir35 = dir15;
             }
 
             if(cost35 + dist16 < dist35){
@@ -997,16 +1338,6 @@ public class BFPathing34 extends Pathfinder {
         if(rc.onTheMap(ml36)){
             cost36 = rc.senseRubble(ml36) + 10;
 
-            if(cost36 + dist18 < dist36){
-                dist36 = cost36 + dist18;
-                dir36 = dir18;
-            }
-
-            if(cost36 + dist17 < dist36){
-                dist36 = cost36 + dist17;
-                dir36 = dir17;
-            }
-
             if(cost36 + dist16 < dist36){
                 dist36 = cost36 + dist16;
                 dir36 = dir16;
@@ -1016,146 +1347,188 @@ public class BFPathing34 extends Pathfinder {
         if(rc.onTheMap(ml37)){
             cost37 = rc.senseRubble(ml37) + 10;
 
-            if(cost37 + dist19 < dist37){
-                dist37 = cost37 + dist19;
-                dir37 = dir19;
-            }
-
-            if(cost37 + dist18 < dist37){
-                dist37 = cost37 + dist18;
-                dir37 = dir18;
-            }
-
             if(cost37 + dist17 < dist37){
                 dist37 = cost37 + dist17;
                 dir37 = dir17;
+            }
+
+            if(cost37 + dist16 < dist37){
+                dist37 = cost37 + dist16;
+                dir37 = dir16;
             }
         }
 
         if(rc.onTheMap(ml38)){
             cost38 = rc.senseRubble(ml38) + 10;
 
-            if(cost38 + dist20 < dist38){
-                dist38 = cost38 + dist20;
-                dir38 = dir20;
-            }
-
-            if(cost38 + dist19 < dist38){
-                dist38 = cost38 + dist19;
-                dir38 = dir19;
-            }
-
             if(cost38 + dist18 < dist38){
                 dist38 = cost38 + dist18;
                 dir38 = dir18;
+            }
+
+            if(cost38 + dist17 < dist38){
+                dist38 = cost38 + dist17;
+                dir38 = dir17;
+            }
+
+            if(cost38 + dist16 < dist38){
+                dist38 = cost38 + dist16;
+                dir38 = dir16;
             }
         }
 
         if(rc.onTheMap(ml39)){
             cost39 = rc.senseRubble(ml39) + 10;
 
-            if(cost39 + dist20 < dist39){
-                dist39 = cost39 + dist20;
-                dir39 = dir20;
-            }
-
             if(cost39 + dist19 < dist39){
                 dist39 = cost39 + dist19;
                 dir39 = dir19;
+            }
+
+            if(cost39 + dist18 < dist39){
+                dist39 = cost39 + dist18;
+                dir39 = dir18;
+            }
+
+            if(cost39 + dist17 < dist39){
+                dist39 = cost39 + dist17;
+                dir39 = dir17;
             }
         }
 
         if(rc.onTheMap(ml40)){
             cost40 = rc.senseRubble(ml40) + 10;
 
-            if(cost40 + dist21 < dist40){
-                dist40 = cost40 + dist21;
-                dir40 = dir21;
-            }
-
             if(cost40 + dist20 < dist40){
                 dist40 = cost40 + dist20;
                 dir40 = dir20;
+            }
+
+            if(cost40 + dist19 < dist40){
+                dist40 = cost40 + dist19;
+                dir40 = dir19;
+            }
+
+            if(cost40 + dist18 < dist40){
+                dist40 = cost40 + dist18;
+                dir40 = dir18;
             }
         }
 
         if(rc.onTheMap(ml41)){
             cost41 = rc.senseRubble(ml41) + 10;
 
-            if(cost41 + dist22 < dist41){
-                dist41 = cost41 + dist22;
-                dir41 = dir22;
-            }
-
-            if(cost41 + dist21 < dist41){
-                dist41 = cost41 + dist21;
-                dir41 = dir21;
-            }
-
             if(cost41 + dist20 < dist41){
                 dist41 = cost41 + dist20;
                 dir41 = dir20;
+            }
+
+            if(cost41 + dist19 < dist41){
+                dist41 = cost41 + dist19;
+                dir41 = dir19;
             }
         }
 
         if(rc.onTheMap(ml42)){
             cost42 = rc.senseRubble(ml42) + 10;
 
-            if(cost42 + dist23 < dist42){
-                dist42 = cost42 + dist23;
-                dir42 = dir23;
-            }
-
-            if(cost42 + dist22 < dist42){
-                dist42 = cost42 + dist22;
-                dir42 = dir22;
-            }
-
-            if(cost42 + dist21 < dist42){
-                dist42 = cost42 + dist21;
-                dir42 = dir21;
+            if(cost42 + dist20 < dist42){
+                dist42 = cost42 + dist20;
+                dir42 = dir20;
             }
         }
 
         if(rc.onTheMap(ml43)){
             cost43 = rc.senseRubble(ml43) + 10;
 
-            if(cost43 + dist24 < dist43){
-                dist43 = cost43 + dist24;
-                dir43 = dir24;
+            if(cost43 + dist21 < dist43){
+                dist43 = cost43 + dist21;
+                dir43 = dir21;
             }
 
-            if(cost43 + dist23 < dist43){
-                dist43 = cost43 + dist23;
-                dir43 = dir23;
-            }
-
-            if(cost43 + dist22 < dist43){
-                dist43 = cost43 + dist22;
-                dir43 = dir22;
+            if(cost43 + dist20 < dist43){
+                dist43 = cost43 + dist20;
+                dir43 = dir20;
             }
         }
 
         if(rc.onTheMap(ml44)){
             cost44 = rc.senseRubble(ml44) + 10;
 
-            if(cost44 + dist24 < dist44){
-                dist44 = cost44 + dist24;
-                dir44 = dir24;
+            if(cost44 + dist22 < dist44){
+                dist44 = cost44 + dist22;
+                dir44 = dir22;
             }
 
-            if(cost44 + dist23 < dist44){
-                dist44 = cost44 + dist23;
-                dir44 = dir23;
+            if(cost44 + dist21 < dist44){
+                dist44 = cost44 + dist21;
+                dir44 = dir21;
+            }
+
+            if(cost44 + dist20 < dist44){
+                dist44 = cost44 + dist20;
+                dir44 = dir20;
             }
         }
 
         if(rc.onTheMap(ml45)){
             cost45 = rc.senseRubble(ml45) + 10;
 
-            if(cost45 + dist24 < dist45){
-                dist45 = cost45 + dist24;
-                dir45 = dir24;
+            if(cost45 + dist23 < dist45){
+                dist45 = cost45 + dist23;
+                dir45 = dir23;
+            }
+
+            if(cost45 + dist22 < dist45){
+                dist45 = cost45 + dist22;
+                dir45 = dir22;
+            }
+
+            if(cost45 + dist21 < dist45){
+                dist45 = cost45 + dist21;
+                dir45 = dir21;
+            }
+        }
+
+        if(rc.onTheMap(ml46)){
+            cost46 = rc.senseRubble(ml46) + 10;
+
+            if(cost46 + dist24 < dist46){
+                dist46 = cost46 + dist24;
+                dir46 = dir24;
+            }
+
+            if(cost46 + dist23 < dist46){
+                dist46 = cost46 + dist23;
+                dir46 = dir23;
+            }
+
+            if(cost46 + dist22 < dist46){
+                dist46 = cost46 + dist22;
+                dir46 = dir22;
+            }
+        }
+
+        if(rc.onTheMap(ml47)){
+            cost47 = rc.senseRubble(ml47) + 10;
+
+            if(cost47 + dist24 < dist47){
+                dist47 = cost47 + dist24;
+                dir47 = dir24;
+            }
+
+            if(cost47 + dist23 < dist47){
+                dist47 = cost47 + dist23;
+                dir47 = dir23;
+            }
+        }
+
+        if(rc.onTheMap(ml48)){
+            cost48 = rc.senseRubble(ml48) + 10;
+
+            if(cost48 + dist24 < dist48){
+                dist48 = cost48 + dist24;
+                dir48 = dir24;
             }
         }
 
@@ -1193,6 +1566,11 @@ public class BFPathing34 extends Pathfinder {
 
         if(dist30 < 10000){
 
+            if(cost30 + dist29 < dist30){
+                dist30 = cost30 + dist29;
+                dir30 = dir29;
+            }
+
             if(cost30 + dist31 < dist30){
                 dist30 = cost30 + dist31;
                 dir30 = dir31;
@@ -1207,11 +1585,11 @@ public class BFPathing34 extends Pathfinder {
             }
         }
 
-        if(dist33 < 10000){
+        if(dist32 < 10000){
 
-            if(cost33 + dist32 < dist33){
-                dist33 = cost33 + dist32;
-                dir33 = dir32;
+            if(cost32 + dist33 < dist32){
+                dist32 = cost32 + dist33;
+                dir32 = dir33;
             }
         }
 
@@ -1225,9 +1603,9 @@ public class BFPathing34 extends Pathfinder {
 
         if(dist35 < 10000){
 
-            if(cost35 + dist36 < dist35){
-                dist35 = cost35 + dist36;
-                dir35 = dir36;
+            if(cost35 + dist34 < dist35){
+                dist35 = cost35 + dist34;
+                dir35 = dir34;
             }
         }
 
@@ -1237,475 +1615,1324 @@ public class BFPathing34 extends Pathfinder {
                 dist36 = cost36 + dist37;
                 dir36 = dir37;
             }
+
+            if(cost36 + dist35 < dist36){
+                dist36 = cost36 + dist35;
+                dir36 = dir35;
+            }
+        }
+
+        if(dist37 < 10000){
+
+            if(cost37 + dist38 < dist37){
+                dist37 = cost37 + dist38;
+                dir37 = dir38;
+            }
         }
 
         if(dist38 < 10000){
 
-            if(cost38 + dist37 < dist38){
-                dist38 = cost38 + dist37;
-                dir38 = dir37;
-            }
-        }
-
-        if(dist39 < 10000){
-
-            if(cost39 + dist38 < dist39){
-                dist39 = cost39 + dist38;
-                dir39 = dir38;
+            if(cost38 + dist39 < dist38){
+                dist38 = cost38 + dist39;
+                dir38 = dir39;
             }
         }
 
         if(dist40 < 10000){
 
-            if(cost40 + dist41 < dist40){
-                dist40 = cost40 + dist41;
-                dir40 = dir41;
+            if(cost40 + dist39 < dist40){
+                dist40 = cost40 + dist39;
+                dir40 = dir39;
             }
         }
 
         if(dist41 < 10000){
 
-            if(cost41 + dist42 < dist41){
-                dist41 = cost41 + dist42;
-                dir41 = dir42;
+            if(cost41 + dist40 < dist41){
+                dist41 = cost41 + dist40;
+                dir41 = dir40;
+            }
+        }
+
+        if(dist42 < 10000){
+
+            if(cost42 + dist43 < dist42){
+                dist42 = cost42 + dist43;
+                dir42 = dir43;
+            }
+
+            if(cost42 + dist41 < dist42){
+                dist42 = cost42 + dist41;
+                dir42 = dir41;
             }
         }
 
         if(dist43 < 10000){
 
-            if(cost43 + dist42 < dist43){
-                dist43 = cost43 + dist42;
-                dir43 = dir42;
+            if(cost43 + dist44 < dist43){
+                dist43 = cost43 + dist44;
+                dir43 = dir44;
             }
         }
 
         if(dist44 < 10000){
 
-            if(cost44 + dist43 < dist44){
-                dist44 = cost44 + dist43;
-                dir44 = dir43;
+            if(cost44 + dist45 < dist44){
+                dist44 = cost44 + dist45;
+                dir44 = dir45;
             }
         }
 
-        if(dist45 < 10000){
-
-            if(cost45 + dist44 < dist45){
-                dist45 = cost45 + dist44;
-                dir45 = dir44;
-            }
-
-            if(cost45 + dist25 < dist45){
-                dist45 = cost45 + dist25;
-                dir45 = dir25;
-            }
-        }
-
-        if(rc.onTheMap(ml46)){
-            cost46 = rc.senseRubble(ml46) + 10;
+        if(dist46 < 10000){
 
             if(cost46 + dist45 < dist46){
                 dist46 = cost46 + dist45;
                 dir46 = dir45;
             }
+        }
 
-            if(cost46 + dist25 < dist46){
-                dist46 = cost46 + dist25;
-                dir46 = dir25;
-            }
+        if(dist47 < 10000){
 
-            if(cost46 + dist26 < dist46){
-                dist46 = cost46 + dist26;
-                dir46 = dir26;
+            if(cost47 + dist46 < dist47){
+                dist47 = cost47 + dist46;
+                dir47 = dir46;
             }
         }
 
-        if(rc.onTheMap(ml47)){
-            cost47 = rc.senseRubble(ml47) + 10;
+        if(dist48 < 10000){
 
-            if(cost47 + dist25 < dist47){
-                dist47 = cost47 + dist25;
-                dir47 = dir25;
+            if(cost48 + dist47 < dist48){
+                dist48 = cost48 + dist47;
+                dir48 = dir47;
             }
 
-            if(cost47 + dist26 < dist47){
-                dist47 = cost47 + dist26;
-                dir47 = dir26;
-            }
-
-            if(cost47 + dist27 < dist47){
-                dist47 = cost47 + dist27;
-                dir47 = dir27;
-            }
-        }
-
-        if(rc.onTheMap(ml48)){
-            cost48 = rc.senseRubble(ml48) + 10;
-
-            if(cost48 + dist26 < dist48){
-                dist48 = cost48 + dist26;
-                dir48 = dir26;
-            }
-
-            if(cost48 + dist27 < dist48){
-                dist48 = cost48 + dist27;
-                dir48 = dir27;
-            }
-
-            if(cost48 + dist28 < dist48){
-                dist48 = cost48 + dist28;
-                dir48 = dir28;
+            if(cost48 + dist25 < dist48){
+                dist48 = cost48 + dist25;
+                dir48 = dir25;
             }
         }
 
         if(rc.onTheMap(ml49)){
             cost49 = rc.senseRubble(ml49) + 10;
 
-            if(cost49 + dist27 < dist49){
-                dist49 = cost49 + dist27;
-                dir49 = dir27;
+            if(cost49 + dist48 < dist49){
+                dist49 = cost49 + dist48;
+                dir49 = dir48;
             }
 
-            if(cost49 + dist28 < dist49){
-                dist49 = cost49 + dist28;
-                dir49 = dir28;
-            }
-
-            if(cost49 + dist29 < dist49){
-                dist49 = cost49 + dist29;
-                dir49 = dir29;
+            if(cost49 + dist25 < dist49){
+                dist49 = cost49 + dist25;
+                dir49 = dir25;
             }
         }
 
         if(rc.onTheMap(ml50)){
             cost50 = rc.senseRubble(ml50) + 10;
 
-            if(cost50 + dist28 < dist50){
-                dist50 = cost50 + dist28;
-                dir50 = dir28;
+            if(cost50 + dist48 < dist50){
+                dist50 = cost50 + dist48;
+                dir50 = dir48;
             }
 
-            if(cost50 + dist29 < dist50){
-                dist50 = cost50 + dist29;
-                dir50 = dir29;
+            if(cost50 + dist25 < dist50){
+                dist50 = cost50 + dist25;
+                dir50 = dir25;
+            }
+
+            if(cost50 + dist26 < dist50){
+                dist50 = cost50 + dist26;
+                dir50 = dir26;
             }
         }
 
         if(rc.onTheMap(ml51)){
             cost51 = rc.senseRubble(ml51) + 10;
 
-            if(cost51 + dist29 < dist51){
-                dist51 = cost51 + dist29;
-                dir51 = dir29;
+            if(cost51 + dist25 < dist51){
+                dist51 = cost51 + dist25;
+                dir51 = dir25;
             }
 
-            if(cost51 + dist12 < dist51){
-                dist51 = cost51 + dist12;
-                dir51 = dir12;
+            if(cost51 + dist26 < dist51){
+                dist51 = cost51 + dist26;
+                dir51 = dir26;
             }
 
-            if(cost51 + dist30 < dist51){
-                dist51 = cost51 + dist30;
-                dir51 = dir30;
+            if(cost51 + dist27 < dist51){
+                dist51 = cost51 + dist27;
+                dir51 = dir27;
             }
         }
 
         if(rc.onTheMap(ml52)){
             cost52 = rc.senseRubble(ml52) + 10;
 
-            if(cost52 + dist30 < dist52){
-                dist52 = cost52 + dist30;
-                dir52 = dir30;
+            if(cost52 + dist26 < dist52){
+                dist52 = cost52 + dist26;
+                dir52 = dir26;
             }
 
-            if(cost52 + dist31 < dist52){
-                dist52 = cost52 + dist31;
-                dir52 = dir31;
+            if(cost52 + dist27 < dist52){
+                dist52 = cost52 + dist27;
+                dir52 = dir27;
+            }
+
+            if(cost52 + dist28 < dist52){
+                dist52 = cost52 + dist28;
+                dir52 = dir28;
             }
         }
 
         if(rc.onTheMap(ml53)){
             cost53 = rc.senseRubble(ml53) + 10;
 
-            if(cost53 + dist30 < dist53){
-                dist53 = cost53 + dist30;
-                dir53 = dir30;
+            if(cost53 + dist27 < dist53){
+                dist53 = cost53 + dist27;
+                dir53 = dir27;
             }
 
-            if(cost53 + dist31 < dist53){
-                dist53 = cost53 + dist31;
-                dir53 = dir31;
+            if(cost53 + dist28 < dist53){
+                dist53 = cost53 + dist28;
+                dir53 = dir28;
             }
 
-            if(cost53 + dist32 < dist53){
-                dist53 = cost53 + dist32;
-                dir53 = dir32;
+            if(cost53 + dist29 < dist53){
+                dist53 = cost53 + dist29;
+                dir53 = dir29;
             }
         }
 
         if(rc.onTheMap(ml54)){
             cost54 = rc.senseRubble(ml54) + 10;
 
-            if(cost54 + dist31 < dist54){
-                dist54 = cost54 + dist31;
-                dir54 = dir31;
+            if(cost54 + dist28 < dist54){
+                dist54 = cost54 + dist28;
+                dir54 = dir28;
             }
 
-            if(cost54 + dist32 < dist54){
-                dist54 = cost54 + dist32;
-                dir54 = dir32;
+            if(cost54 + dist29 < dist54){
+                dist54 = cost54 + dist29;
+                dir54 = dir29;
             }
 
-            if(cost54 + dist33 < dist54){
-                dist54 = cost54 + dist33;
-                dir54 = dir33;
+            if(cost54 + dist30 < dist54){
+                dist54 = cost54 + dist30;
+                dir54 = dir30;
             }
         }
 
         if(rc.onTheMap(ml55)){
             cost55 = rc.senseRubble(ml55) + 10;
 
-            if(cost55 + dist32 < dist55){
-                dist55 = cost55 + dist32;
-                dir55 = dir32;
+            if(cost55 + dist29 < dist55){
+                dist55 = cost55 + dist29;
+                dir55 = dir29;
             }
 
-            if(cost55 + dist33 < dist55){
-                dist55 = cost55 + dist33;
-                dir55 = dir33;
-            }
-
-            if(cost55 + dist34 < dist55){
-                dist55 = cost55 + dist34;
-                dir55 = dir34;
+            if(cost55 + dist30 < dist55){
+                dist55 = cost55 + dist30;
+                dir55 = dir30;
             }
         }
 
         if(rc.onTheMap(ml56)){
             cost56 = rc.senseRubble(ml56) + 10;
 
-            if(cost56 + dist33 < dist56){
-                dist56 = cost56 + dist33;
-                dir56 = dir33;
+            if(cost56 + dist30 < dist56){
+                dist56 = cost56 + dist30;
+                dir56 = dir30;
             }
 
-            if(cost56 + dist34 < dist56){
-                dist56 = cost56 + dist34;
-                dir56 = dir34;
+            if(cost56 + dist31 < dist56){
+                dist56 = cost56 + dist31;
+                dir56 = dir31;
             }
         }
 
         if(rc.onTheMap(ml57)){
             cost57 = rc.senseRubble(ml57) + 10;
 
-            if(cost57 + dist16 < dist57){
-                dist57 = cost57 + dist16;
-                dir57 = dir16;
+            if(cost57 + dist30 < dist57){
+                dist57 = cost57 + dist30;
+                dir57 = dir30;
             }
 
-            if(cost57 + dist35 < dist57){
-                dist57 = cost57 + dist35;
-                dir57 = dir35;
+            if(cost57 + dist31 < dist57){
+                dist57 = cost57 + dist31;
+                dir57 = dir31;
             }
 
-            if(cost57 + dist34 < dist57){
-                dist57 = cost57 + dist34;
-                dir57 = dir34;
+            if(cost57 + dist32 < dist57){
+                dist57 = cost57 + dist32;
+                dir57 = dir32;
             }
         }
 
         if(rc.onTheMap(ml58)){
             cost58 = rc.senseRubble(ml58) + 10;
 
-            if(cost58 + dist36 < dist58){
-                dist58 = cost58 + dist36;
-                dir58 = dir36;
+            if(cost58 + dist31 < dist58){
+                dist58 = cost58 + dist31;
+                dir58 = dir31;
             }
 
-            if(cost58 + dist35 < dist58){
-                dist58 = cost58 + dist35;
-                dir58 = dir35;
+            if(cost58 + dist32 < dist58){
+                dist58 = cost58 + dist32;
+                dir58 = dir32;
+            }
+
+            if(cost58 + dist33 < dist58){
+                dist58 = cost58 + dist33;
+                dir58 = dir33;
             }
         }
 
         if(rc.onTheMap(ml59)){
             cost59 = rc.senseRubble(ml59) + 10;
 
-            if(cost59 + dist37 < dist59){
-                dist59 = cost59 + dist37;
-                dir59 = dir37;
+            if(cost59 + dist32 < dist59){
+                dist59 = cost59 + dist32;
+                dir59 = dir32;
             }
 
-            if(cost59 + dist36 < dist59){
-                dist59 = cost59 + dist36;
-                dir59 = dir36;
+            if(cost59 + dist33 < dist59){
+                dist59 = cost59 + dist33;
+                dir59 = dir33;
             }
 
-            if(cost59 + dist35 < dist59){
-                dist59 = cost59 + dist35;
-                dir59 = dir35;
+            if(cost59 + dist34 < dist59){
+                dist59 = cost59 + dist34;
+                dir59 = dir34;
             }
         }
 
         if(rc.onTheMap(ml60)){
             cost60 = rc.senseRubble(ml60) + 10;
 
-            if(cost60 + dist38 < dist60){
-                dist60 = cost60 + dist38;
-                dir60 = dir38;
+            if(cost60 + dist33 < dist60){
+                dist60 = cost60 + dist33;
+                dir60 = dir33;
             }
 
-            if(cost60 + dist37 < dist60){
-                dist60 = cost60 + dist37;
-                dir60 = dir37;
+            if(cost60 + dist34 < dist60){
+                dist60 = cost60 + dist34;
+                dir60 = dir34;
             }
 
-            if(cost60 + dist36 < dist60){
-                dist60 = cost60 + dist36;
-                dir60 = dir36;
+            if(cost60 + dist35 < dist60){
+                dist60 = cost60 + dist35;
+                dir60 = dir35;
             }
         }
 
         if(rc.onTheMap(ml61)){
             cost61 = rc.senseRubble(ml61) + 10;
 
-            if(cost61 + dist39 < dist61){
-                dist61 = cost61 + dist39;
-                dir61 = dir39;
+            if(cost61 + dist34 < dist61){
+                dist61 = cost61 + dist34;
+                dir61 = dir34;
             }
 
-            if(cost61 + dist38 < dist61){
-                dist61 = cost61 + dist38;
-                dir61 = dir38;
+            if(cost61 + dist35 < dist61){
+                dist61 = cost61 + dist35;
+                dir61 = dir35;
             }
 
-            if(cost61 + dist37 < dist61){
-                dist61 = cost61 + dist37;
-                dir61 = dir37;
+            if(cost61 + dist36 < dist61){
+                dist61 = cost61 + dist36;
+                dir61 = dir36;
             }
         }
 
         if(rc.onTheMap(ml62)){
             cost62 = rc.senseRubble(ml62) + 10;
 
-            if(cost62 + dist39 < dist62){
-                dist62 = cost62 + dist39;
-                dir62 = dir39;
+            if(cost62 + dist35 < dist62){
+                dist62 = cost62 + dist35;
+                dir62 = dir35;
             }
 
-            if(cost62 + dist38 < dist62){
-                dist62 = cost62 + dist38;
-                dir62 = dir38;
+            if(cost62 + dist36 < dist62){
+                dist62 = cost62 + dist36;
+                dir62 = dir36;
             }
         }
 
         if(rc.onTheMap(ml63)){
             cost63 = rc.senseRubble(ml63) + 10;
 
-            if(cost63 + dist40 < dist63){
-                dist63 = cost63 + dist40;
-                dir63 = dir40;
+            if(cost63 + dist37 < dist63){
+                dist63 = cost63 + dist37;
+                dir63 = dir37;
             }
 
-            if(cost63 + dist20 < dist63){
-                dist63 = cost63 + dist20;
-                dir63 = dir20;
-            }
-
-            if(cost63 + dist39 < dist63){
-                dist63 = cost63 + dist39;
-                dir63 = dir39;
+            if(cost63 + dist36 < dist63){
+                dist63 = cost63 + dist36;
+                dir63 = dir36;
             }
         }
 
         if(rc.onTheMap(ml64)){
             cost64 = rc.senseRubble(ml64) + 10;
 
-            if(cost64 + dist41 < dist64){
-                dist64 = cost64 + dist41;
-                dir64 = dir41;
+            if(cost64 + dist38 < dist64){
+                dist64 = cost64 + dist38;
+                dir64 = dir38;
             }
 
-            if(cost64 + dist40 < dist64){
-                dist64 = cost64 + dist40;
-                dir64 = dir40;
+            if(cost64 + dist37 < dist64){
+                dist64 = cost64 + dist37;
+                dir64 = dir37;
+            }
+
+            if(cost64 + dist36 < dist64){
+                dist64 = cost64 + dist36;
+                dir64 = dir36;
             }
         }
 
         if(rc.onTheMap(ml65)){
             cost65 = rc.senseRubble(ml65) + 10;
 
-            if(cost65 + dist42 < dist65){
-                dist65 = cost65 + dist42;
-                dir65 = dir42;
+            if(cost65 + dist39 < dist65){
+                dist65 = cost65 + dist39;
+                dir65 = dir39;
             }
 
-            if(cost65 + dist41 < dist65){
-                dist65 = cost65 + dist41;
-                dir65 = dir41;
+            if(cost65 + dist38 < dist65){
+                dist65 = cost65 + dist38;
+                dir65 = dir38;
             }
 
-            if(cost65 + dist40 < dist65){
-                dist65 = cost65 + dist40;
-                dir65 = dir40;
+            if(cost65 + dist37 < dist65){
+                dist65 = cost65 + dist37;
+                dir65 = dir37;
             }
         }
 
         if(rc.onTheMap(ml66)){
             cost66 = rc.senseRubble(ml66) + 10;
 
-            if(cost66 + dist43 < dist66){
-                dist66 = cost66 + dist43;
-                dir66 = dir43;
+            if(cost66 + dist40 < dist66){
+                dist66 = cost66 + dist40;
+                dir66 = dir40;
             }
 
-            if(cost66 + dist42 < dist66){
-                dist66 = cost66 + dist42;
-                dir66 = dir42;
+            if(cost66 + dist39 < dist66){
+                dist66 = cost66 + dist39;
+                dir66 = dir39;
             }
 
-            if(cost66 + dist41 < dist66){
-                dist66 = cost66 + dist41;
-                dir66 = dir41;
+            if(cost66 + dist38 < dist66){
+                dist66 = cost66 + dist38;
+                dir66 = dir38;
             }
         }
 
         if(rc.onTheMap(ml67)){
             cost67 = rc.senseRubble(ml67) + 10;
 
-            if(cost67 + dist44 < dist67){
-                dist67 = cost67 + dist44;
-                dir67 = dir44;
+            if(cost67 + dist41 < dist67){
+                dist67 = cost67 + dist41;
+                dir67 = dir41;
             }
 
-            if(cost67 + dist43 < dist67){
-                dist67 = cost67 + dist43;
-                dir67 = dir43;
+            if(cost67 + dist40 < dist67){
+                dist67 = cost67 + dist40;
+                dir67 = dir40;
             }
 
-            if(cost67 + dist42 < dist67){
-                dist67 = cost67 + dist42;
-                dir67 = dir42;
+            if(cost67 + dist39 < dist67){
+                dist67 = cost67 + dist39;
+                dir67 = dir39;
             }
         }
 
         if(rc.onTheMap(ml68)){
             cost68 = rc.senseRubble(ml68) + 10;
 
-            if(cost68 + dist45 < dist68){
-                dist68 = cost68 + dist45;
-                dir68 = dir45;
+            if(cost68 + dist42 < dist68){
+                dist68 = cost68 + dist42;
+                dir68 = dir42;
             }
 
-            if(cost68 + dist44 < dist68){
-                dist68 = cost68 + dist44;
-                dir68 = dir44;
+            if(cost68 + dist41 < dist68){
+                dist68 = cost68 + dist41;
+                dir68 = dir41;
             }
 
-            if(cost68 + dist43 < dist68){
-                dist68 = cost68 + dist43;
-                dir68 = dir43;
+            if(cost68 + dist40 < dist68){
+                dist68 = cost68 + dist40;
+                dir68 = dir40;
             }
         }
+
+        if(rc.onTheMap(ml69)){
+            cost69 = rc.senseRubble(ml69) + 10;
+
+            if(cost69 + dist42 < dist69){
+                dist69 = cost69 + dist42;
+                dir69 = dir42;
+            }
+
+            if(cost69 + dist41 < dist69){
+                dist69 = cost69 + dist41;
+                dir69 = dir41;
+            }
+        }
+
+        if(rc.onTheMap(ml70)){
+            cost70 = rc.senseRubble(ml70) + 10;
+
+            if(cost70 + dist43 < dist70){
+                dist70 = cost70 + dist43;
+                dir70 = dir43;
+            }
+
+            if(cost70 + dist42 < dist70){
+                dist70 = cost70 + dist42;
+                dir70 = dir42;
+            }
+        }
+
+        if(rc.onTheMap(ml71)){
+            cost71 = rc.senseRubble(ml71) + 10;
+
+            if(cost71 + dist44 < dist71){
+                dist71 = cost71 + dist44;
+                dir71 = dir44;
+            }
+
+            if(cost71 + dist43 < dist71){
+                dist71 = cost71 + dist43;
+                dir71 = dir43;
+            }
+
+            if(cost71 + dist42 < dist71){
+                dist71 = cost71 + dist42;
+                dir71 = dir42;
+            }
+        }
+
+        if(rc.onTheMap(ml72)){
+            cost72 = rc.senseRubble(ml72) + 10;
+
+            if(cost72 + dist45 < dist72){
+                dist72 = cost72 + dist45;
+                dir72 = dir45;
+            }
+
+            if(cost72 + dist44 < dist72){
+                dist72 = cost72 + dist44;
+                dir72 = dir44;
+            }
+
+            if(cost72 + dist43 < dist72){
+                dist72 = cost72 + dist43;
+                dir72 = dir43;
+            }
+        }
+
+        if(rc.onTheMap(ml73)){
+            cost73 = rc.senseRubble(ml73) + 10;
+
+            if(cost73 + dist46 < dist73){
+                dist73 = cost73 + dist46;
+                dir73 = dir46;
+            }
+
+            if(cost73 + dist45 < dist73){
+                dist73 = cost73 + dist45;
+                dir73 = dir45;
+            }
+
+            if(cost73 + dist44 < dist73){
+                dist73 = cost73 + dist44;
+                dir73 = dir44;
+            }
+        }
+
+        if(rc.onTheMap(ml74)){
+            cost74 = rc.senseRubble(ml74) + 10;
+
+            if(cost74 + dist47 < dist74){
+                dist74 = cost74 + dist47;
+                dir74 = dir47;
+            }
+
+            if(cost74 + dist46 < dist74){
+                dist74 = cost74 + dist46;
+                dir74 = dir46;
+            }
+
+            if(cost74 + dist45 < dist74){
+                dist74 = cost74 + dist45;
+                dir74 = dir45;
+            }
+        }
+
+        if(rc.onTheMap(ml75)){
+            cost75 = rc.senseRubble(ml75) + 10;
+
+            if(cost75 + dist48 < dist75){
+                dist75 = cost75 + dist48;
+                dir75 = dir48;
+            }
+
+            if(cost75 + dist47 < dist75){
+                dist75 = cost75 + dist47;
+                dir75 = dir47;
+            }
+
+            if(cost75 + dist46 < dist75){
+                dist75 = cost75 + dist46;
+                dir75 = dir46;
+            }
+        }
+
+        if(rc.onTheMap(ml76)){
+            cost76 = rc.senseRubble(ml76) + 10;
+
+            if(cost76 + dist48 < dist76){
+                dist76 = cost76 + dist48;
+                dir76 = dir48;
+            }
+
+            if(cost76 + dist47 < dist76){
+                dist76 = cost76 + dist47;
+                dir76 = dir47;
+            }
+        }
+
+        if(dist49 < 10000){
+
+            if(cost49 + dist50 < dist49){
+                dist49 = cost49 + dist50;
+                dir49 = dir50;
+            }
+        }
+
+        if(dist50 < 10000){
+
+            if(cost50 + dist51 < dist50){
+                dist50 = cost50 + dist51;
+                dir50 = dir51;
+            }
+        }
+
+        if(dist51 < 10000){
+
+            if(cost51 + dist52 < dist51){
+                dist51 = cost51 + dist52;
+                dir51 = dir52;
+            }
+        }
+
+        if(dist53 < 10000){
+
+            if(cost53 + dist52 < dist53){
+                dist53 = cost53 + dist52;
+                dir53 = dir52;
+            }
+        }
+
+        if(dist54 < 10000){
+
+            if(cost54 + dist53 < dist54){
+                dist54 = cost54 + dist53;
+                dir54 = dir53;
+            }
+        }
+
+        if(dist55 < 10000){
+
+            if(cost55 + dist54 < dist55){
+                dist55 = cost55 + dist54;
+                dir55 = dir54;
+            }
+        }
+
+        if(dist56 < 10000){
+
+            if(cost56 + dist57 < dist56){
+                dist56 = cost56 + dist57;
+                dir56 = dir57;
+            }
+        }
+
+        if(dist57 < 10000){
+
+            if(cost57 + dist58 < dist57){
+                dist57 = cost57 + dist58;
+                dir57 = dir58;
+            }
+        }
+
+        if(dist58 < 10000){
+
+            if(cost58 + dist59 < dist58){
+                dist58 = cost58 + dist59;
+                dir58 = dir59;
+            }
+        }
+
+        if(dist60 < 10000){
+
+            if(cost60 + dist59 < dist60){
+                dist60 = cost60 + dist59;
+                dir60 = dir59;
+            }
+        }
+
+        if(dist61 < 10000){
+
+            if(cost61 + dist60 < dist61){
+                dist61 = cost61 + dist60;
+                dir61 = dir60;
+            }
+        }
+
+        if(dist62 < 10000){
+
+            if(cost62 + dist61 < dist62){
+                dist62 = cost62 + dist61;
+                dir62 = dir61;
+            }
+        }
+
+        if(dist63 < 10000){
+
+            if(cost63 + dist64 < dist63){
+                dist63 = cost63 + dist64;
+                dir63 = dir64;
+            }
+        }
+
+        if(dist64 < 10000){
+
+            if(cost64 + dist65 < dist64){
+                dist64 = cost64 + dist65;
+                dir64 = dir65;
+            }
+        }
+
+        if(dist65 < 10000){
+
+            if(cost65 + dist66 < dist65){
+                dist65 = cost65 + dist66;
+                dir65 = dir66;
+            }
+        }
+
+        if(dist67 < 10000){
+
+            if(cost67 + dist66 < dist67){
+                dist67 = cost67 + dist66;
+                dir67 = dir66;
+            }
+        }
+
+        if(dist68 < 10000){
+
+            if(cost68 + dist67 < dist68){
+                dist68 = cost68 + dist67;
+                dir68 = dir67;
+            }
+        }
+
+        if(dist69 < 10000){
+
+            if(cost69 + dist68 < dist69){
+                dist69 = cost69 + dist68;
+                dir69 = dir68;
+            }
+        }
+
+        if(dist70 < 10000){
+
+            if(cost70 + dist71 < dist70){
+                dist70 = cost70 + dist71;
+                dir70 = dir71;
+            }
+        }
+
+        if(dist71 < 10000){
+
+            if(cost71 + dist72 < dist71){
+                dist71 = cost71 + dist72;
+                dir71 = dir72;
+            }
+        }
+
+        if(dist72 < 10000){
+
+            if(cost72 + dist73 < dist72){
+                dist72 = cost72 + dist73;
+                dir72 = dir73;
+            }
+        }
+
+        if(dist74 < 10000){
+
+            if(cost74 + dist73 < dist74){
+                dist74 = cost74 + dist73;
+                dir74 = dir73;
+            }
+        }
+
+        if(dist75 < 10000){
+
+            if(cost75 + dist74 < dist75){
+                dist75 = cost75 + dist74;
+                dir75 = dir74;
+            }
+        }
+
+        if(dist76 < 10000){
+
+            if(cost76 + dist75 < dist76){
+                dist76 = cost76 + dist75;
+                dir76 = dir75;
+            }
+        }
+
+        if(rc.onTheMap(ml77)){
+
+            if(cost77 + dist76 < dist77){
+                dist77 = cost77 + dist76;
+                dir77 = dir76;
+            }
+
+            if(cost77 + dist49 < dist77){
+                dist77 = cost77 + dist49;
+                dir77 = dir49;
+            }
+
+            if(cost77 + dist48 < dist77){
+                dist77 = cost77 + dist48;
+                dir77 = dir48;
+            }
+        }
+
+        if(rc.onTheMap(ml78)){
+
+            if(cost78 + dist49 < dist78){
+                dist78 = cost78 + dist49;
+                dir78 = dir49;
+            }
+
+            if(cost78 + dist50 < dist78){
+                dist78 = cost78 + dist50;
+                dir78 = dir50;
+            }
+        }
+
+        if(rc.onTheMap(ml79)){
+
+            if(cost79 + dist49 < dist79){
+                dist79 = cost79 + dist49;
+                dir79 = dir49;
+            }
+
+            if(cost79 + dist50 < dist79){
+                dist79 = cost79 + dist50;
+                dir79 = dir50;
+            }
+
+            if(cost79 + dist51 < dist79){
+                dist79 = cost79 + dist51;
+                dir79 = dir51;
+            }
+        }
+
+        if(rc.onTheMap(ml80)){
+
+            if(cost80 + dist50 < dist80){
+                dist80 = cost80 + dist50;
+                dir80 = dir50;
+            }
+
+            if(cost80 + dist51 < dist80){
+                dist80 = cost80 + dist51;
+                dir80 = dir51;
+            }
+
+            if(cost80 + dist52 < dist80){
+                dist80 = cost80 + dist52;
+                dir80 = dir52;
+            }
+        }
+
+        if(rc.onTheMap(ml81)){
+
+            if(cost81 + dist51 < dist81){
+                dist81 = cost81 + dist51;
+                dir81 = dir51;
+            }
+
+            if(cost81 + dist52 < dist81){
+                dist81 = cost81 + dist52;
+                dir81 = dir52;
+            }
+
+            if(cost81 + dist53 < dist81){
+                dist81 = cost81 + dist53;
+                dir81 = dir53;
+            }
+        }
+
+        if(rc.onTheMap(ml82)){
+
+            if(cost82 + dist52 < dist82){
+                dist82 = cost82 + dist52;
+                dir82 = dir52;
+            }
+
+            if(cost82 + dist53 < dist82){
+                dist82 = cost82 + dist53;
+                dir82 = dir53;
+            }
+
+            if(cost82 + dist54 < dist82){
+                dist82 = cost82 + dist54;
+                dir82 = dir54;
+            }
+        }
+
+        if(rc.onTheMap(ml83)){
+
+            if(cost83 + dist53 < dist83){
+                dist83 = cost83 + dist53;
+                dir83 = dir53;
+            }
+
+            if(cost83 + dist54 < dist83){
+                dist83 = cost83 + dist54;
+                dir83 = dir54;
+            }
+
+            if(cost83 + dist55 < dist83){
+                dist83 = cost83 + dist55;
+                dir83 = dir55;
+            }
+        }
+
+        if(rc.onTheMap(ml84)){
+
+            if(cost84 + dist54 < dist84){
+                dist84 = cost84 + dist54;
+                dir84 = dir54;
+            }
+
+            if(cost84 + dist55 < dist84){
+                dist84 = cost84 + dist55;
+                dir84 = dir55;
+            }
+        }
+
+        if(rc.onTheMap(ml85)){
+
+            if(cost85 + dist55 < dist85){
+                dist85 = cost85 + dist55;
+                dir85 = dir55;
+            }
+
+            if(cost85 + dist30 < dist85){
+                dist85 = cost85 + dist30;
+                dir85 = dir30;
+            }
+
+            if(cost85 + dist56 < dist85){
+                dist85 = cost85 + dist56;
+                dir85 = dir56;
+            }
+        }
+
+        if(rc.onTheMap(ml86)){
+
+            if(cost86 + dist56 < dist86){
+                dist86 = cost86 + dist56;
+                dir86 = dir56;
+            }
+
+            if(cost86 + dist57 < dist86){
+                dist86 = cost86 + dist57;
+                dir86 = dir57;
+            }
+        }
+
+        if(rc.onTheMap(ml87)){
+
+            if(cost87 + dist56 < dist87){
+                dist87 = cost87 + dist56;
+                dir87 = dir56;
+            }
+
+            if(cost87 + dist57 < dist87){
+                dist87 = cost87 + dist57;
+                dir87 = dir57;
+            }
+
+            if(cost87 + dist58 < dist87){
+                dist87 = cost87 + dist58;
+                dir87 = dir58;
+            }
+        }
+
+        if(rc.onTheMap(ml88)){
+
+            if(cost88 + dist57 < dist88){
+                dist88 = cost88 + dist57;
+                dir88 = dir57;
+            }
+
+            if(cost88 + dist58 < dist88){
+                dist88 = cost88 + dist58;
+                dir88 = dir58;
+            }
+
+            if(cost88 + dist59 < dist88){
+                dist88 = cost88 + dist59;
+                dir88 = dir59;
+            }
+        }
+
+        if(rc.onTheMap(ml89)){
+
+            if(cost89 + dist58 < dist89){
+                dist89 = cost89 + dist58;
+                dir89 = dir58;
+            }
+
+            if(cost89 + dist59 < dist89){
+                dist89 = cost89 + dist59;
+                dir89 = dir59;
+            }
+
+            if(cost89 + dist60 < dist89){
+                dist89 = cost89 + dist60;
+                dir89 = dir60;
+            }
+        }
+
+        if(rc.onTheMap(ml90)){
+
+            if(cost90 + dist59 < dist90){
+                dist90 = cost90 + dist59;
+                dir90 = dir59;
+            }
+
+            if(cost90 + dist60 < dist90){
+                dist90 = cost90 + dist60;
+                dir90 = dir60;
+            }
+
+            if(cost90 + dist61 < dist90){
+                dist90 = cost90 + dist61;
+                dir90 = dir61;
+            }
+        }
+
+        if(rc.onTheMap(ml91)){
+
+            if(cost91 + dist60 < dist91){
+                dist91 = cost91 + dist60;
+                dir91 = dir60;
+            }
+
+            if(cost91 + dist61 < dist91){
+                dist91 = cost91 + dist61;
+                dir91 = dir61;
+            }
+
+            if(cost91 + dist62 < dist91){
+                dist91 = cost91 + dist62;
+                dir91 = dir62;
+            }
+        }
+
+        if(rc.onTheMap(ml92)){
+
+            if(cost92 + dist61 < dist92){
+                dist92 = cost92 + dist61;
+                dir92 = dir61;
+            }
+
+            if(cost92 + dist62 < dist92){
+                dist92 = cost92 + dist62;
+                dir92 = dir62;
+            }
+        }
+
+        if(rc.onTheMap(ml93)){
+
+            if(cost93 + dist36 < dist93){
+                dist93 = cost93 + dist36;
+                dir93 = dir36;
+            }
+
+            if(cost93 + dist63 < dist93){
+                dist93 = cost93 + dist63;
+                dir93 = dir63;
+            }
+
+            if(cost93 + dist62 < dist93){
+                dist93 = cost93 + dist62;
+                dir93 = dir62;
+            }
+        }
+
+        if(rc.onTheMap(ml94)){
+
+            if(cost94 + dist64 < dist94){
+                dist94 = cost94 + dist64;
+                dir94 = dir64;
+            }
+
+            if(cost94 + dist63 < dist94){
+                dist94 = cost94 + dist63;
+                dir94 = dir63;
+            }
+        }
+
+        if(rc.onTheMap(ml95)){
+
+            if(cost95 + dist65 < dist95){
+                dist95 = cost95 + dist65;
+                dir95 = dir65;
+            }
+
+            if(cost95 + dist64 < dist95){
+                dist95 = cost95 + dist64;
+                dir95 = dir64;
+            }
+
+            if(cost95 + dist63 < dist95){
+                dist95 = cost95 + dist63;
+                dir95 = dir63;
+            }
+        }
+
+        if(rc.onTheMap(ml96)){
+
+            if(cost96 + dist66 < dist96){
+                dist96 = cost96 + dist66;
+                dir96 = dir66;
+            }
+
+            if(cost96 + dist65 < dist96){
+                dist96 = cost96 + dist65;
+                dir96 = dir65;
+            }
+
+            if(cost96 + dist64 < dist96){
+                dist96 = cost96 + dist64;
+                dir96 = dir64;
+            }
+        }
+
+        if(rc.onTheMap(ml97)){
+
+            if(cost97 + dist67 < dist97){
+                dist97 = cost97 + dist67;
+                dir97 = dir67;
+            }
+
+            if(cost97 + dist66 < dist97){
+                dist97 = cost97 + dist66;
+                dir97 = dir66;
+            }
+
+            if(cost97 + dist65 < dist97){
+                dist97 = cost97 + dist65;
+                dir97 = dir65;
+            }
+        }
+
+        if(rc.onTheMap(ml98)){
+
+            if(cost98 + dist68 < dist98){
+                dist98 = cost98 + dist68;
+                dir98 = dir68;
+            }
+
+            if(cost98 + dist67 < dist98){
+                dist98 = cost98 + dist67;
+                dir98 = dir67;
+            }
+
+            if(cost98 + dist66 < dist98){
+                dist98 = cost98 + dist66;
+                dir98 = dir66;
+            }
+        }
+
+        if(rc.onTheMap(ml99)){
+
+            if(cost99 + dist69 < dist99){
+                dist99 = cost99 + dist69;
+                dir99 = dir69;
+            }
+
+            if(cost99 + dist68 < dist99){
+                dist99 = cost99 + dist68;
+                dir99 = dir68;
+            }
+
+            if(cost99 + dist67 < dist99){
+                dist99 = cost99 + dist67;
+                dir99 = dir67;
+            }
+        }
+
+        if(rc.onTheMap(ml100)){
+
+            if(cost100 + dist69 < dist100){
+                dist100 = cost100 + dist69;
+                dir100 = dir69;
+            }
+
+            if(cost100 + dist68 < dist100){
+                dist100 = cost100 + dist68;
+                dir100 = dir68;
+            }
+        }
+
+        if(rc.onTheMap(ml101)){
+
+            if(cost101 + dist70 < dist101){
+                dist101 = cost101 + dist70;
+                dir101 = dir70;
+            }
+
+            if(cost101 + dist42 < dist101){
+                dist101 = cost101 + dist42;
+                dir101 = dir42;
+            }
+
+            if(cost101 + dist69 < dist101){
+                dist101 = cost101 + dist69;
+                dir101 = dir69;
+            }
+        }
+
+        if(rc.onTheMap(ml102)){
+
+            if(cost102 + dist71 < dist102){
+                dist102 = cost102 + dist71;
+                dir102 = dir71;
+            }
+
+            if(cost102 + dist70 < dist102){
+                dist102 = cost102 + dist70;
+                dir102 = dir70;
+            }
+        }
+
+        if(rc.onTheMap(ml103)){
+
+            if(cost103 + dist72 < dist103){
+                dist103 = cost103 + dist72;
+                dir103 = dir72;
+            }
+
+            if(cost103 + dist71 < dist103){
+                dist103 = cost103 + dist71;
+                dir103 = dir71;
+            }
+
+            if(cost103 + dist70 < dist103){
+                dist103 = cost103 + dist70;
+                dir103 = dir70;
+            }
+        }
+
+        if(rc.onTheMap(ml104)){
+
+            if(cost104 + dist73 < dist104){
+                dist104 = cost104 + dist73;
+                dir104 = dir73;
+            }
+
+            if(cost104 + dist72 < dist104){
+                dist104 = cost104 + dist72;
+                dir104 = dir72;
+            }
+
+            if(cost104 + dist71 < dist104){
+                dist104 = cost104 + dist71;
+                dir104 = dir71;
+            }
+        }
+
+        if(rc.onTheMap(ml105)){
+
+            if(cost105 + dist74 < dist105){
+                dist105 = cost105 + dist74;
+                dir105 = dir74;
+            }
+
+            if(cost105 + dist73 < dist105){
+                dist105 = cost105 + dist73;
+                dir105 = dir73;
+            }
+
+            if(cost105 + dist72 < dist105){
+                dist105 = cost105 + dist72;
+                dir105 = dir72;
+            }
+        }
+
+        if(rc.onTheMap(ml106)){
+
+            if(cost106 + dist75 < dist106){
+                dist106 = cost106 + dist75;
+                dir106 = dir75;
+            }
+
+            if(cost106 + dist74 < dist106){
+                dist106 = cost106 + dist74;
+                dir106 = dir74;
+            }
+
+            if(cost106 + dist73 < dist106){
+                dist106 = cost106 + dist73;
+                dir106 = dir73;
+            }
+        }
+
+        if(rc.onTheMap(ml107)){
+
+            if(cost107 + dist76 < dist107){
+                dist107 = cost107 + dist76;
+                dir107 = dir76;
+            }
+
+            if(cost107 + dist75 < dist107){
+                dist107 = cost107 + dist75;
+                dir107 = dir75;
+            }
+
+            if(cost107 + dist74 < dist107){
+                dist107 = cost107 + dist74;
+                dir107 = dir74;
+            }
+        }
+
+        if(rc.onTheMap(ml108)){
+
+            if(cost108 + dist76 < dist108){
+                dist108 = cost108 + dist76;
+                dir108 = dir76;
+            }
+
+            if(cost108 + dist75 < dist108){
+                dist108 = cost108 + dist75;
+                dir108 = dir75;
+            }
+        }
+
+
         //rc.setIndicatorString(time1+" ");
 
 
@@ -1713,42 +2940,62 @@ public class BFPathing34 extends Pathfinder {
         int yDiff = target.y - ml0.y;
 
         switch (xDiff){
+            case -5:
+                switch (yDiff){
+                    case -3:
+                        return dir108;
+                    case -2:
+                        return dir107;
+                    case -1:
+                        return dir106;
+                    case 0:
+                        return dir105;
+                    case 1:
+                        return dir104;
+                    case 2:
+                        return dir103;
+                    case 3:
+                        return dir102;
+                }
+                break;
             case -4:
                 switch (yDiff){
+                    case -3:
+                        return dir76;
                     case -2:
-                        return dir68;
+                        return dir75;
                     case -1:
-                        return dir67;
+                        return dir74;
                     case 0:
-                        return dir66;
+                        return dir73;
                     case 1:
-                        return dir65;
+                        return dir72;
                     case 2:
-                        return dir64;
+                        return dir71;
+                    case 3:
+                        return dir70;
                 }
                 break;
             case -3:
                 switch (yDiff){
                     case -3:
-                        return dir45;
+                        return dir48;
                     case -2:
-                        return dir44;
+                        return dir47;
                     case -1:
-                        return dir43;
+                        return dir46;
                     case 0:
-                        return dir42;
+                        return dir45;
                     case 1:
-                        return dir41;
+                        return dir44;
                     case 2:
-                        return dir40;
+                        return dir43;
                     case 3:
-                        return dir63;
+                        return dir42;
                 }
                 break;
             case -2:
                 switch (yDiff){
-                    case -4:
-                        return dir46;
                     case -3:
                         return dir25;
                     case -2:
@@ -1762,15 +3009,11 @@ public class BFPathing34 extends Pathfinder {
                     case 2:
                         return dir20;
                     case 3:
-                        return dir39;
-                    case 4:
-                        return dir62;
+                        return dir41;
                 }
                 break;
             case -1:
                 switch (yDiff){
-                    case -4:
-                        return dir47;
                     case -3:
                         return dir26;
                     case -2:
@@ -1784,15 +3027,11 @@ public class BFPathing34 extends Pathfinder {
                     case 2:
                         return dir19;
                     case 3:
-                        return dir38;
-                    case 4:
-                        return dir61;
+                        return dir40;
                 }
                 break;
             case 0:
                 switch (yDiff){
-                    case -4:
-                        return dir48;
                     case -3:
                         return dir27;
                     case -2:
@@ -1804,15 +3043,11 @@ public class BFPathing34 extends Pathfinder {
                     case 2:
                         return dir18;
                     case 3:
-                        return dir37;
-                    case 4:
-                        return dir60;
+                        return dir39;
                 }
                 break;
             case 1:
                 switch (yDiff){
-                    case -4:
-                        return dir49;
                     case -3:
                         return dir28;
                     case -2:
@@ -1826,15 +3061,11 @@ public class BFPathing34 extends Pathfinder {
                     case 2:
                         return dir17;
                     case 3:
-                        return dir36;
-                    case 4:
-                        return dir59;
+                        return dir38;
                 }
                 break;
             case 2:
                 switch (yDiff){
-                    case -4:
-                        return dir50;
                     case -3:
                         return dir29;
                     case -2:
@@ -1848,108 +3079,261 @@ public class BFPathing34 extends Pathfinder {
                     case 2:
                         return dir16;
                     case 3:
-                        return dir35;
-                    case 4:
-                        return dir58;
+                        return dir37;
                 }
                 break;
             case 3:
                 switch (yDiff){
                     case -3:
-                        return dir51;
-                    case -2:
                         return dir30;
-                    case -1:
+                    case -2:
                         return dir31;
-                    case 0:
+                    case -1:
                         return dir32;
-                    case 1:
+                    case 0:
                         return dir33;
-                    case 2:
+                    case 1:
                         return dir34;
+                    case 2:
+                        return dir35;
                     case 3:
-                        return dir57;
+                        return dir36;
                 }
                 break;
             case 4:
                 switch (yDiff){
-                    case -2:
-                        return dir52;
-                    case -1:
-                        return dir53;
-                    case 0:
-                        return dir54;
-                    case 1:
-                        return dir55;
-                    case 2:
+                    case -3:
                         return dir56;
+                    case -2:
+                        return dir57;
+                    case -1:
+                        return dir58;
+                    case 0:
+                        return dir59;
+                    case 1:
+                        return dir60;
+                    case 2:
+                        return dir61;
+                    case 3:
+                        return dir62;
+                }
+                break;
+            case 5:
+                switch (yDiff){
+                    case -3:
+                        return dir86;
+                    case -2:
+                        return dir87;
+                    case -1:
+                        return dir88;
+                    case 0:
+                        return dir89;
+                    case 1:
+                        return dir90;
+                    case 2:
+                        return dir91;
+                    case 3:
+                        return dir92;
                 }
                 break;
         }
+
         double gain;
 
         Direction ans = Direction.CENTER;
         double initDist = Math.sqrt(ml0.distanceSquaredTo(target));
         double maxGainPerCost = 0;
 
-        gain = (initDist - Math.sqrt(ml45.distanceSquaredTo(target))) / dist45;
+        gain = (initDist - Math.sqrt(ml77.distanceSquaredTo(target))) / dist77;
         if(gain > maxGainPerCost){
             maxGainPerCost = gain;
-            ans = dir45;
+            ans = dir77;
         }
 
-        gain = (initDist - Math.sqrt(ml46.distanceSquaredTo(target))) / dist46;
+        gain = (initDist - Math.sqrt(ml78.distanceSquaredTo(target))) / dist78;
         if(gain > maxGainPerCost){
             maxGainPerCost = gain;
-            ans = dir46;
+            ans = dir78;
         }
 
-        gain = (initDist - Math.sqrt(ml47.distanceSquaredTo(target))) / dist47;
+        gain = (initDist - Math.sqrt(ml79.distanceSquaredTo(target))) / dist79;
         if(gain > maxGainPerCost){
             maxGainPerCost = gain;
-            ans = dir47;
+            ans = dir79;
         }
 
-        gain = (initDist - Math.sqrt(ml48.distanceSquaredTo(target))) / dist48;
+        gain = (initDist - Math.sqrt(ml80.distanceSquaredTo(target))) / dist80;
         if(gain > maxGainPerCost){
             maxGainPerCost = gain;
-            ans = dir48;
+            ans = dir80;
         }
 
-        gain = (initDist - Math.sqrt(ml49.distanceSquaredTo(target))) / dist49;
+        gain = (initDist - Math.sqrt(ml81.distanceSquaredTo(target))) / dist81;
         if(gain > maxGainPerCost){
             maxGainPerCost = gain;
-            ans = dir49;
+            ans = dir81;
         }
 
-        gain = (initDist - Math.sqrt(ml50.distanceSquaredTo(target))) / dist50;
+        gain = (initDist - Math.sqrt(ml82.distanceSquaredTo(target))) / dist82;
         if(gain > maxGainPerCost){
             maxGainPerCost = gain;
-            ans = dir50;
+            ans = dir82;
         }
 
-        gain = (initDist - Math.sqrt(ml51.distanceSquaredTo(target))) / dist51;
+        gain = (initDist - Math.sqrt(ml83.distanceSquaredTo(target))) / dist83;
         if(gain > maxGainPerCost){
             maxGainPerCost = gain;
-            ans = dir51;
+            ans = dir83;
         }
 
-        gain = (initDist - Math.sqrt(ml52.distanceSquaredTo(target))) / dist52;
+        gain = (initDist - Math.sqrt(ml84.distanceSquaredTo(target))) / dist84;
         if(gain > maxGainPerCost){
             maxGainPerCost = gain;
-            ans = dir52;
+            ans = dir84;
         }
 
-        gain = (initDist - Math.sqrt(ml53.distanceSquaredTo(target))) / dist53;
+        gain = (initDist - Math.sqrt(ml85.distanceSquaredTo(target))) / dist85;
         if(gain > maxGainPerCost){
             maxGainPerCost = gain;
-            ans = dir53;
+            ans = dir85;
         }
 
-        gain = (initDist - Math.sqrt(ml54.distanceSquaredTo(target))) / dist54;
+        gain = (initDist - Math.sqrt(ml86.distanceSquaredTo(target))) / dist86;
         if(gain > maxGainPerCost){
             maxGainPerCost = gain;
-            ans = dir54;
+            ans = dir86;
+        }
+
+        gain = (initDist - Math.sqrt(ml87.distanceSquaredTo(target))) / dist87;
+        if(gain > maxGainPerCost){
+            maxGainPerCost = gain;
+            ans = dir87;
+        }
+
+        gain = (initDist - Math.sqrt(ml88.distanceSquaredTo(target))) / dist88;
+        if(gain > maxGainPerCost){
+            maxGainPerCost = gain;
+            ans = dir88;
+        }
+
+        gain = (initDist - Math.sqrt(ml89.distanceSquaredTo(target))) / dist89;
+        if(gain > maxGainPerCost){
+            maxGainPerCost = gain;
+            ans = dir89;
+        }
+
+        gain = (initDist - Math.sqrt(ml90.distanceSquaredTo(target))) / dist90;
+        if(gain > maxGainPerCost){
+            maxGainPerCost = gain;
+            ans = dir90;
+        }
+
+        gain = (initDist - Math.sqrt(ml91.distanceSquaredTo(target))) / dist91;
+        if(gain > maxGainPerCost){
+            maxGainPerCost = gain;
+            ans = dir91;
+        }
+
+        gain = (initDist - Math.sqrt(ml92.distanceSquaredTo(target))) / dist92;
+        if(gain > maxGainPerCost){
+            maxGainPerCost = gain;
+            ans = dir92;
+        }
+
+        gain = (initDist - Math.sqrt(ml93.distanceSquaredTo(target))) / dist93;
+        if(gain > maxGainPerCost){
+            maxGainPerCost = gain;
+            ans = dir93;
+        }
+
+        gain = (initDist - Math.sqrt(ml94.distanceSquaredTo(target))) / dist94;
+        if(gain > maxGainPerCost){
+            maxGainPerCost = gain;
+            ans = dir94;
+        }
+
+        gain = (initDist - Math.sqrt(ml95.distanceSquaredTo(target))) / dist95;
+        if(gain > maxGainPerCost){
+            maxGainPerCost = gain;
+            ans = dir95;
+        }
+
+        gain = (initDist - Math.sqrt(ml96.distanceSquaredTo(target))) / dist96;
+        if(gain > maxGainPerCost){
+            maxGainPerCost = gain;
+            ans = dir96;
+        }
+
+        gain = (initDist - Math.sqrt(ml97.distanceSquaredTo(target))) / dist97;
+        if(gain > maxGainPerCost){
+            maxGainPerCost = gain;
+            ans = dir97;
+        }
+
+        gain = (initDist - Math.sqrt(ml98.distanceSquaredTo(target))) / dist98;
+        if(gain > maxGainPerCost){
+            maxGainPerCost = gain;
+            ans = dir98;
+        }
+
+        gain = (initDist - Math.sqrt(ml99.distanceSquaredTo(target))) / dist99;
+        if(gain > maxGainPerCost){
+            maxGainPerCost = gain;
+            ans = dir99;
+        }
+
+        gain = (initDist - Math.sqrt(ml100.distanceSquaredTo(target))) / dist100;
+        if(gain > maxGainPerCost){
+            maxGainPerCost = gain;
+            ans = dir100;
+        }
+
+        gain = (initDist - Math.sqrt(ml101.distanceSquaredTo(target))) / dist101;
+        if(gain > maxGainPerCost){
+            maxGainPerCost = gain;
+            ans = dir101;
+        }
+
+        gain = (initDist - Math.sqrt(ml102.distanceSquaredTo(target))) / dist102;
+        if(gain > maxGainPerCost){
+            maxGainPerCost = gain;
+            ans = dir102;
+        }
+
+        gain = (initDist - Math.sqrt(ml103.distanceSquaredTo(target))) / dist103;
+        if(gain > maxGainPerCost){
+            maxGainPerCost = gain;
+            ans = dir103;
+        }
+
+        gain = (initDist - Math.sqrt(ml104.distanceSquaredTo(target))) / dist104;
+        if(gain > maxGainPerCost){
+            maxGainPerCost = gain;
+            ans = dir104;
+        }
+
+        gain = (initDist - Math.sqrt(ml105.distanceSquaredTo(target))) / dist105;
+        if(gain > maxGainPerCost){
+            maxGainPerCost = gain;
+            ans = dir105;
+        }
+
+        gain = (initDist - Math.sqrt(ml106.distanceSquaredTo(target))) / dist106;
+        if(gain > maxGainPerCost){
+            maxGainPerCost = gain;
+            ans = dir106;
+        }
+
+        gain = (initDist - Math.sqrt(ml107.distanceSquaredTo(target))) / dist107;
+        if(gain > maxGainPerCost){
+            maxGainPerCost = gain;
+            ans = dir107;
+        }
+
+        gain = (initDist - Math.sqrt(ml108.distanceSquaredTo(target))) / dist108;
+        if(gain > maxGainPerCost){
+            maxGainPerCost = gain;
+            ans = dir108;
         }
 
         gain = (initDist - Math.sqrt(ml55.distanceSquaredTo(target))) / dist55;
@@ -1964,36 +3348,6 @@ public class BFPathing34 extends Pathfinder {
             ans = dir56;
         }
 
-        gain = (initDist - Math.sqrt(ml57.distanceSquaredTo(target))) / dist57;
-        if(gain > maxGainPerCost){
-            maxGainPerCost = gain;
-            ans = dir57;
-        }
-
-        gain = (initDist - Math.sqrt(ml58.distanceSquaredTo(target))) / dist58;
-        if(gain > maxGainPerCost){
-            maxGainPerCost = gain;
-            ans = dir58;
-        }
-
-        gain = (initDist - Math.sqrt(ml59.distanceSquaredTo(target))) / dist59;
-        if(gain > maxGainPerCost){
-            maxGainPerCost = gain;
-            ans = dir59;
-        }
-
-        gain = (initDist - Math.sqrt(ml60.distanceSquaredTo(target))) / dist60;
-        if(gain > maxGainPerCost){
-            maxGainPerCost = gain;
-            ans = dir60;
-        }
-
-        gain = (initDist - Math.sqrt(ml61.distanceSquaredTo(target))) / dist61;
-        if(gain > maxGainPerCost){
-            maxGainPerCost = gain;
-            ans = dir61;
-        }
-
         gain = (initDist - Math.sqrt(ml62.distanceSquaredTo(target))) / dist62;
         if(gain > maxGainPerCost){
             maxGainPerCost = gain;
@@ -2006,82 +3360,28 @@ public class BFPathing34 extends Pathfinder {
             ans = dir63;
         }
 
-        gain = (initDist - Math.sqrt(ml64.distanceSquaredTo(target))) / dist64;
+        gain = (initDist - Math.sqrt(ml69.distanceSquaredTo(target))) / dist69;
         if(gain > maxGainPerCost){
             maxGainPerCost = gain;
-            ans = dir64;
+            ans = dir69;
         }
 
-        gain = (initDist - Math.sqrt(ml65.distanceSquaredTo(target))) / dist65;
+        gain = (initDist - Math.sqrt(ml70.distanceSquaredTo(target))) / dist70;
         if(gain > maxGainPerCost){
             maxGainPerCost = gain;
-            ans = dir65;
+            ans = dir70;
         }
 
-        gain = (initDist - Math.sqrt(ml66.distanceSquaredTo(target))) / dist66;
+        gain = (initDist - Math.sqrt(ml76.distanceSquaredTo(target))) / dist76;
         if(gain > maxGainPerCost){
             maxGainPerCost = gain;
-            ans = dir66;
+            ans = dir76;
         }
 
-        gain = (initDist - Math.sqrt(ml67.distanceSquaredTo(target))) / dist67;
+        gain = (initDist - Math.sqrt(ml49.distanceSquaredTo(target))) / dist49;
         if(gain > maxGainPerCost){
             maxGainPerCost = gain;
-            ans = dir67;
-        }
-
-        gain = (initDist - Math.sqrt(ml68.distanceSquaredTo(target))) / dist68;
-        if(gain > maxGainPerCost){
-            maxGainPerCost = gain;
-            ans = dir68;
-        }
-
-        gain = (initDist - Math.sqrt(ml44.distanceSquaredTo(target))) / dist44;
-        if(gain > maxGainPerCost){
-            maxGainPerCost = gain;
-            ans = dir44;
-        }
-
-        gain = (initDist - Math.sqrt(ml25.distanceSquaredTo(target))) / dist25;
-        if(gain > maxGainPerCost){
-            maxGainPerCost = gain;
-            ans = dir25;
-        }
-
-        gain = (initDist - Math.sqrt(ml29.distanceSquaredTo(target))) / dist29;
-        if(gain > maxGainPerCost){
-            maxGainPerCost = gain;
-            ans = dir29;
-        }
-
-        gain = (initDist - Math.sqrt(ml30.distanceSquaredTo(target))) / dist30;
-        if(gain > maxGainPerCost){
-            maxGainPerCost = gain;
-            ans = dir30;
-        }
-
-        gain = (initDist - Math.sqrt(ml34.distanceSquaredTo(target))) / dist34;
-        if(gain > maxGainPerCost){
-            maxGainPerCost = gain;
-            ans = dir34;
-        }
-
-        gain = (initDist - Math.sqrt(ml35.distanceSquaredTo(target))) / dist35;
-        if(gain > maxGainPerCost){
-            maxGainPerCost = gain;
-            ans = dir35;
-        }
-
-        gain = (initDist - Math.sqrt(ml39.distanceSquaredTo(target))) / dist39;
-        if(gain > maxGainPerCost){
-            maxGainPerCost = gain;
-            ans = dir39;
-        }
-
-        gain = (initDist - Math.sqrt(ml40.distanceSquaredTo(target))) / dist40;
-        if(gain > maxGainPerCost){
-            maxGainPerCost = gain;
-            ans = dir40;
+            ans = dir49;
         }
 
         int time8 = Clock.getBytecodesLeft();
