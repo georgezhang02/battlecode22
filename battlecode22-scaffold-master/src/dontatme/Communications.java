@@ -80,9 +80,10 @@ public class Communications {
         return decode(rc.readSharedArray(TURN_INFO), 1);
     }
 
-    public static void incrementMinerTurn(RobotController rc, int size) throws GameActionException {
+    public static void incrementMinerTurn(RobotController rc, int locInd) throws GameActionException {
         int arrayValue = rc.readSharedArray(TURN_INFO);
-        rc.writeSharedArray(TURN_INFO, encode(decode(arrayValue, 0), (decode(arrayValue, 1) + 1) % size));
+        rc.writeSharedArray(TURN_INFO, encode(decode(arrayValue, 0), decode(arrayValue, 1) + (int) Math.pow(2, locInd)));
+        System.out.println(decode(arrayValue, 1) + (int) Math.pow(2, locInd));
     }
 
     /**

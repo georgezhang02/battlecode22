@@ -8,8 +8,8 @@ public strictfp class Miner {
     static MinerType minerType = MinerType.None;
 
     static MapLocation heading = null;
-    //static MapLocation exploreLoc = null;
     static Pathfinder pathfinder = null;
+    static MapLocation exploreLoc = null;
 
     static int runAwayTimer = 0;
     static MapLocation[] currentEnemies = null;
@@ -65,6 +65,12 @@ public strictfp class Miner {
 
         // Mine around if possible
         mineAround(rc, me);
+
+        // Set exploration as done if found location
+        if (exploreLoc != null && rc.canSenseLocation(exploreLoc) && rc.senseLead(exploreLoc) == 0) {
+            exploreLoc = null;
+            System.out.println("Done exploring");
+        }
 
         // Run away from enemies for 2 moves if necessary
         currentEnemies = Helper.updateEnemyLocations(rc, robotInfo);
@@ -147,11 +153,57 @@ public strictfp class Miner {
     }
 
     static void exploreMiner(RobotController rc, MapLocation me) throws GameActionException{
-        Direction exploreDir = pathfinder.pathToExplore();
-        //exploreLoc = pathfinder.explorer.target;
-        if (rc.canMove(exploreDir)) {
-            rc.move(exploreDir);
-            rc.setIndicatorLine(me.add(exploreDir), pathfinder.explorer.target, 0, 0, 255);
+        int minerTurn = Communications.getMinerTurn(rc);
+        if (exploreLoc == null && minerTurn < 31) {
+            int height = rc.getMapHeight();
+            int width = rc.getMapWidth();
+            MapLocation selectedLocation = null;
+            int locInd = -1;
+            int selectedLocInd = -1;
+            for (int i = 0; i < 5; i++) {
+                if ((minerTurn >> i) % 2 == 0) {
+                    switch(i) {
+                        case 0:
+                            selectedLocation = new MapLocation(0, 0);
+                            selectedLocInd = 0;
+                            break;
+                        case 1:
+                            selectedLocation = new MapLocation(width - 1, 0);
+                            selectedLocInd = 1;
+                            break;
+                        case 2:
+                            selectedLocation = new MapLocation(0, height - 1);
+                            selectedLocInd = 2;
+                            break;
+                        case 3:
+                            selectedLocation = new MapLocation(width - 1, height - 1);
+                            selectedLocInd = 3;
+                            break;
+                        case 4:
+                            selectedLocation = new MapLocation((width - 1) / 2, (height - 1) / 2);
+                            selectedLocInd = 4;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                if (exploreLoc == null || selectedLocation.distanceSquaredTo(me) < exploreLoc.distanceSquaredTo(me)) {
+                    exploreLoc = selectedLocation;
+                    locInd = selectedLocInd;
+                }
+            }
+            Communications.incrementMinerTurn(rc, locInd);
+            System.out.println("Explore: " + exploreLoc);
+            tryMove(rc, me, exploreLoc);
+        } else if (exploreLoc != null) {
+            tryMove(rc, me, exploreLoc);
+        } else {
+            Direction exploreDir = pathfinder.pathToExplore();
+            //exploreLoc = pathfinder.explorer.target;
+            if (rc.canMove(exploreDir)) {
+                rc.move(exploreDir);
+                rc.setIndicatorLine(me.add(exploreDir), pathfinder.explorer.target, 0, 0, 255);
+            }
         }
     }
 
