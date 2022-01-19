@@ -224,8 +224,8 @@ public strictfp class Miner {
     static MapLocation goTowardsNearbyLead(RobotController rc, MapLocation me, MapLocation[] leads) throws GameActionException {
         for (MapLocation lead : leads) {
             if (rc.senseLead(lead) > leadThreshold && !friendlyMinerAt(rc, lead)) {
+                // && (exploreLoc == null || towards(me, lead, exploreLoc))
                 tryMove(rc, me, lead);
-                //exploreLoc = null;
                 return lead;
             }
         }
@@ -239,7 +239,7 @@ public strictfp class Miner {
         return toLead == toExplore || toLead == toExplore.rotateLeft() || toLead == toExplore.rotateRight()
                 || toLead == toExplore.rotateLeft().rotateLeft() || toLead == toExplore.rotateRight().rotateRight();
     }
-     */
+    */
 
     static int minersNear(RobotController rc, MapLocation lead) throws GameActionException {
         int count = 0;
@@ -301,7 +301,7 @@ public strictfp class Miner {
             }
         }
          */
-        if (rc.canMove(dir)) {
+        if (dir != null && rc.canMove(dir)) {
             rc.move(dir);
             rc.setIndicatorLine(me.add(dir), loc, 0, 255, 0);
         }
