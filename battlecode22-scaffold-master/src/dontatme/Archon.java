@@ -267,20 +267,33 @@ public strictfp class Archon {
     static void healLowestAround(RobotController rc) throws GameActionException {
         RobotInfo[] robotsDetected = rc.senseNearbyRobots();
         RobotInfo lowestHealth = null;
-        int lowestHealthValue = Integer.MAX_VALUE;
         for (RobotInfo robot : robotsDetected){
             if (robot.getTeam() == rc.getTeam()) {
-                if (robot.getHealth() < lowestHealthValue) {
+                // first robot
+                if (lowestHealth == null) {
                     lowestHealth = robot;
-                    lowestHealthValue = robot.getHealth();
+                }
+                // break if non-soldier is trying to get healing when already healing soldier
+                else if (lowestHealth.getType() == RobotType.SOLDIER && robot.getType() != RobotType.SOLDIER) {
+                    break;
+                }
+                // if the current type is not a soldier and soldier shows up heal soldier
+                else if (lowestHealth.getType() != RobotType.SOLDIER && robot.getType() == RobotType.SOLDIER) {
+                    lowestHealth = robot;
+                }
+                // two soldiers or two non-soldiers then just compare health
+                else {
+                    if (robot.getHealth() < lowestHealth.getHealth()) {
+                        lowestHealth = robot;
+                    }
                 }
             }
         }
 
+        // if found a good target heal it
         if (lowestHealth != null && rc.canRepair(lowestHealth.getLocation())) {
             rc.repair(lowestHealth.getLocation());
         }
-
     }
 
     static int getRubble(RobotController rc, Direction d) {
