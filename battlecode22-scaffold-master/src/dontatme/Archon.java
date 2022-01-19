@@ -8,7 +8,7 @@ public strictfp class Archon {
 
     static int id = -1;
     static MapLocation me = null;
-    static int miners = 0, soldiers = 0;
+    static int miners = 0, soldiers = 0, builders = 0;
 
     static int gameState = 0;
     // gamestate 0 for building soldiers and miners
@@ -26,6 +26,8 @@ public strictfp class Archon {
     static int curArchonOrder = -1;
 
     static double MAP_SCALER = -1;
+
+    static int watchTower = 0;
 
     /**
      * Run a single turn for an Archon.
@@ -192,13 +194,20 @@ public strictfp class Archon {
                 if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
                     buildTowardsLowRubble(rc, RobotType.MINER);
                 }
-            }
-            else if (soldierCount / rc.getArchonCount() < 5 ){
+            } else if (watchTower < builders) {
+
+            }else if (soldierCount / rc.getArchonCount() < 5 ){
                 if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
                     buildTowardsLowRubble(rc, RobotType.SOLDIER);
 
                 }
-            } else if (minerCount / rc.getArchonCount() < 10 *  MAP_SCALER){
+            } else if (soldierCount > builders * 4) {
+                if (rc.getTeamLeadAmount(rc.getTeam()) >= 60) {
+                    buildTowardsLowRubble(rc, RobotType.BUILDER);
+                    builders++;
+                }
+            }
+            else if (minerCount / rc.getArchonCount() < 10 *  MAP_SCALER) {
                 if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
                     buildTowardsLowRubble(rc, RobotType.MINER);
 
@@ -238,6 +247,8 @@ public strictfp class Archon {
                 rc.buildRobot(type, d);
                 Communications.incrementArchonTurn(rc);
                 switch(type) {
+                    case BUILDER:
+                        builders++;
                     case MINER:
                         miners++;
                         break;

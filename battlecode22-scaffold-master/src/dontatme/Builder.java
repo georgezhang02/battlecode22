@@ -12,91 +12,77 @@ public strictfp class Builder {
     static boolean movedTowardsCenter = false;
     static boolean hasBuiltTower = false;
     static Pathfinder pathfinder;
+    static RobotController rc;
     public static void run(RobotController rc) throws GameActionException {
         //part 1: see if there are any nearby buildings that are in prototype mode
-        searchNonMoveActions(rc);
+        //searchNonMoveActions(rc);
 
         //now just explore
+        if (pathfinder == null){
+            pathfinder = new BFPathing20(rc);
+        }
         Direction dir = pathfinder.pathToExplore();
+
         while (rc.canMove(dir)) {
+            buildTowersNearBase(rc);
             rc.move(dir);
-            searchNonMoveActions(rc);
+            //searchNonMoveActions(rc); //error here
         }
     }
-    static void detonate(RobotController rc) throws GameActionException {
-        //search areas near me in cardinal directions
-        int lowestRubble = Integer.MAX_VALUE;
-        int lowestIndex = Integer.MAX_VALUE;
-        for (int i = 0; i < Helper.directions.length; i++) {
-            int amountRubble = rc.senseRubble(rc.getLocation().add(Helper.directions[i]));
-            if (amountRubble < lowestRubble && rc.canMove(Helper.directions[i])) {
-                lowestRubble = amountRubble;
-                lowestIndex = i;
-            }
-        }
-        Direction dir = Helper.directions[lowestIndex];
-        rc.move(dir);
-        rc.disintegrate();
+    static void buildTowersNearBase(RobotController rc) throws GameActionException {
 
+        RobotInfo [] allies = getAllies(rc);
+        int minAllyCount = 4;
+        Direction buildPlace = null;
+
+        //number of allies near me implies that I am relatively inside safe space, so build there
+        if (allies.length >= minAllyCount && rc.isActionReady()) {
+            buildPlace = findPlaceToBuildTower(rc);
+        }
+
+        if (buildPlace != null)
+            rc.buildRobot(RobotType.WATCHTOWER, buildPlace);
     }
+
     static void searchNonMoveActions(RobotController rc) throws GameActionException {
-        RobotInfo [] buildings = getNearbyTowers(rc);
-        RobotInfo [] protoBuildings = findPrototypeTowers(rc, buildings);
+        RobotInfo [] towers = getNearbyTowers(rc);
+        RobotInfo [] protoTowers = findPrototypeTowers(rc, towers);
 
-        //that means that there are prototype buildings, and see if we can prototype
-        if (protoBuildings != null) {
+        //that means that there are prototype towers, and see if we can prototype
+        if (protoTowers != null) {
             int counter = 0;
-            repairBuild(rc, protoBuildings);
+            repairBuild(rc, protoTowers);
         }
-        //check if there's a level 1 building that can be mutated
-        if (buildings[0] != null ) {
-            seeBuildingMutation(rc, buildings);
+        //check if there's a level 1 tower that can be mutated
+        if (towers[0] != null) {
+            seeTowerMutation(rc, towers);
         }
-        //means that there is a nearby building
+        //means that there is a nearby tower
         //check if it can be repaired
-        if (buildings[0] != null) {
-            repairBuild(rc, buildings);
+        if (towers[0] != null) {
+            repairBuild(rc, towers);
         }
     }
-    static void seeBuildingMutation(RobotController rc, RobotInfo [] buildings) throws GameActionException {
+    static void seeTowerMutation(RobotController rc, RobotInfo [] towers) throws GameActionException {
         int counter = 0;
-        while (counter < buildings.length && buildings[counter] != null ) {
-            if (buildings[counter].getLevel() == 1 && buildings[counter].getType().equals(RobotType.WATCHTOWER)) {
-                if (rc.canMutate(buildings[counter].getLocation()))//also implement watchtower analysis
-                    rc.mutate(buildings[counter].getLocation());
+        while (counter < towers.length && towers[counter] != null ) {
+            if (towers[counter].getLevel() == 1) {
+                if (rc.canMutate(towers[counter].getLocation()))//also implement watchtower analysis
+                    rc.mutate(towers[counter].getLocation());
             }
             counter++;
         }
     }
-    static void repairBuild(RobotController rc, RobotInfo [] buildings) throws GameActionException{
+    static void repairBuild(RobotController rc, RobotInfo [] towers) throws GameActionException{
         int counter = 0;
-        while (counter < buildings.length && buildings[counter] != null) {
-            if (rc.canRepair(buildings[counter].getLocation())) {
-                rc.repair(buildings[counter].getLocation());
+        while (counter < towers.length && towers[counter] != null) {
+            if (rc.canRepair(towers[counter].getLocation())) {
+                rc.repair(towers[counter].getLocation());
             }
             counter++;
         }
     }
 
-    static void advance(RobotController rc) throws GameActionException {
-        //nub -> in development
-        MapLocation nearestArchon = findNearestArchon(rc);
-        int activationNumber = 4; //number of nearby enemies to trigger tower building
-        int numberNearbyEnemies = getNumberOfNearbyEnemies(rc);
-        if (rc.isActionReady() && numberNearbyEnemies >= activationNumber) {
-            Direction dir = findPlaceToBuildTower(rc);
-            if (dir != null)
-                rc.buildRobot(RobotType.WATCHTOWER, dir);
-            else {
-                //fill in with path planning code
-                //if it can't build a tower, it needs to continue advancing
-            }
-        }
-
-        else {
-           //fill in with path planning code
-        }
-    }
 
     static Direction findPlaceToBuildTower(RobotController rc) throws GameActionException {
         Direction dir = Helper.directions[0];
@@ -132,10 +118,6 @@ public strictfp class Builder {
         return dir;
     }
 
-    static MapLocation findNearestArchon(RobotController rc) throws GameActionException {
-        MapLocation nearestArchon = new MapLocation(0, 0); //placeholder
-        return nearestArchon;
-    }
     static int getNumberOfNearbyEnemies(RobotController rc) throws GameActionException {
         //find number of nearby enemy opponents
         Team opponent = rc.getTeam().opponent();
@@ -152,34 +134,34 @@ public strictfp class Builder {
         RobotInfo [] allies = getAllies(rc);
 
         //an ArrayList could be used here, but I believe it will use much more Bytecode
-        RobotInfo [] buildings = new RobotInfo [allies.length];
+        RobotInfo [] towers = new RobotInfo [allies.length];
         int buildingCounter = 0;
 
         for (int i = 0; i < allies.length; i++) {
-            if (allies[i].getType().isBuilding()) {
-                buildings[buildingCounter] = allies[i];
+            if (allies[i].getType().equals(RobotType.WATCHTOWER)) {
+                towers[buildingCounter] = allies[i];
                 buildingCounter++;
             }
         }
-        return buildings;
+        return towers;
     }
-    static RobotInfo [] findPrototypeTowers(RobotController rc, RobotInfo [] buildings)
+    static RobotInfo [] findPrototypeTowers(RobotController rc, RobotInfo [] towers)
             throws GameActionException {
 
-        RobotInfo [] protoBuildings = new RobotInfo[buildings.length];
-        if (buildings == null)
+        RobotInfo [] protoTowers = new RobotInfo[towers.length];
+        if (towers == null)
             return null;
         else {
             int counter = 0;
             int protoCounter = 0;
-            while (buildings[counter] != null && counter < buildings.length) {
-                if (buildings[counter].getMode() == RobotMode.PROTOTYPE) {
-                    protoBuildings[protoCounter] = buildings[counter];
+            while (towers[counter] != null && counter < towers.length) {
+                if (towers[counter].getMode() == RobotMode.PROTOTYPE) {
+                    protoTowers[protoCounter] = towers[counter];
                     protoCounter++;
                 }
                 counter++;
             }
         }
-        return protoBuildings;
+        return protoTowers;
     }
 }
