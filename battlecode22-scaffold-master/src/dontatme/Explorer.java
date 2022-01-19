@@ -20,6 +20,7 @@ public class Explorer {
     public Explorer(RobotController rc, boolean fastExplore){
         this.rc = rc;
         this.fastExplore = fastExplore;
+        this.target = rc.getLocation();
         if (!fastExplore){
             visited = new boolean[rc.getMapWidth()][rc.getMapHeight()];
         }
