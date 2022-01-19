@@ -264,6 +264,25 @@ public strictfp class Archon {
         }
     }
 
+    static void healLowestAround(RobotController rc) throws GameActionException {
+        RobotInfo[] robotsDetected = rc.senseNearbyRobots();
+        RobotInfo lowestHealth = null;
+        int lowestHealthValue = Integer.MAX_VALUE;
+        for (RobotInfo robot : robotsDetected){
+            if (robot.getTeam() == rc.getTeam()) {
+                if (robot.getHealth() < lowestHealthValue) {
+                    lowestHealth = robot;
+                    lowestHealthValue = robot.getHealth();
+                }
+            }
+        }
+
+        if (lowestHealth != null && rc.canRepair(lowestHealth.getLocation())) {
+            rc.repair(lowestHealth.getLocation());
+        }
+
+    }
+
     static int getRubble(RobotController rc, Direction d) {
         try {
             MapLocation loc = rc.getLocation().add(d);
