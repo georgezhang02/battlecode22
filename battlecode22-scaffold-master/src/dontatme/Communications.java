@@ -24,6 +24,7 @@ public class Communications {
     private static final int LEAD_ODD_OFFSET = 54;
     private static final int MOVE_TO_EVEN_OFFSET = 57;
     private static final int MOVE_TO_ODD_OFFSET = 58;
+    private static final int ARCHON_MOVING = 59;
     private static final int HAS_WIPED = 60;
     private static final int NEXT_INDICES = 61;
     private static final int UNIT_COUNT_OFFSET = 62;
@@ -43,6 +44,7 @@ public class Communications {
                 if (hasWiped(rc)) {
                     break;
                 }
+                checkTeamArchonDied(rc);
                 wipeAttackCommands(rc);
                 wipeDefCommands(rc);
                 wipeUnitCounts(rc);
@@ -157,11 +159,17 @@ public class Communications {
      */
     public static MapLocation getTeamArchonLocation(RobotController rc, int archonID) throws GameActionException {
         int archonIndex = getTeamArchonIndexFromID(rc, archonID);
-        int offset = (rc.getRoundNum() % 2 == 0) ? FRIENDLY_ARCHON_OFFSET_ODD : FRIENDLY_ARCHON_OFFSET_EVEN;
 
-        int arrayValue = rc.readSharedArray(archonIndex + offset);
-        MapLocation archonLocation = new MapLocation(decode(arrayValue, 0), decode(arrayValue, 1));
-        return archonLocation;
+        if(archonIndex != -1){
+            int offset = (rc.getRoundNum() % 2 == 0) ? FRIENDLY_ARCHON_OFFSET_ODD : FRIENDLY_ARCHON_OFFSET_EVEN;
+
+            int arrayValue = rc.readSharedArray(archonIndex + offset);
+            MapLocation archonLocation = new MapLocation(decode(arrayValue, 0), decode(arrayValue, 1));
+            return archonLocation;
+        } else{
+            return null;
+        }
+
     }
 
     /**
@@ -221,6 +229,11 @@ public class Communications {
             }
         }
         return -1;
+    }
+
+    public static int getTeamArchonIDFromIndex(RobotController rc, int index) throws GameActionException {
+        int offset = (rc.getRoundNum() % 2 == 0) ? FRIENDLY_ARCHON_OFFSET_ODD : FRIENDLY_ARCHON_OFFSET_EVEN;
+        return decode(rc.readSharedArray(index + offset), 2);
     }
 
 
@@ -840,16 +853,42 @@ public class Communications {
         return false;
     }
 
+    public static void checkTeamArchonDied(RobotController rc) throws GameActionException {
+        if(Communications.isArchonMoving(rc)){
+            for(int i = 0; i< 4; i++){
+
+                if(getTeamArchonLocation(rc, Communications.getArchonMovingID(rc))==null){
+                    setArchonMoving(rc, 0, false, 0);
+                    return;
+                }
+            }
+
+        }
+
+
+
+    }
+
     /**
      * Toggles whether an archon is moving this round.
      *
      * @throws GameActionException
      */
-    public static void setArchonMoving(RobotController rc, boolean moving, int id) throws GameActionException {
-        int arrValue = rc.readSharedArray(HAS_WIPED);
+    public static void setArchonMoving(RobotController rc, int dist, boolean moving, int id) throws GameActionException {
+        int arrValue = rc.readSharedArray(ARCHON_MOVING);
         int writeVal = (moving) ? 1 : 0;
-        rc.writeSharedArray(HAS_WIPED, encode(
-                decode(arrValue, 0), id,  writeVal));
+        rc.writeSharedArray(ARCHON_MOVING, encode(
+                dist, id,  writeVal));
+    }
+
+    /**
+     * Toggles whether an archon is moving this round.
+     *
+     * @throws GameActionException
+     */
+    public static int getArchonMovingDistToTarget(RobotController rc) throws GameActionException {
+        int arrValue = rc.readSharedArray(ARCHON_MOVING);
+        return decode(arrValue, 0);
     }
 
     /**
@@ -858,7 +897,7 @@ public class Communications {
      * @throws GameActionException
      */
     public static int getArchonMovingID(RobotController rc) throws GameActionException {
-        int arrValue = rc.readSharedArray(HAS_WIPED);
+        int arrValue = rc.readSharedArray(ARCHON_MOVING);
         return decode(arrValue, 1);
     }
 
@@ -868,7 +907,7 @@ public class Communications {
      * @throws GameActionException
      */
     public static boolean isArchonMoving(RobotController rc) throws GameActionException {
-        int arrValue = rc.readSharedArray(HAS_WIPED);
+        int arrValue = rc.readSharedArray(ARCHON_MOVING);
         return decode(arrValue, 2) == 1;
     }
 

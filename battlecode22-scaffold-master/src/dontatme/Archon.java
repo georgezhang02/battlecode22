@@ -23,16 +23,20 @@ public strictfp class Archon {
 
     static Pathfinder pathfinder;
 
-    static boolean transformed = false;
     static int curHealingID = -1;
 
     static Communications.Command commands[] = new Communications.Command[2];
     static int curArchonOrder = -1;
 
     static double MAP_SCALER = -1;
-    static int movesUntilTransform = 1;
+    static int movesUntilLand = 1;
 
+    static boolean landing = false;
+    static boolean moving = false;
+    static MapLocation curTarget;
     static int initArchonCount = 0;
+    static boolean flying = false;
+    static int moveCooldown = 100;
 
     /**
      * Run a single turn for an Archon.
@@ -52,11 +56,11 @@ public strictfp class Archon {
             pathfinder = new BFPathing34(rc);
         }
 
-        int x = Clock.getBytecodesLeft();
-        pathfinder.pathToTarget(new MapLocation(0,0), false);
-        int y = Clock.getBytecodesLeft();
-
-        rc.setIndicatorString(x+" "+y);
+        if(Communications.getArchonMovingID(rc) == id && !moving){
+            moving = true;
+            landing = false;
+            movesUntilLand = 2000;
+        }
 
         Communications.runStart(rc);
 
@@ -64,9 +68,11 @@ public strictfp class Archon {
 
         commandCooldown[0]--;
         commandCooldown[1]--;
+        moveCooldown--;
         Team opponent = rc.getTeam().opponent();
         enemies = rc.senseNearbyRobots(34, opponent);
         allies = rc.senseNearbyRobots(34, rc.getTeam());
+
 
         // Get the archon ID if needed
         if (id == -1) {
@@ -91,8 +97,6 @@ public strictfp class Archon {
         }
 
 
-
-
         // Write archon location if needed
         me = rc.getLocation();
         Communications.setTeamArchonLocation(rc, id, me);
@@ -100,10 +104,11 @@ public strictfp class Archon {
 
 
 
-        // determining whether archon should run away
+
 
         int enemyCount = 0;
         int allyCount = 0;
+        int healingCount = 0;
 
         MapLocation[] enemyPos = new MapLocation[5];
 
@@ -121,107 +126,215 @@ public strictfp class Archon {
             if(type == RobotType.SOLDIER || type == RobotType.WATCHTOWER || type == RobotType.SAGE){
                 allyCount++;
             }
+
+            if(robot.getHealth() < 20){
+                healingCount++;
+            }
         }
 
-        //dicatorString(enemyCount + " "+ commandCooldown[1]);
-        if( ((enemyCount >= allyCount && enemyCount >= 1)  || (enemyCount > 2)) && commandCooldown[1] <= 0){
-            Communications.sendDefenseCommand(rc, rc.getLocation(), RobotType.ARCHON);
-            commandCooldown[1] = Communications.getCommandCooldown(rc, RobotType.ARCHON, false);
+        if(flying && Communications.getArchonTurn(rc)  == curArchonOrder){
+            Communications.incrementArchonTurn(rc);
         }
 
 
-        // If there is lead left, save the first open lead location in the shared array
-        MapLocation leadLoc = Communications.getArchonVisionLead(rc, id);
-        if (leadLoc.y >= 60) {
-            MapLocation[] allLoc = rc.getAllLocationsWithinRadiusSquared(rc.getLocation(), 34);
-            boolean found = false;
-            for (MapLocation loc : allLoc) {
-                if (rc.senseLead(loc) > 1 && !rc.isLocationOccupied(loc)) {
-                    Communications.setArchonVisionLead(rc, id, loc);
+        //rc.setIndicatorString(moving+" "+landing+" "+flying+""+movesUntilLand+" ");
+        if(moving){
+            if(landing && !flying){
+                moving = false;
+                Communications.setArchonMoving(rc, 0, false, 0);
+                moveCooldown = 100;
+            }
+            else if(movesUntilLand<=0){
+                if(rc.canTransform() && landing && flying){
+                    rc.transform();
+                    flying = false;
+                    Communications.setArchonMoving(rc, 0, false, 0);
+                }
+            } else {
 
-                    found = true;
-                    break;
+
+                if(curTarget == null || (enemyCount >= 2 && healingCount >= 2 && !landing)){
+                    landing = true;
+                    movesUntilLand = 1;
+
+                }  else if(landing){
+                    Direction dir = lookForBetterSquare(rc);
+                    if(dir == Direction.CENTER){
+                        if(rc.canTransform() && flying){
+                            rc.transform();
+                            flying = false;
+                            Communications.setArchonMoving(rc, 0, false, 0);
+                        }
+                    } else{
+                        move(rc, dir);
+                    }
+
+                } else if(!pathfinder.targetWithinRadius(curTarget, 34)){
+                    if(!flying){
+                        if(rc.canTransform()){
+                            rc.transform();
+                            flying = true;
+                        }
+                    } else{
+                        move(rc, pathfinder.pathToTarget(curTarget, false));
+                    }
+                } else if(!pathfinder.targetWithinRadius(curTarget, 20)){
+                    if(!flying){
+                        if(rc.canTransform()){
+                            rc.transform();
+                            flying = true;
+                        }
+                    } else{
+                        move(rc, pathfinder.pathToTargetGreedy(curTarget, 0));
+                    }
+
+                } else {
+                    landing = true;
+                    movesUntilLand = 2;
                 }
             }
-            if (!found) {
-                Communications.setArchonVisionNoLead(rc, id);
-            }
+
         }
 
 
-        int[] units = Communications.getUnitCounts(rc);
+        if(!moving){
+            if(enemyCount < 2 && healingCount < 2 && moveCooldown <= 0){
 
-        // deciding to rush
-        int minerCount = units[0];
-        int soldierCount = units[1];
-        if(gameState == 0){
-            //rc.setIndicatorString(5 * MAP_SCALER+" "+ (double)soldierCount / rc.getArchonCount());
-            if(commandCooldown[0] < 0 && (double)soldierCount / initArchonCount >= 5 * MAP_SCALER){
-                rushArchon(rc);
+                readComms(rc);
             }
-        } else if (gameState == 1){
 
-            if(Communications.getEnemyArchonLocationByIndex(rc, attackingArchon).x < 60){
-                //rc.setIndicatorString("destroyed");
-                attackingArchon = -1;
-                gameState = 0;
-                if(soldierCount / rc.getArchonCount() >= 10 * MAP_SCALER){
+            //dicatorString(enemyCount + " "+ commandCooldown[1]);
+            if( ((enemyCount >= allyCount && enemyCount >= 1)  || (enemyCount > 2)) && commandCooldown[1] <= 0){
+                Communications.sendDefenseCommand(rc, rc.getLocation(), RobotType.ARCHON);
+                commandCooldown[1] = Communications.getCommandCooldown(rc, RobotType.ARCHON, false);
+            }
+
+
+            // If there is lead left, save the first open lead location in the shared array
+            MapLocation leadLoc = Communications.getArchonVisionLead(rc, id);
+            if (leadLoc.y >= 60) {
+                MapLocation[] allLoc = rc.getAllLocationsWithinRadiusSquared(rc.getLocation(), 34);
+                boolean found = false;
+                for (MapLocation loc : allLoc) {
+                    if (rc.senseLead(loc) > 1 && !rc.isLocationOccupied(loc)) {
+                        Communications.setArchonVisionLead(rc, id, loc);
+
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    Communications.setArchonVisionNoLead(rc, id);
+                }
+            }
+
+
+            int[] units = Communications.getUnitCounts(rc);
+
+            // deciding to rush
+            int minerCount = units[0];
+            int soldierCount = units[1];
+            if(gameState == 0){
+                //rc.setIndicatorString(5 * MAP_SCALER+" "+ (double)soldierCount / rc.getArchonCount());
+                if(commandCooldown[0] < 0 && (double)soldierCount / initArchonCount >= 5 * MAP_SCALER){
                     rushArchon(rc);
-                    if(attackingArchon == -1){
+                }
+            } else if (gameState == 1){
+
+                if(Communications.getEnemyArchonLocationByIndex(rc, attackingArchon).x < 60){
+                    //rc.setIndicatorString("destroyed");
+                    attackingArchon = -1;
+                    gameState = 0;
+                    if(soldierCount / rc.getArchonCount() >= 10 * MAP_SCALER){
+                        rushArchon(rc);
+                        if(attackingArchon == -1){
+                            Communications.sendStopAttackCommand(rc, commands[0].location);
+                            System.out.println("Stop Attacking");
+                        }
+                    } else{
                         Communications.sendStopAttackCommand(rc, commands[0].location);
                         System.out.println("Stop Attacking");
                     }
-                } else{
-                    Communications.sendStopAttackCommand(rc, commands[0].location);
-                    System.out.println("Stop Attacking");
+
+
+                } else if(commandCooldown[0] <= 0){
+                    gameState = 0;
+                    attackingArchon = -1;
+                }
+            }
+
+            // If there are less than 4 miners per archon
+            // Build a miner in any direction (but take turns)
+
+            if( rc.isActionReady() && Communications.getArchonTurn(rc)  == curArchonOrder){
+
+                if (miners < 3) {
+                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
+                        buildTowardsLowRubble(rc, RobotType.MINER);
+                    }
+                }
+                else if (soldierCount / rc.getArchonCount() < 5 ){
+                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
+                        buildTowardsLowRubble(rc, RobotType.SOLDIER);
+
+                    }
+                } else if (minerCount / rc.getArchonCount() < 5 *  MAP_SCALER){
+                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
+                        buildTowardsLowRubble(rc, RobotType.MINER);
+
+                    }
+                } else {
+                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 75 * MAP_SCALER) {
+                        buildTowardsLowRubble(rc, RobotType.SOLDIER);
+                    }
                 }
 
+            }
 
-            } else if(commandCooldown[0] <= 0){
-                gameState = 0;
-                attackingArchon = -1;
+            if(rc.isActionReady()){
+                MapLocation toHeal = healUnitsAround(rc, allies);
+                if(toHeal != null){
+                    rc.repair(toHeal);
+                    if(Communications.getArchonTurn(rc)  == curArchonOrder){
+                        Communications.incrementArchonTurn(rc);
+                    }
+
+                }
             }
         }
-        
-        // If there are less than 4 miners per archon
-        // Build a miner in any direction (but take turns)
+    }
+
+    static void readComms(RobotController rc) throws GameActionException {
+        MapLocation dest = Communications.getMoveToCommand(rc).location;
+        double maxDist = Communications.getArchonMovingDistToTarget(rc);
+
+        if(!Communications.isArchonMoving(rc) && dest.x < 60){
+
+            double cross = (int) Math.sqrt(rc.getMapWidth() *rc.getMapHeight() + rc.getMapWidth() * rc.getMapWidth());
 
 
-        if( rc.isActionReady() && Communications.getArchonTurn(rc)  == curArchonOrder){
+            double dist = Math.sqrt(rc.getLocation().distanceSquaredTo(dest));
 
-            if (miners < 3) {
-                if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
-                    buildTowardsLowRubble(rc, RobotType.MINER);
-                }
+            rc.setIndicatorString(dist+" "+maxDist);
+
+            if(dist > 5 && (maxDist == 0 || dist < maxDist)){
+
+                Communications.setArchonMoving(rc, (int) dist, false, id);
+                curTarget = dest;
             }
-            else if (soldierCount / rc.getArchonCount() < 5 ){
-                if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
-                    buildTowardsLowRubble(rc, RobotType.SOLDIER);
 
-                }
-            } else if (minerCount / rc.getArchonCount() < 5 *  MAP_SCALER){
-                if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
-                    buildTowardsLowRubble(rc, RobotType.MINER);
-
-                }
-            } else {
-                if (rc.getTeamLeadAmount(rc.getTeam()) >= 75 * MAP_SCALER) {
-                    buildTowardsLowRubble(rc, RobotType.SOLDIER);
-                }
-            }
 
         }
+    }
 
-        if(rc.isActionReady()){
-            MapLocation toHeal = healUnitsAround(rc, allies);
-            if(toHeal != null){
-                rc.repair(toHeal);
-                if(Communications.getArchonTurn(rc)  == curArchonOrder){
-                    Communications.incrementArchonTurn(rc);
-                }
-
+    static Direction lookForBetterSquare(RobotController rc) throws GameActionException{
+        for(Direction dir: Direction.allDirections()){
+            if(rc.canMove(dir) && 1.5 * (rc.senseRubble(rc.getLocation().add(dir) ) + 10)
+                    <= rc.senseRubble(rc.getLocation())+ 10){
+                return dir;
             }
         }
+        return Direction.CENTER;
     }
 
 
@@ -307,6 +420,17 @@ public strictfp class Archon {
         catch (GameActionException e) {
             e.printStackTrace();
             return 0;
+        }
+    }
+
+    static void move(RobotController rc, Direction dir) throws GameActionException {
+        if(dir != null && rc.canMove(dir)){
+            rc.move(dir);
+            movesUntilLand--;
+        }
+
+        if(dir == Direction.CENTER){
+            movesUntilLand--;
         }
     }
 }

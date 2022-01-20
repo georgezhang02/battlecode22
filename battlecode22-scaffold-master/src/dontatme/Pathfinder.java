@@ -88,12 +88,13 @@ public abstract class Pathfinder {
             } else{
                 Direction dir = bfPathToTarget(target);
 
-                lastPos = rc.getLocation();
+
                 if(lastPos != null && dir != null && rc.getLocation().add(dir).equals(lastPos)) {
 
                     dir = pathToTargetGreedy(target, 0);
                     lastPos = null;
                 }
+                lastPos = rc.getLocation();
 
 
 
