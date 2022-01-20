@@ -1,11 +1,11 @@
-package dontatme;
+package dontatme_no_healing;
 
 import battlecode.common.*;
 
 public strictfp class Soldier {
 
     public enum SoldierState {
-        Rushing, Defending, Exploring, PURSUING, ArchonDefense, Anomaly, Healing
+        Rushing, Defending, Exploring, PURSUING, ArchonDefense, Anomaly
     }
 
     static SoldierState currentState = SoldierState.Exploring;
@@ -26,8 +26,6 @@ public strictfp class Soldier {
 
     static int combatCooldown = 0;
 
-
-
     public Soldier (RobotController rc) throws GameActionException {
         this.rc = rc;
         pathfinder = new BFPathing20(rc);
@@ -35,48 +33,38 @@ public strictfp class Soldier {
 
     public void run() throws GameActionException {
         Communications.runStart(rc);
-        
+
         Team opponent = rc.getTeam().opponent();
         enemies = rc.senseNearbyRobots(20, opponent);
         allies = rc.senseNearbyRobots(20, rc.getTeam());
 
         combatCooldown--;
 
-        MapLocation healingLoc = findHealingArchon();
-
-
-
-        if(currentState == SoldierState.Healing){
-            currentTarget = healingLoc;
+        if(commandTimer <= 0){
+            clearCommand();
         } else{
-            if(commandTimer <= 0){
-                clearCommand();
-            } else{
-                commandTimer--;
-            }
-
-            Helper.updateEnemyLocations(rc, enemies);
-            readComms();
-            if(command != null){
-                if(command.type == RobotType.ARCHON){
-                    currentState = command.isAttack ? SoldierState.Rushing : SoldierState.ArchonDefense;
-                } else {
-                    currentState = command.isAttack ? SoldierState.PURSUING : SoldierState.Defending;
-                }
-            } else {
-                currentState = SoldierState.Exploring;
-            }
+            commandTimer--;
         }
 
-        switch (currentState){
-            case Healing:
-                healAt(currentTarget);
-                rc.setIndicatorString("Healing");
-                break;
-            case Rushing:
+        readComms();
 
+        Helper.updateEnemyLocations(rc, enemies);
+
+        if(command != null){
+            if(command.type == RobotType.ARCHON){
+                currentState = command.isAttack ? SoldierState.Rushing : SoldierState.ArchonDefense;
+            } else {
+                currentState = command.isAttack ? SoldierState.PURSUING : SoldierState.Defending;
+            }
+        } else {
+            currentState = SoldierState.Exploring;
+        }
+
+
+        switch (currentState){
+            case Rushing:
                 offense(currentTarget, 0);
-                rc.setIndicatorString("Rushing ");
+                rc.setIndicatorString("Rushing");
                 break;
             case PURSUING:
                 offense(currentTarget, 1);
@@ -174,30 +162,6 @@ public strictfp class Soldier {
                 }
             }
         }
-
-
-    }
-
-    static MapLocation findHealingArchon() throws GameActionException {
-        MapLocation ans = null;
-        if(rc.getHealth() <= 17){
-            double lowestDist = 120;
-            for(int i = 0; i< 4; i++){
-                MapLocation archonLoc = Communications.getTeamArchonLocationByIndex(rc, i);
-
-                if(archonLoc.x < 60){
-                    double dist = Math.sqrt(rc.getLocation().distanceSquaredTo(archonLoc));
-                    if(dist < lowestDist){
-                        if(rc.getHealth() < 1050 / dist){
-                            lowestDist = dist;
-                            ans = archonLoc;
-                            currentState = SoldierState.Healing;
-                        }
-                    }
-                }
-            }
-        }
-        return ans;
     }
 
     static void checkCurrentAttackingTarget() throws GameActionException {
@@ -306,6 +270,7 @@ public strictfp class Soldier {
                 Communications.sendAttackCommand(rc, ml, RobotType.SOLDIER);
                 currentTarget = ml;
                 currentState = SoldierState.PURSUING;
+                combatCooldown = 3;
             }
         }
     }
@@ -398,91 +363,9 @@ public strictfp class Soldier {
                 combatCooldown = 3;
             }
         }
-    }
-
-    void healAt(MapLocation target) throws GameActionException {
-
-        if(rc.getHealth() >=45){
-            currentState = SoldierState.Exploring;
-            clearCommand();
-            this.run();
-        } else{
-            rc.setIndicatorString("Healing");
-
-            // check everything that you can see
-            int enemyCount = 0;
-            int allyCount = 1;
-
-            MapLocation[] enemyPos = new MapLocation[5];
-
-            int closestEnemy = 21;
-
-            for(RobotInfo robot:enemies){
-                if(robot.getType() == RobotType.SOLDIER || robot.getType() == RobotType.WATCHTOWER){
-                    int dist =  robot.getLocation().distanceSquaredTo(rc.getLocation());
-                    if(dist < closestEnemy){
-                        closestEnemy = dist;
-                        enemyPos[0] = robot.getLocation();
-                    }
-                    enemyCount++;
-                }
-            }
-            for(RobotInfo robot: allies){
-                if(robot.getType() == RobotType.SOLDIER){
-                    allyCount++;
-                }
-            }
-
-            if(enemyCount > 0){
-                if(commandTimer <= 0){
-                    Communications.sendAttackCommand(rc, enemyPos[0], RobotType.SOLDIER);
-                    commandTimer = Communications.getCommandCooldown(rc, RobotType.SOLDIER, true);
-                }
 
 
-                currentTarget = enemyPos[0];
-            }
 
-            // initial attack
-            MapLocation ml = attack(1);
-
-            // looking for best movement
-            Direction dir = Direction.CENTER;
-
-            if(enemyCount > 0 || !rc.isActionReady() && pathfinder.targetWithinRadius(target, 20)){ // in combat
-                if(!rc.isActionReady() ){ // action not ready
-                    dir = pathfinder.pathAwayFrom(enemyPos, 0); // kite
-                } else if(enemyCount >= allyCount){
-                    dir = lookForBetterSquare();
-                }  else {
-                    if(enemyPos[0]!= null){
-                        dir = pathfinder.pathToTargetGreedy(target, 0); // path to target close
-                    }
-                }
-            } // travelling
-            else if(target != null && !pathfinder.targetWithinRadius(target, 8)){
-                move(pathfinder.pathToTarget(target, false)); // path to target from far away
-            } else{
-                //move(Direction.allDirections()[(int) (10000 * Math.random()) % 9]);
-
-                // possibly move randomly to create space?
-            }
-            if(rc.isMovementReady()){
-                if(rc.canMove(dir) && rc.senseRubble(rc.getLocation().add(dir)) + 10
-                        <= 1.5 * (rc.senseRubble(rc.getLocation())+ 10) ){
-                    move(dir); // path to target from far away
-                }
-            }
-            if(rc.isActionReady()){
-                ml = attack(1);
-                if(ml != null){
-                    Communications.sendAttackCommand(rc, ml, RobotType.SOLDIER);
-                }
-            }
-
-
-            currentState = SoldierState.Healing;
-        }
     }
 
     static MapLocation attack(int attackType) throws GameActionException {

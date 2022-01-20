@@ -1,4 +1,4 @@
-package dontatme;
+package dontatme_no_healing;
 
 import battlecode.common.*;
 
@@ -9,28 +9,25 @@ public class Communications {
     // Indices
     public static final int TURN_INFO = 0;
 
-    private static final int FRIENDLY_ARCHON_OFFSET_EVEN = 1;
-    private static final int FRIENDLY_ARCHON_OFFSET_ODD = 5;
-
-    private static final int ENEMY_ARCHON_OFFSET = 9;
-    private static final int LEAD_OFFSET = 13;
-    public static final int ATTACK_EVEN_OFFSET = 17;
-    public static final int ATTACK_ODD_OFFSET = 27;
-    public static final int DEFENSE_EVEN_OFFSET = 37;
-    public static final int DEFENSE_ODD_OFFSET = 42;
-    public static final int BUILD_EVEN_OFFSET = 47;
-    public static final int BUILD_ODD_OFFSET = 49;
-    private static final int LEAD_EVEN_OFFSET = 51;
-    private static final int LEAD_ODD_OFFSET = 54;
-    private static final int MOVE_TO_EVEN_OFFSET = 57;
-    private static final int MOVE_TO_ODD_OFFSET = 58;
+    private static final int FRIENDLY_ARCHON_OFFSET = 1;
+    private static final int ENEMY_ARCHON_OFFSET = 5;
+    private static final int LEAD_OFFSET = 9;
+    public static final int ATTACK_EVEN_OFFSET = 13;
+    public static final int ATTACK_ODD_OFFSET = 23;
+    public static final int DEFENSE_EVEN_OFFSET = 33;
+    public static final int DEFENSE_ODD_OFFSET = 38;
+    public static final int BUILD_EVEN_OFFSET = 43;
+    public static final int BUILD_ODD_OFFSET = 45;
+    private static final int LEAD_EVEN_OFFSET = 47;
+    private static final int LEAD_ODD_OFFSET = 50;
+    private static final int ANOMOLY = 53;
     private static final int HAS_WIPED = 60;
     private static final int NEXT_INDICES = 61;
     private static final int UNIT_COUNT_OFFSET = 62;
 
     private static final int ATTACK_SIZE = ATTACK_ODD_OFFSET - ATTACK_EVEN_OFFSET;
     private static final int DEFENSE_SIZE = DEFENSE_ODD_OFFSET - DEFENSE_EVEN_OFFSET;
-    private static final int BUILD_SIZE = BUILD_ODD_OFFSET - BUILD_EVEN_OFFSET;
+
     private static final int NULL_LOCATION = 61;
 
     // cleans out your previous commands and adds your robot type to the ongoing
@@ -39,7 +36,6 @@ public class Communications {
 
         switch (rc.getType()) {
             case ARCHON:
-                setTeamArchonLocation(rc, rc.getID(), rc.getLocation());
                 if (hasWiped(rc)) {
                     break;
                 }
@@ -50,8 +46,6 @@ public class Communications {
                 wipeNextIndex(rc);
                 wipeArchonOrder(rc);
                 wipeLeadLocation(rc);
-                wipeMoveToCommands(rc);
-                wipeArchonLocation(rc);
                 setWiped(rc);
                 break;
             case MINER:
@@ -157,9 +151,7 @@ public class Communications {
      */
     public static MapLocation getTeamArchonLocation(RobotController rc, int archonID) throws GameActionException {
         int archonIndex = getTeamArchonIndexFromID(rc, archonID);
-        int offset = (rc.getRoundNum() % 2 == 0) ? FRIENDLY_ARCHON_OFFSET_ODD : FRIENDLY_ARCHON_OFFSET_EVEN;
-
-        int arrayValue = rc.readSharedArray(archonIndex + offset);
+        int arrayValue = rc.readSharedArray(archonIndex + FRIENDLY_ARCHON_OFFSET);
         MapLocation archonLocation = new MapLocation(decode(arrayValue, 0), decode(arrayValue, 1));
         return archonLocation;
     }
@@ -174,9 +166,7 @@ public class Communications {
         if (!(index >= 0 && index < GameConstants.MAX_STARTING_ARCHONS)) {
             throw new IllegalArgumentException();
         }
-        int offset = (rc.getRoundNum() % 2 == 0) ? FRIENDLY_ARCHON_OFFSET_ODD : FRIENDLY_ARCHON_OFFSET_EVEN;
-
-        int arrayValue = rc.readSharedArray(index + offset);
+        int arrayValue = rc.readSharedArray(index + FRIENDLY_ARCHON_OFFSET);
         MapLocation archonLocation = new MapLocation(decode(arrayValue, 0), decode(arrayValue, 1));
         return archonLocation;
     }
@@ -184,15 +174,15 @@ public class Communications {
     public static void setTeamArchonLocation(RobotController rc, int archonID, MapLocation archonLocation)
             throws GameActionException {
         int writeValue = encode(archonLocation.x, archonLocation.y, archonID);
-        int offset = (rc.getRoundNum() % 2 == 0) ? FRIENDLY_ARCHON_OFFSET_EVEN : FRIENDLY_ARCHON_OFFSET_ODD;
+
 
         for (int i = 0; i < GameConstants.MAX_STARTING_ARCHONS; i++) {
-            int arrayValue = rc.readSharedArray(i + offset);
+            int arrayValue = rc.readSharedArray(i + FRIENDLY_ARCHON_OFFSET);
             int arrID = decode(arrayValue, 2);
             int arrX = decode(arrayValue, 0);
 
             if (arrID == archonID || arrX >= 60) {
-                rc.writeSharedArray(i + offset, writeValue);
+                rc.writeSharedArray(i + FRIENDLY_ARCHON_OFFSET, writeValue);
                 return;
 
             }
@@ -204,17 +194,14 @@ public class Communications {
         if (!(index >= 0 && index < GameConstants.MAX_STARTING_ARCHONS)) {
             throw new IllegalArgumentException();
         }
-        int offset = (rc.getRoundNum() % 2 == 0) ? FRIENDLY_ARCHON_OFFSET_EVEN : FRIENDLY_ARCHON_OFFSET_ODD;
         int writeValue = encode(archonLocation.x, archonLocation.y, archonID);
-        rc.writeSharedArray(index + offset, writeValue);
+        rc.writeSharedArray(index + FRIENDLY_ARCHON_OFFSET, writeValue);
 
     }
 
     public static int getTeamArchonIndexFromID(RobotController rc, int archonID) throws GameActionException {
-        int offset = (rc.getRoundNum() % 2 == 0) ? FRIENDLY_ARCHON_OFFSET_ODD : FRIENDLY_ARCHON_OFFSET_EVEN;
-
         for (int i = 0; i < GameConstants.MAX_STARTING_ARCHONS; i++) {
-            int arrayValue = rc.readSharedArray(i + offset);
+            int arrayValue = rc.readSharedArray(i + FRIENDLY_ARCHON_OFFSET);
             int arrID = decode(arrayValue, 2);
             if (arrID == archonID) {
                 return i;
@@ -222,15 +209,6 @@ public class Communications {
         }
         return -1;
     }
-
-
-    public static void wipeArchonLocation(RobotController rc) throws GameActionException {
-        int offset = (rc.getRoundNum() % 2 == 0) ? FRIENDLY_ARCHON_OFFSET_EVEN : FRIENDLY_ARCHON_OFFSET_ODD;
-        for (int i = 0; i < GameConstants.MAX_STARTING_ARCHONS; i++) {
-            rc.writeSharedArray(i + offset, encode(NULL_LOCATION, NULL_LOCATION));
-        }
-    }
-
 
     /**
      * @return MapLocation of Enemy Archon
@@ -305,17 +283,10 @@ public class Communications {
         public MapLocation location;
         public RobotType type;
         public boolean isAttack;
-        public int num;
 
         public Command(MapLocation location, RobotType type, boolean isAttack) {
             this.location = location;
             this.type = type;
-            this.isAttack = isAttack;
-        }
-
-        public Command(MapLocation location, int num, boolean isAttack) {
-            this.location = location;
-            this.num = num;
             this.isAttack = isAttack;
         }
 
@@ -359,7 +330,7 @@ public class Communications {
 
             return true;
         }
-        //System.out.println("UGH OH TOO MANY ATTACK COMMANDS!: " + nextIndex);
+        System.out.println("UGH OH TOO MANY ATTACK COMMANDS!: " + nextIndex);
         return false;
     }
 
@@ -437,7 +408,7 @@ public class Communications {
 
     /**
      * Retrieve all defend commands (use turn to determine turn)
-     *
+     * 
      * @throws GameActionException
      */
     public static Command[] getDefenseCommand(RobotController rc) throws GameActionException {
@@ -448,43 +419,6 @@ public class Communications {
         }
 
         return commands;
-    }
-
-    /**
-     * Send a command for archons to move to(map location, robot type, robot id)
-     * Commands are only overwriteable after one full turn
-     * (each command is guaranteed one full turn).
-     *
-     * @throws GameActionException
-     */
-    public static boolean sendMoveToCommand(RobotController rc, MapLocation location, int numEnemies) throws GameActionException {
-        int index = (rc.getRoundNum() % 2 == 0) ? MOVE_TO_EVEN_OFFSET : MOVE_TO_ODD_OFFSET;
-        int newCommand = encode(location.x, location.y, Math.max(numEnemies, 15));
-
-        int readVal = rc.readSharedArray(index);
-        if ((decode(readVal, 0) == NULL_LOCATION || decode(readVal, 2) < numEnemies)) {
-            rc.writeSharedArray(index, newCommand);
-
-            return true;
-        }
-        return false;
-    }
-
-
-    /**
-     * Retrieve all moveTo commands (use turn to determine turn)
-     *
-     * @throws GameActionException
-     */
-    public static Command getMoveToCommand(RobotController rc) throws GameActionException {
-        int index = (rc.getRoundNum() % 2 == 0) ? MOVE_TO_ODD_OFFSET : MOVE_TO_EVEN_OFFSET;
-        int readVal = rc.readSharedArray(index);
-        Command command = new Command(
-                new MapLocation(decode(readVal, 0), decode(readVal, 1)),
-                decode(readVal, 2), true
-        );
-
-        return command;
     }
 
     /**
@@ -793,15 +727,6 @@ public class Communications {
         for (int i = 0; i < 2; i++) {
             rc.writeSharedArray(i + offset, NULL_LOCATION);
         }
-    }
-
-    /**
-     * Wipes unit counts to prepare for current round of incrementing unit counts.
-     */
-    public static void wipeMoveToCommands(RobotController rc) throws GameActionException {
-        int index = (rc.getRoundNum() % 2 == 0) ? MOVE_TO_EVEN_OFFSET : MOVE_TO_ODD_OFFSET;
-        rc.writeSharedArray(index, NULL_LOCATION);
-
     }
 
     /**

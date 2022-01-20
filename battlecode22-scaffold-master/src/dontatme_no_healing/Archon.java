@@ -1,4 +1,4 @@
-package dontatme;
+package dontatme_no_healing;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -24,13 +24,11 @@ public strictfp class Archon {
     static Pathfinder pathfinder;
 
     static boolean transformed = false;
-    static int curHealingID = -1;
 
     static Communications.Command commands[] = new Communications.Command[2];
     static int curArchonOrder = -1;
 
     static double MAP_SCALER = -1;
-    static int movesUntilTransform = 1;
 
     /**
      * Run a single turn for an Archon.
@@ -124,6 +122,26 @@ public strictfp class Archon {
         }
 
 
+        /*
+        if(enemyCount >= 2 * soldierCount && enemyCount > 2){
+            if(!transformed && rc.canTransform()){
+                rc.transform();
+                transformed = true;
+            } else{
+                Direction dir = pathfinder.pathAwayFrom(enemyPos));
+                if(dir != null && rc.canMove(dir)){
+                    rc.move(dir);
+                }
+            }
+        } else {
+            if(transformed && rc.canTransform()){
+                rc.transform();
+                transformed = false;
+            }
+        }
+        */
+
+
         // If there is lead left, save the first open lead location in the shared array
         MapLocation leadLoc = Communications.getArchonVisionLead(rc, id);
         if (leadLoc.y >= 60) {
@@ -206,15 +224,7 @@ public strictfp class Archon {
 
         }
 
-        if(rc.isActionReady()){
-            MapLocation toHeal = healUnitsAround(rc, allies);
-            if(toHeal != null){
-                rc.repair(toHeal);
-                Communications.incrementArchonTurn(rc);
-            }
-        }
     }
-
 
     static void rushArchon(RobotController rc) throws GameActionException {
 
@@ -252,41 +262,6 @@ public strictfp class Archon {
                 }
             }
         }
-    }
-
-    static MapLocation healUnitsAround(RobotController rc, RobotInfo[]allies){
-        int lowHealth = 51;
-        boolean foundSoldier = false;
-        int id = -1;
-        MapLocation ans = null;
-        for(RobotInfo robot:allies){
-            if(rc.getLocation().distanceSquaredTo(robot.getLocation()) <= 20){
-                if(robot.getType() == RobotType.SOLDIER && robot.getHealth() < 50){
-                    if(robot.getID() == curHealingID ){
-                        return robot.getLocation();
-                    }
-                    else if(robot.getHealth() < lowHealth  || ! foundSoldier){
-                        lowHealth = robot.getHealth();
-                        id = robot.getID();
-                        foundSoldier = true;
-                        ans = robot.getLocation();
-                    }
-                } else if(robot.getType() == RobotType.MINER && robot.getHealth() < 40 && !foundSoldier){
-                    if(robot.getID() == curHealingID ){
-                        ans = robot.getLocation();
-                    }
-                    else if(robot.getHealth() < lowHealth){
-                        lowHealth = robot.getHealth();
-                        ans = robot.getLocation();
-                    }
-                }
-            }
-
-        }
-
-        curHealingID = id;
-        return ans;
-
     }
 
     static int getRubble(RobotController rc, Direction d) {
