@@ -210,6 +210,7 @@ public strictfp class Archon {
             MapLocation toHeal = healUnitsAround(rc, allies);
             if(toHeal != null){
                 rc.repair(toHeal);
+                Communications.incrementArchonTurn(rc);
             }
         }
     }

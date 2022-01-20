@@ -44,15 +44,10 @@ public strictfp class Soldier {
 
         MapLocation healingLoc = findHealingArchon();
 
-        if(healingLoc == null){
-            rc.setIndicatorString( "no healing");
-        } else{
-            rc.setIndicatorString( healingLoc.toString());
-        }
 
-        if(healingLoc != null || currentState == SoldierState.Healing){
+
+        if(currentState == SoldierState.Healing){
             currentTarget = healingLoc;
-            currentState = SoldierState.Healing;
         } else{
             if(commandTimer <= 0){
                 clearCommand();
@@ -76,19 +71,20 @@ public strictfp class Soldier {
         switch (currentState){
             case Healing:
                 healAt(currentTarget);
-                //rc.setIndicatorString("Healing");
+                rc.setIndicatorString("Healing");
                 break;
             case Rushing:
+
                 offense(currentTarget, 0);
-                //rc.setIndicatorString("Rushing");
+                rc.setIndicatorString("Rushing ");
                 break;
             case PURSUING:
                 offense(currentTarget, 1);
-                //rc.setIndicatorString("Pursuing");
+                rc.setIndicatorString("Pursuing");
                 break;
             case Defending:
                 defense(currentTarget, 6);
-               // rc.setIndicatorString("Defending");
+                rc.setIndicatorString("Defending");
                 break;
             case Exploring:
                 explore();
@@ -96,11 +92,11 @@ public strictfp class Soldier {
                 break;
             case ArchonDefense:
                 defense(currentTarget, 10);
-               // rc.setIndicatorString("ArchonDefense");
+                rc.setIndicatorString("ArchonDefense");
                 break;
             case Anomaly:
                 prepForAnomaly(AnomalyType.ABYSS);
-               // rc.setIndicatorString("Anomaly");
+                rc.setIndicatorString("Anomaly");
                 break;
 
         }
@@ -195,6 +191,7 @@ public strictfp class Soldier {
                         if(rc.getHealth() < 1050 / dist){
                             lowestDist = dist;
                             ans = archonLoc;
+                            currentState = SoldierState.Healing;
                         }
                     }
                 }
@@ -403,84 +400,87 @@ public strictfp class Soldier {
         }
     }
 
-    static void healAt(MapLocation target) throws GameActionException {
+    void healAt(MapLocation target) throws GameActionException {
 
-        // check everything that you can see
-        int enemyCount = 0;
-        int allyCount = 1;
+        if(rc.getHealth() >=45){
+            currentState = SoldierState.Exploring;
+            clearCommand();
+            this.run();
+        } else{
+            rc.setIndicatorString("Healing");
 
-        MapLocation[] enemyPos = new MapLocation[5];
+            // check everything that you can see
+            int enemyCount = 0;
+            int allyCount = 1;
 
-        int closestEnemy = 21;
+            MapLocation[] enemyPos = new MapLocation[5];
 
-        for(RobotInfo robot:enemies){
-            if(robot.getType() == RobotType.SOLDIER || robot.getType() == RobotType.WATCHTOWER){
-                int dist =  robot.getLocation().distanceSquaredTo(rc.getLocation());
-                if(dist < closestEnemy){
-                    closestEnemy = dist;
-                    enemyPos[0] = robot.getLocation();
+            int closestEnemy = 21;
+
+            for(RobotInfo robot:enemies){
+                if(robot.getType() == RobotType.SOLDIER || robot.getType() == RobotType.WATCHTOWER){
+                    int dist =  robot.getLocation().distanceSquaredTo(rc.getLocation());
+                    if(dist < closestEnemy){
+                        closestEnemy = dist;
+                        enemyPos[0] = robot.getLocation();
+                    }
+                    enemyCount++;
                 }
-                enemyCount++;
             }
-        }
-        for(RobotInfo robot: allies){
-            if(robot.getType() == RobotType.SOLDIER){
-                allyCount++;
+            for(RobotInfo robot: allies){
+                if(robot.getType() == RobotType.SOLDIER){
+                    allyCount++;
+                }
             }
-        }
 
-        if(enemyCount > 0){
-            if(commandTimer <= 0){
+            if(enemyCount > 0){
                 if(commandTimer <= 0){
                     Communications.sendAttackCommand(rc, enemyPos[0], RobotType.SOLDIER);
                     commandTimer = Communications.getCommandCooldown(rc, RobotType.SOLDIER, true);
                 }
-                commandTimer = Communications.getCommandCooldown(rc, RobotType.SOLDIER, true);
+
+
+                currentTarget = enemyPos[0];
             }
 
-            currentTarget = enemyPos[0];
-        }
+            // initial attack
+            MapLocation ml = attack(1);
 
-        // initial attack
-        MapLocation ml = attack(1);
+            // looking for best movement
+            Direction dir = Direction.CENTER;
 
-        // looking for best movement
-        Direction dir = Direction.CENTER;
+            if(enemyCount > 0 || !rc.isActionReady() && pathfinder.targetWithinRadius(target, 20)){ // in combat
+                if(!rc.isActionReady() ){ // action not ready
+                    dir = pathfinder.pathAwayFrom(enemyPos, 0); // kite
+                } else if(enemyCount >= allyCount){
+                    dir = lookForBetterSquare();
+                }  else {
+                    if(enemyPos[0]!= null){
+                        dir = pathfinder.pathToTargetGreedy(target, 0); // path to target close
+                    }
+                }
+            } // travelling
+            else if(target != null && !pathfinder.targetWithinRadius(target, 8)){
+                move(pathfinder.pathToTarget(target, false)); // path to target from far away
+            } else{
+                //move(Direction.allDirections()[(int) (10000 * Math.random()) % 9]);
 
-        if(enemyCount > 0 || !rc.isActionReady() && pathfinder.targetWithinRadius(target, 20)){ // in combat
-            if(!rc.isActionReady() ){ // action not ready
-                dir = pathfinder.pathAwayFrom(enemyPos, 0); // kite
-            } else if(enemyCount >= allyCount){
-                dir = lookForBetterSquare();
-            }  else {
-                if(enemyPos[0]!= null){
-                    dir = pathfinder.pathToTargetGreedy(target, 0); // path to target close
+                // possibly move randomly to create space?
+            }
+            if(rc.isMovementReady()){
+                if(rc.canMove(dir) && rc.senseRubble(rc.getLocation().add(dir)) + 10
+                        <= 1.5 * (rc.senseRubble(rc.getLocation())+ 10) ){
+                    move(dir); // path to target from far away
                 }
             }
-        } // travelling
-        else if(target != null && !pathfinder.targetWithinRadius(target, 8)){
-            move(pathfinder.pathToTarget(target, false)); // path to target from far away
-        } else{
-            //move(Direction.allDirections()[(int) (10000 * Math.random()) % 9]);
-
-            // possibly move randomly to create space?
-        }
-        if(rc.isMovementReady()){
-            if(rc.canMove(dir) && rc.senseRubble(rc.getLocation().add(dir)) + 10
-                    <= 1.5 * (rc.senseRubble(rc.getLocation())+ 10) ){
-                move(dir); // path to target from far away
+            if(rc.isActionReady()){
+                ml = attack(1);
+                if(ml != null){
+                    Communications.sendAttackCommand(rc, ml, RobotType.SOLDIER);
+                }
             }
-        }
-        if(rc.isActionReady()){
-            ml = attack(1);
-            if(ml != null){
-                Communications.sendAttackCommand(rc, ml, RobotType.SOLDIER);
-            }
-        }
 
-        if(rc.getHealth() >=45){
-            currentState = SoldierState.Exploring;
-        } else{
+
             currentState = SoldierState.Healing;
         }
     }

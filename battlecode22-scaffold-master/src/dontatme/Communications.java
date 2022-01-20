@@ -359,7 +359,7 @@ public class Communications {
 
             return true;
         }
-        System.out.println("UGH OH TOO MANY ATTACK COMMANDS!: " + nextIndex);
+        //System.out.println("UGH OH TOO MANY ATTACK COMMANDS!: " + nextIndex);
         return false;
     }
 
