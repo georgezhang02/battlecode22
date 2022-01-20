@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="fcd8da0b-c6fd-442f-8ac6-769e91da29e8" name="Changes" comment="" />
+    <list default="true" id="fcd8da0b-c6fd-442f-8ac6-769e91da29e8" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme/Archon.java" beforeDir="false" afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme/Archon.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme/Soldier.java" beforeDir="false" afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme/Soldier.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
