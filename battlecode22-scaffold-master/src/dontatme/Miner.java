@@ -224,7 +224,8 @@ public strictfp class Miner {
 
     static MapLocation goTowardsNearbyLead(RobotController rc, MapLocation me, MapLocation[] leads) throws GameActionException {
         for (MapLocation lead : leads) {
-            if (rc.senseLead(lead) > leadThreshold && !friendlyMinerAt(rc, lead)) {
+            if (rc.senseLead(lead) > leadThreshold && !friendlyMinerAt(rc, lead)
+                && (exploreLoc == null || towards(me, lead, exploreLoc))) {
                 tryMove(rc, me, lead);
                 return lead;
             }
