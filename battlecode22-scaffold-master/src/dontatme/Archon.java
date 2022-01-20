@@ -32,11 +32,17 @@ public strictfp class Archon {
     static double MAP_SCALER = -1;
     static int movesUntilTransform = 1;
 
+    static int initArchonCount = 0;
+
     /**
      * Run a single turn for an Archon.
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
      */
     static void run(RobotController rc) throws GameActionException {
+
+        if(initArchonCount == 0){
+            initArchonCount = rc.getArchonCount();
+        }
 
         if(MAP_SCALER == -1){
             MAP_SCALER = .4 + .6 * ((rc.getMapWidth() + rc.getMapHeight())/ 120.0);
@@ -150,7 +156,7 @@ public strictfp class Archon {
         int soldierCount = units[1];
         if(gameState == 0){
             //rc.setIndicatorString(5 * MAP_SCALER+" "+ (double)soldierCount / rc.getArchonCount());
-            if(commandCooldown[0] < 0 && (double)soldierCount / rc.getArchonCount() >= 5 * MAP_SCALER){
+            if(commandCooldown[0] < 0 && (double)soldierCount / initArchonCount >= 5 * MAP_SCALER){
                 rushArchon(rc);
             }
         } else if (gameState == 1){
@@ -217,6 +223,7 @@ public strictfp class Archon {
             }
         }
     }
+
 
 
     static void rushArchon(RobotController rc) throws GameActionException {
