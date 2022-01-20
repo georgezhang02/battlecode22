@@ -2,6 +2,8 @@ package dontatme;
 
 import battlecode.common.*;
 
+import java.awt.*;
+
 public strictfp class Builder {
     /**
      * Run a single turn for a Builder.
@@ -32,6 +34,37 @@ public strictfp class Builder {
         Direction dir = Helper.directions[lowestIndex];
         rc.move(dir);
         rc.disintegrate();
+
+    }
+
+    static void buildTower(RobotController rc) throws GameActionException {
+        Team myTeam = rc.getTeam();
+
+        //cost of watchtower
+        if (rc.isActionReady() && rc.getTeamLeadAmount(myTeam) >= 150 ) {
+
+        }
+    }
+
+
+
+    static void mutateTower(RobotController rc, int level) throws GameActionException {
+
+    }
+
+    static void mutateTower(RobotController rc) throws GameActionException {
+
+    }
+
+    static void buildLab(RobotController rc) throws GameActionException {
+
+    }
+
+    static void mutateLab(RobotController rc, int level) throws GameActionException {
+
+    }
+
+    static void mutateLab(RobotController rc) throws GameActionException {
 
     }
 
@@ -224,7 +257,7 @@ public strictfp class Builder {
         else
             return nearbyBuildings;
     }
-    
+
     private static int findHighestHealth(RobotController rc, RobotInfo [] units) {
         int highestHealthUnit = 0;
         int highestHealth = 0;
@@ -253,5 +286,26 @@ public strictfp class Builder {
             }
         }
         return lowestHealthUnit;
+    }
+
+    private static Direction findDirLowestRubble(RobotController rc, MapLocation myLoc)
+        throws GameActionException{
+        Direction dir = null;
+        int minRubble = GameConstants.MAX_RUBBLE;
+
+        for (int i = 0; i < Helper.directions.length; i++) {
+            MapLocation tempLoc = myLoc.add(Helper.directions[i]);
+
+            //checks if there is a robot on a square and if it has a lower rubble count
+            //than what is currently stored
+            if (rc.senseRobotAtLocation(tempLoc) == null && rc.senseRubble(tempLoc) < minRubble) {
+                dir = Helper.directions[i];
+                minRubble = rc.senseRubble(tempLoc);
+            }
+        }
+
+        if (dir == null)
+            return null;
+        return dir;
     }
 }
