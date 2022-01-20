@@ -35,6 +35,47 @@ public strictfp class Builder {
 
     }
 
+    static void repairProtoTowers(RobotController rc) throws GameActionException {
+        RobotInfo [] protoTowers = findNearbyProtoTowers(rc);
+        if (protoTowers[0] != null && rc.isActionReady()) {
+
+            //find highest health prototype
+            int highestHealthUnit = findHighestHealth(rc, protoTowers);
+            rc.repair(protoTowers[highestHealthUnit].getLocation());
+        }
+    }
+
+    static void repairProtoLabs(RobotController rc) throws GameActionException {
+        RobotInfo [] protoLabs = findNearbyProtoLabs(rc);
+        if (protoLabs[0] != null && rc.isActionReady()) {
+            int highestHealthUnit = findHighestHealth(rc, protoLabs);
+            rc.repair(protoLabs[highestHealthUnit].getLocation());
+            //find highest health prototype
+
+        }
+    }
+
+
+    static void repairTowers(RobotController rc) throws GameActionException {
+        RobotInfo [] towers = findNearbyTowers(rc);
+        if (towers[0] != null && rc.isActionReady()) {
+
+            //find lowest health tower
+            int lowestHealthTower = findLowestHealth(rc, towers);
+            rc.repair(towers[lowestHealthTower].getLocation());
+        }
+    }
+
+    static void repairLabs(RobotController rc) throws GameActionException {
+        RobotInfo [] labs = findNearbyLabs(rc);
+        if (labs[0] != null && rc.isActionReady()) {
+
+            //find lowest health tower
+            int lowestHealthUnit = findLowestHealth(rc, labs);
+            rc.repair(labs[lowestHealthUnit].getLocation());
+        }
+    }
+
     static RobotInfo [] findNearbyProtoTowers(RobotController rc) {
         RobotInfo [] nearbyProtos = findNearbyProtos(rc);
         if (nearbyProtos[0] == null)
@@ -182,5 +223,35 @@ public strictfp class Builder {
             return null;
         else
             return nearbyBuildings;
+    }
+    
+    private static int findHighestHealth(RobotController rc, RobotInfo [] units) {
+        int highestHealthUnit = 0;
+        int highestHealth = 0;
+        int i = 0;
+
+        while (i < units.length && units[i] != null) {
+            if (units[i].getHealth() > highestHealth) {
+                highestHealth = units[i].getHealth();
+                highestHealthUnit = i;
+            }
+            i++;
+        }
+        return highestHealthUnit;
+    }
+
+    private static int findLowestHealth(RobotController rc, RobotInfo [] units)
+            throws GameActionException {
+        int lowestHealthUnit = 0;
+        int lowestHealth = Integer.MAX_VALUE;
+        int i = 0;
+
+        while (i < units.length && units[i] != null) {
+            if (units[i].getHealth() < lowestHealth) {
+                lowestHealth = units[i].getHealth();
+                lowestHealthUnit = i;
+            }
+        }
+        return lowestHealthUnit;
     }
 }
