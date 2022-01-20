@@ -399,6 +399,36 @@ public class Communications {
         return false;
     }
 
+    public static boolean sendStopDefenseCommand(RobotController rc, MapLocation location) throws GameActionException {
+        int offset = (rc.getRoundNum() % 2 == 0) ? DEFENSE_EVEN_OFFSET : DEFENSE_ODD_OFFSET;
+        int newCommand = encode(location.x, location.y, 15);
+
+        int nextIndex = getNextDefIndex(rc) + offset;
+        int readVal = rc.readSharedArray(nextIndex);
+        if ((decode(readVal, 0) == NULL_LOCATION || rc.getType().equals(RobotType.ARCHON))) {
+            rc.writeSharedArray(nextIndex, newCommand);
+            incrementDefIndex(rc);
+
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Retrieve all defend commands (use turn to determine turn)
+     *
+     * @throws GameActionException
+     */
+    public static Command[] getDefenseCommand(RobotController rc) throws GameActionException {
+        int offset = (rc.getRoundNum() % 2 == 0) ? DEFENSE_ODD_OFFSET : DEFENSE_EVEN_OFFSET;
+        Command[] commands = new Command[DEFENSE_SIZE];
+        for (int i = 0; i < DEFENSE_SIZE; i++) {
+            commands[i] = getCommandFromArray(rc, i + offset);
+        }
+
+        return commands;
+    }
+
     /**
      * Send a command for archons to move to(map location, robot type, robot id)
      * Commands are only overwriteable after one full turn
