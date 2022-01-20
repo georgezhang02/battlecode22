@@ -39,6 +39,7 @@ public class Communications {
 
         switch (rc.getType()) {
             case ARCHON:
+                setTeamArchonLocation(rc, rc.getID(), rc.getLocation());
                 if (hasWiped(rc)) {
                     break;
                 }
