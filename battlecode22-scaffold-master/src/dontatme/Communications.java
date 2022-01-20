@@ -20,14 +20,15 @@ public class Communications {
     public static final int BUILD_ODD_OFFSET = 45;
     private static final int LEAD_EVEN_OFFSET = 47;
     private static final int LEAD_ODD_OFFSET = 50;
-    private static final int ANOMOLY = 53;
+    private static final int MOVE_TO_EVEN_OFFSET = 53;
+    private static final int MOVE_TO_ODD_OFFSET = 54;
     private static final int HAS_WIPED = 60;
     private static final int NEXT_INDICES = 61;
     private static final int UNIT_COUNT_OFFSET = 62;
 
     private static final int ATTACK_SIZE = ATTACK_ODD_OFFSET - ATTACK_EVEN_OFFSET;
     private static final int DEFENSE_SIZE = DEFENSE_ODD_OFFSET - DEFENSE_EVEN_OFFSET;
-
+    private static final int BUILD_SIZE = BUILD_ODD_OFFSET - BUILD_EVEN_OFFSET;
     private static final int NULL_LOCATION = 61;
 
     // cleans out your previous commands and adds your robot type to the ongoing
@@ -283,10 +284,17 @@ public class Communications {
         public MapLocation location;
         public RobotType type;
         public boolean isAttack;
+        public int num;
 
         public Command(MapLocation location, RobotType type, boolean isAttack) {
             this.location = location;
             this.type = type;
+            this.isAttack = isAttack;
+        }
+
+        public Command(MapLocation location, int num, boolean isAttack) {
+            this.location = location;
+            this.num = num;
             this.isAttack = isAttack;
         }
 
@@ -391,34 +399,41 @@ public class Communications {
         return false;
     }
 
-    public static boolean sendStopDefenseCommand(RobotController rc, MapLocation location) throws GameActionException {
-        int offset = (rc.getRoundNum() % 2 == 0) ? DEFENSE_EVEN_OFFSET : DEFENSE_ODD_OFFSET;
-        int newCommand = encode(location.x, location.y, 15);
+    /**
+     * Send a command for archons to move to(map location, robot type, robot id)
+     * Commands are only overwriteable after one full turn
+     * (each command is guaranteed one full turn).
+     *
+     * @throws GameActionException
+     */
+    public static boolean sendMoveToCommand(RobotController rc, MapLocation location, int numEnemies) throws GameActionException {
+        int index = (rc.getRoundNum() % 2 == 0) ? MOVE_TO_EVEN_OFFSET : MOVE_TO_ODD_OFFSET;
+        int newCommand = encode(location.x, location.y, Math.max(numEnemies, 15));
 
-        int nextIndex = getNextDefIndex(rc) + offset;
-        int readVal = rc.readSharedArray(nextIndex);
-        if ((decode(readVal, 0) == NULL_LOCATION || rc.getType().equals(RobotType.ARCHON))) {
-            rc.writeSharedArray(nextIndex, newCommand);
-            incrementDefIndex(rc);
+        int readVal = rc.readSharedArray(index);
+        if ((decode(readVal, 0) == NULL_LOCATION || decode(readVal, 2) < numEnemies)) {
+            rc.writeSharedArray(index, newCommand);
 
             return true;
         }
         return false;
     }
 
+
     /**
-     * Retrieve all defend commands (use turn to determine turn)
-     * 
+     * Retrieve all moveTo commands (use turn to determine turn)
+     *
      * @throws GameActionException
      */
-    public static Command[] getDefenseCommand(RobotController rc) throws GameActionException {
-        int offset = (rc.getRoundNum() % 2 == 0) ? DEFENSE_ODD_OFFSET : DEFENSE_EVEN_OFFSET;
-        Command[] commands = new Command[DEFENSE_SIZE];
-        for (int i = 0; i < DEFENSE_SIZE; i++) {
-            commands[i] = getCommandFromArray(rc, i + offset);
-        }
+    public static Command getMoveToCommand(RobotController rc) throws GameActionException {
+        int index = (rc.getRoundNum() % 2 == 0) ? MOVE_TO_ODD_OFFSET : MOVE_TO_EVEN_OFFSET;
+        int readVal = rc.readSharedArray(index);
+        Command command = new Command(
+                new MapLocation(decode(readVal, 0), decode(readVal, 1)),
+                decode(readVal, 2), true
+        );
 
-        return commands;
+        return command;
     }
 
     /**
@@ -727,6 +742,15 @@ public class Communications {
         for (int i = 0; i < 2; i++) {
             rc.writeSharedArray(i + offset, NULL_LOCATION);
         }
+    }
+
+    /**
+     * Wipes unit counts to prepare for current round of incrementing unit counts.
+     */
+    public static void wipeMoveToCommands(RobotController rc) throws GameActionException {
+        int index = (rc.getRoundNum() % 2 == 0) ? MOVE_TO_EVEN_OFFSET : MOVE_TO_ODD_OFFSET;
+        rc.writeSharedArray(index, NULL_LOCATION);
+
     }
 
     /**
