@@ -15,7 +15,11 @@ public strictfp class Builder {
     static boolean hasBuiltTower = false;
     static Pathfinder pathfinder;
     public static void run(RobotController rc) throws GameActionException {
-        //part 1: see if there are any nearby buildings that are in prototype mode
+
+        //key questions: priority order -> how will builders decide when to move
+        //adding the ability to store lead for builders to use
+        //adding the ability to store gold -> is it hte responsibility of the builder to check lead amounts
+        //adding decision-making on the builder end that's separate from command structure(?)
 
     }
     
@@ -57,10 +61,6 @@ public strictfp class Builder {
         //check if action ready
         if (rc.canMutate(target.getLocation()));
             rc.mutate(target.getLocation());
-    }
-
-    static void mutateBuilding(RobotController rc, int level, RobotType type) throws GameActionException {
-
     }
 
     static void repairProtoTowers(RobotController rc) throws GameActionException {
