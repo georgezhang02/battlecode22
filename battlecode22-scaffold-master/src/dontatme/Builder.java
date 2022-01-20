@@ -37,34 +37,29 @@ public strictfp class Builder {
 
     }
 
-    static void buildTower(RobotController rc) throws GameActionException {
+    static void buildBuilding(RobotController rc, RobotType type) throws GameActionException {
         Team myTeam = rc.getTeam();
 
         //cost of watchtower
-        if (rc.isActionReady() && rc.getTeamLeadAmount(myTeam) >= 150 ) {
-
+        if (rc.isActionReady() && type.equals(RobotType.WATCHTOWER) &&
+                rc.getTeamLeadAmount(myTeam) >= 150 ) {
+            Direction dir = findDirLowestRubble(rc, rc.getLocation());
+            rc.buildRobot(type, dir);
+        }
+        if (rc.isActionReady() && type.equals(RobotType.LABORATORY) &&
+                rc.getTeamLeadAmount(myTeam) >= 180) {
+            Direction dir = findDirLowestRubble(rc, rc.getLocation());
+            rc.buildRobot(type, dir);
         }
     }
 
-
-
-    static void mutateTower(RobotController rc, int level) throws GameActionException {
-
+    static void mutateBuilding(RobotController rc, RobotType type, RobotInfo target) throws GameActionException {
+        //check if action ready
+        if (rc.canMutate(target.getLocation()));
+            rc.mutate(target.getLocation());
     }
 
-    static void mutateTower(RobotController rc) throws GameActionException {
-
-    }
-
-    static void buildLab(RobotController rc) throws GameActionException {
-
-    }
-
-    static void mutateLab(RobotController rc, int level) throws GameActionException {
-
-    }
-
-    static void mutateLab(RobotController rc) throws GameActionException {
+    static void mutateBuilding(RobotController rc, int level, RobotType type) throws GameActionException {
 
     }
 
