@@ -180,7 +180,7 @@ public strictfp class Soldier {
 
     static MapLocation findHealingArchon() throws GameActionException {
         MapLocation ans = null;
-        if(rc.getHealth() <= 17){
+        if(rc.getHealth() <= 10){
             double lowestDist = 120;
             for(int i = 0; i< 4; i++){
                 MapLocation archonLoc = Communications.getTeamArchonLocationByIndex(rc, i);
@@ -188,7 +188,7 @@ public strictfp class Soldier {
                 if(archonLoc.x < 60){
                     double dist = Math.sqrt(rc.getLocation().distanceSquaredTo(archonLoc));
                     if(dist < lowestDist){
-                        if(rc.getHealth() < 1050 / dist){
+                        if(rc.getHealth() < 600 / dist){
                             lowestDist = dist;
                             ans = archonLoc;
                             currentState = SoldierState.Healing;
@@ -455,7 +455,7 @@ public strictfp class Soldier {
                 } else if(enemyCount >= allyCount){
                     dir = lookForBetterSquare();
                 }  else {
-                    if(enemyPos[0]!= null){
+                    if(enemyPos[0]!= null && target != null){
                         dir = pathfinder.pathToTargetGreedy(target, 0); // path to target close
                     }
                 }
