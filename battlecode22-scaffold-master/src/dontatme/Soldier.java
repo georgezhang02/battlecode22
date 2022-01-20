@@ -450,6 +450,10 @@ public strictfp class Soldier {
             Direction dir = Direction.CENTER;
 
             if(enemyCount > 0 || !rc.isActionReady() && pathfinder.targetWithinRadius(target, 20)){ // in combat
+
+                if(allyCount > enemyCount){
+                    Communications.sendMoveToCommand(rc, rc.getLocation(), enemyCount );
+                }
                 if(!rc.isActionReady() ){ // action not ready
                     dir = pathfinder.pathAwayFrom(enemyPos, 0); // kite
                 } else if(enemyCount >= allyCount){

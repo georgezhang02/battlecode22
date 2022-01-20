@@ -818,10 +818,12 @@ public class Communications {
      * @throws GameActionException
      */
     public static boolean setWiped(RobotController rc) throws GameActionException {
-        if (hasWiped(rc)) {
+        int arrValue = rc.readSharedArray(HAS_WIPED);
+        if (decode(arrValue, 0) == rc.getRoundNum()) {
             return false;
         }
-        rc.writeSharedArray(HAS_WIPED, encode(rc.getRoundNum() % 2));
+        rc.writeSharedArray(HAS_WIPED, encode(rc.getRoundNum() % 2,
+                decode(arrValue, 1), decode(arrValue, 2)));
         return true;
     }
 
@@ -836,6 +838,38 @@ public class Communications {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Toggles whether an archon is moving this round.
+     *
+     * @throws GameActionException
+     */
+    public static void setArchonMoving(RobotController rc, boolean moving, int id) throws GameActionException {
+        int arrValue = rc.readSharedArray(HAS_WIPED);
+        int writeVal = (moving) ? 1 : 0;
+        rc.writeSharedArray(HAS_WIPED, encode(
+                decode(arrValue, 0), id,  writeVal));
+    }
+
+    /**
+     * Return if there is an archon moving
+     *
+     * @throws GameActionException
+     */
+    public static int getArchonMovingID(RobotController rc) throws GameActionException {
+        int arrValue = rc.readSharedArray(HAS_WIPED);
+        return decode(arrValue, 1);
+    }
+
+    /**
+     * Return if there is an archon moving
+     *
+     * @throws GameActionException
+     */
+    public static boolean isArchonMoving(RobotController rc) throws GameActionException {
+        int arrValue = rc.readSharedArray(HAS_WIPED);
+        return decode(arrValue, 2) == 1;
     }
 
     /**
