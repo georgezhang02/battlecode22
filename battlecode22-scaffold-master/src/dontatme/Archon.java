@@ -153,7 +153,7 @@ public strictfp class Archon {
             } else {
 
 
-                if(curTarget == null || (enemyCount >= 2 && healingCount >= 2 && !landing)){
+                if(curTarget == null || ((enemyCount >= 2 || healingCount >= 3) && !landing)){
                     landing = true;
                     movesUntilLand = 1;
 

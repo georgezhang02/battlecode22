@@ -277,7 +277,7 @@ public strictfp class Soldier {
 
 
         if(enemyCount > 0 || !rc.isActionReady()){ // in combat
-            if(enemyCount > 1){
+            if(enemyCount < allyCount){
                 Communications.sendMoveToCommand(rc, rc.getLocation(), enemyCount );
             }
             if(!rc.isActionReady() ){ // action not ready
