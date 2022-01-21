@@ -64,6 +64,7 @@ public strictfp class Archon {
 
         // first turn locations wipes
         if(firstTurn){
+            Communications.setArchonMoving(rc, 0, false, 61);
             for(int i = 0; i < 4; i++){
                 Communications.setTeamArchonLocationByIndex(rc, 15, i, new MapLocation(60, 60));
                 Communications.setEnemyArchonLocationByIndex(rc, 15, i, new MapLocation(60, 60));
@@ -88,6 +89,7 @@ public strictfp class Archon {
             moving = true;
             landing = false;
             movesUntilLand = 2000;
+            Communications.setArchonMoving(rc, 0, true, id);
         } // check if archon should be moving
 
         Communications.runStart(rc);
@@ -155,7 +157,7 @@ public strictfp class Archon {
             // you have landed
             if(landing && !flying){
                 moving = false;
-                Communications.setArchonMoving(rc, 0, false, 0);
+                Communications.setArchonMoving(rc, 0, false, 61);
                 moveCooldown = 100;
             }
             //You have to land this turn
@@ -163,7 +165,7 @@ public strictfp class Archon {
                 if(rc.canTransform() && landing && flying){
                     rc.transform();
                     flying = false;
-                    Communications.setArchonMoving(rc, 0, false, 0);
+                    Communications.setArchonMoving(rc, 0, false, 61);
                 }
             } else {
                 // if you see enemies, or need to heal, find a good spot to land and then land
@@ -179,7 +181,7 @@ public strictfp class Archon {
                         if(rc.canTransform() && flying){
                             rc.transform();
                             flying = false;
-                            Communications.setArchonMoving(rc, 0, false, 0);
+                            Communications.setArchonMoving(rc, 0, false, 61);
                         }
                     } else{
                         move(rc, dir);
