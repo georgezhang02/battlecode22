@@ -857,8 +857,9 @@ public class Communications {
         if(Communications.isArchonMoving(rc)){
             for(int i = 0; i< 4; i++){
 
-                if(getTeamArchonLocation(rc, Communications.getArchonMovingID(rc))==null){
-                    setArchonMoving(rc, 0, false, 0);
+                if(Communications.getArchonMovingID(rc) < 60 &&
+                        getTeamArchonLocation(rc, Communications.getArchonMovingID(rc))==null){
+                    setArchonMoving(rc, 0, false, 61);
                     return;
                 }
             }
@@ -875,7 +876,6 @@ public class Communications {
      * @throws GameActionException
      */
     public static void setArchonMoving(RobotController rc, int dist, boolean moving, int id) throws GameActionException {
-        int arrValue = rc.readSharedArray(ARCHON_MOVING);
         int writeVal = (moving) ? 1 : 0;
         rc.writeSharedArray(ARCHON_MOVING, encode(
                 dist, id,  writeVal));
