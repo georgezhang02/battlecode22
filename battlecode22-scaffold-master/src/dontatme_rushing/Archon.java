@@ -284,14 +284,23 @@ public strictfp class Archon {
                 }
             }
 
-            Boolean shouldSpawnSoldiers = closestToCenter();
-
             // Build order and token passing
 
-            if (rc.isActionReady() && shouldSpawnSoldiers) {
-                if (soldierCount / rc.getArchonCount() < 5 ){
+            if( rc.isActionReady() && Communications.getArchonTurn(rc)  == curArchonOrder){
+
+                if (miners < 3) {
+                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
+                        buildTowardsLowRubble(rc, RobotType.MINER);
+                    }
+                }
+                else if (soldierCount / rc.getArchonCount() < 5 ){
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
                         buildTowardsLowRubble(rc, RobotType.SOLDIER);
+
+                    }
+                } else if (minerCount / rc.getArchonCount() < 5 *  MAP_SCALER){
+                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
+                        buildTowardsLowRubble(rc, RobotType.MINER);
 
                     }
                 } else {
@@ -299,17 +308,7 @@ public strictfp class Archon {
                         buildTowardsLowRubble(rc, RobotType.SOLDIER);
                     }
                 }
-            } else if ( rc.isActionReady() && Communications.getArchonTurn(rc)  == curArchonOrder){
-                if (miners < 3) {
-                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
-                        buildTowardsLowRubble(rc, RobotType.MINER);
-                    }
-                } else if (minerCount / rc.getArchonCount() < 5 *  MAP_SCALER){
-                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
-                        buildTowardsLowRubble(rc, RobotType.MINER);
 
-                    }
-                }
             }
 
             // heal units around me
@@ -327,8 +326,7 @@ public strictfp class Archon {
     }
 
     static void readComms(RobotController rc) throws GameActionException {
-        MapLocation soldierLocation = Communications.getMoveToCommand(rc).location;
-        MapLocation dest = intermediateLocation(rc.getLocation(), soldierLocation, 0.1f);
+        MapLocation dest = Communications.getMoveToCommand(rc).location;
         double maxDist = Communications.getArchonMovingDistToTarget(rc);
 
         if(!Communications.isArchonMoving(rc) && dest.x < 60){
@@ -454,23 +452,6 @@ public strictfp class Archon {
 
         if(dir == Direction.CENTER){
             movesUntilLand--;
-        }
-    }
-
-    static MapLocation intermediateLocation(MapLocation m1, MapLocation m2, float m2weight) {
-        int x = (int) (m2.x - ((m2.x - m1.x) * m2weight));
-        int y = (int) (m2.y - ((m2.y - m1.y) * m2weight));
-
-        return new MapLocation(x, y);
-    }
-
-    static boolean closestToCenter(RobotController rc, int id) throws GameActionException {
-        MapLocation center = new MapLocation(GameConstants.MAP_MAX_WIDTH / 2, GameConstants.MAP_MAX_HEIGHT / 2);
-        int maxDistance = 1000;
-        for (int i = 0; i < 4; i++) {
-            MapLocation archonLoc = Communications.getTeamArchonLocationByIndex(rc, i);
-            int distance = center.distanceSquaredTo(archonLoc);
-            if (distance < maxDistance)
         }
     }
 }
