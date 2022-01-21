@@ -44,7 +44,6 @@ public class Communications {
                 if (hasWiped(rc)) {
                     break;
                 }
-                checkTeamArchonDied(rc);
                 wipeAttackCommands(rc);
                 wipeDefCommands(rc);
                 wipeUnitCounts(rc);
@@ -853,32 +852,18 @@ public class Communications {
         return false;
     }
 
-    public static void checkTeamArchonDied(RobotController rc) throws GameActionException {
-        if(Communications.isArchonMoving(rc)){
-            for(int i = 0; i< 4; i++){
 
-                if(getTeamArchonLocation(rc, Communications.getArchonMovingID(rc))==null){
-                    setArchonMoving(rc, 0, false, 0);
-                    return;
-                }
-            }
-
-        }
-
-
-
-    }
 
     /**
      * Toggles whether an archon is moving this round.
      *
      * @throws GameActionException
      */
-    public static void setArchonMoving(RobotController rc, int dist, boolean moving, int id) throws GameActionException {
+    public static void setArchonMoving(RobotController rc, int dist, int moving, int id) throws GameActionException {
         int arrValue = rc.readSharedArray(ARCHON_MOVING);
-        int writeVal = (moving) ? 1 : 0;
         rc.writeSharedArray(ARCHON_MOVING, encode(
-                dist, id,  writeVal));
+                dist, id,  moving));
+
     }
 
     /**
@@ -906,9 +891,9 @@ public class Communications {
      *
      * @throws GameActionException
      */
-    public static boolean isArchonMoving(RobotController rc) throws GameActionException {
+    public static int getNumArchonMoving(RobotController rc) throws GameActionException {
         int arrValue = rc.readSharedArray(ARCHON_MOVING);
-        return decode(arrValue, 2) == 1;
+        return decode(arrValue, 2);
     }
 
     /**

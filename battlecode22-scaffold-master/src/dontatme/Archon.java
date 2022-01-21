@@ -36,7 +36,9 @@ public strictfp class Archon {
     static MapLocation curTarget;
     static int initArchonCount = 0;
     static boolean flying = false;
-    static int moveCooldown = 100;
+    static int moveCooldown = 50;
+
+    static int lastNumTeamArchons = 0;
 
     /**
      * Run a single turn for an Archon.
@@ -64,6 +66,8 @@ public strictfp class Archon {
 
         // first turn locations wipes
         if(firstTurn){
+            lastNumTeamArchons = rc.getArchonCount();
+            Communications.setArchonMoving(rc, 0, 0, 61);
             for(int i = 0; i < 4; i++){
                 Communications.setTeamArchonLocationByIndex(rc, 15, i, new MapLocation(60, 60));
                 Communications.setEnemyArchonLocationByIndex(rc, 15, i, new MapLocation(60, 60));
@@ -81,14 +85,21 @@ public strictfp class Archon {
             firstTurn = false;
         }
 
+        if(rc.getArchonCount() < lastNumTeamArchons){
+            Communications.setArchonMoving(rc, 0, Math.max(0, Communications.getNumArchonMoving(rc)-1), 0);
+        }
+        lastNumTeamArchons = rc.getArchonCount();
+
 
         // on round start
 
-        if(Communications.getArchonMovingID(rc) == id && !moving){
+        if( !moving && curTarget != null){
             moving = true;
             landing = false;
             movesUntilLand = 2000;
+
         } // check if archon should be moving
+
 
         Communications.runStart(rc);
         // wipe stuff
@@ -149,13 +160,14 @@ public strictfp class Archon {
             Communications.incrementArchonTurn(rc);
         }
 
-
+        rc.setIndicatorString(Communications.getNumArchonMoving(rc)+" ");
         // flight code
         if(moving){
             // you have landed
             if(landing && !flying){
                 moving = false;
-                Communications.setArchonMoving(rc, 0, false, 0);
+                Communications.setArchonMoving(rc, 0, Math.max(0, Communications.getNumArchonMoving(rc)-1), 61);
+                curTarget = null;
                 moveCooldown = 100;
             }
             //You have to land this turn
@@ -163,7 +175,9 @@ public strictfp class Archon {
                 if(rc.canTransform() && landing && flying){
                     rc.transform();
                     flying = false;
-                    Communications.setArchonMoving(rc, 0, false, 0);
+                    Communications.setArchonMoving(rc, 0, Math.max(0,
+                            Communications.getNumArchonMoving(rc)-1), 61);
+                    curTarget = null;
                 }
             } else {
                 // if you see enemies, or need to heal, find a good spot to land and then land
@@ -179,7 +193,10 @@ public strictfp class Archon {
                         if(rc.canTransform() && flying){
                             rc.transform();
                             flying = false;
-                            Communications.setArchonMoving(rc, 0, false, 0);
+                            Communications.setArchonMoving(rc, 0, Math.max(0,
+                                    Communications.getNumArchonMoving(rc)-1), 61);
+                            curTarget = null;
+
                         }
                     } else{
                         move(rc, dir);
@@ -329,22 +346,20 @@ public strictfp class Archon {
     static void readComms(RobotController rc) throws GameActionException {
         MapLocation dest = Communications.getMoveToCommand(rc).location;
         double maxDist = Communications.getArchonMovingDistToTarget(rc);
-
-        if(!Communications.isArchonMoving(rc) && dest.x < 60){
+        int curMoving = Communications.getNumArchonMoving(rc);
+        if(curMoving < (rc.getArchonCount() +1)/2 && dest.x < 60){
 
             double cross = (int) Math.sqrt(rc.getMapWidth() *rc.getMapHeight() + rc.getMapWidth() * rc.getMapWidth());
 
-
             double dist = Math.sqrt(rc.getLocation().distanceSquaredTo(dest));
 
-            rc.setIndicatorString(dist+" "+maxDist);
 
-            if(dist > 5 && (maxDist == 0 || dist < maxDist)){
+            if(dist > cross / 4 && (maxDist == 0 || dist < maxDist)){
 
-                Communications.setArchonMoving(rc, (int) dist, false, id);
+                Communications.setArchonMoving(rc, (int)dist, Math.min(rc.getArchonCount(),
+                        curMoving + 1), 0);
                 curTarget = dest;
             }
-
 
         }
     }
