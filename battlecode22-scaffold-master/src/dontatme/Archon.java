@@ -44,6 +44,7 @@ public strictfp class Archon {
      */
     static void run(RobotController rc) throws GameActionException {
 
+        //initialization
         if(initArchonCount == 0){
             initArchonCount = rc.getArchonCount();
         }
@@ -56,28 +57,12 @@ public strictfp class Archon {
             pathfinder = new BFPathing34(rc);
         }
 
-        if(Communications.getArchonMovingID(rc) == id && !moving){
-            moving = true;
-            landing = false;
-            movesUntilLand = 2000;
-        }
-
-        Communications.runStart(rc);
-
-        curArchonOrder = Communications.getArchonOrder(rc);
-
-        commandCooldown[0]--;
-        commandCooldown[1]--;
-        moveCooldown--;
-        Team opponent = rc.getTeam().opponent();
-        enemies = rc.senseNearbyRobots(34, opponent);
-        allies = rc.senseNearbyRobots(34, rc.getTeam());
-
-
-        // Get the archon ID if needed
         if (id == -1) {
             id = rc.getID();
         }
+
+
+        // first turn locations wipes
         if(firstTurn){
             for(int i = 0; i < 4; i++){
                 Communications.setTeamArchonLocationByIndex(rc, 15, i, new MapLocation(60, 60));
@@ -97,19 +82,45 @@ public strictfp class Archon {
         }
 
 
+        // on round start
+
+        if(Communications.getArchonMovingID(rc) == id && !moving){
+            moving = true;
+            landing = false;
+            movesUntilLand = 2000;
+        } // check if archon should be moving
+
+        Communications.runStart(rc);
+        // wipe stuff
+
+        curArchonOrder = Communications.getArchonOrder(rc);
+        // get your token order
+
+        commandCooldown[0]--;
+        commandCooldown[1]--;
+        moveCooldown--;
+        // cooldowns (
+
+
+        Team opponent = rc.getTeam().opponent();
+        enemies = rc.senseNearbyRobots(34, opponent);
+        allies = rc.senseNearbyRobots(34, rc.getTeam());
+        // get number of opponents and enemies
+
+
+
         // Write archon location if needed
         me = rc.getLocation();
         Communications.setTeamArchonLocation(rc, id, me);
         Communications.setArchonVisionNoLead(rc, id);
 
 
-
-
-
         int enemyCount = 0;
         int allyCount = 0;
         int healingCount = 0;
 
+
+        // get all enemy and ally positions
         MapLocation[] enemyPos = new MapLocation[5];
 
         for(RobotInfo robot:enemies){
@@ -132,18 +143,22 @@ public strictfp class Archon {
             }
         }
 
+
+        // If you are currently flying, skip your turn
         if(flying && Communications.getArchonTurn(rc)  == curArchonOrder){
             Communications.incrementArchonTurn(rc);
         }
 
 
-        //rc.setIndicatorString(moving+" "+landing+" "+flying+""+movesUntilLand+" ");
+        // flight code
         if(moving){
+            // you have landed
             if(landing && !flying){
                 moving = false;
                 Communications.setArchonMoving(rc, 0, false, 0);
                 moveCooldown = 100;
             }
+            //You have to land this turn
             else if(movesUntilLand<=0){
                 if(rc.canTransform() && landing && flying){
                     rc.transform();
@@ -151,13 +166,14 @@ public strictfp class Archon {
                     Communications.setArchonMoving(rc, 0, false, 0);
                 }
             } else {
-
-
+                // if you see enemies, or need to heal, find a good spot to land and then land
                 if(curTarget == null || ((enemyCount >= 2 || healingCount >= 3) && !landing)){
                     landing = true;
                     movesUntilLand = 1;
 
-                }  else if(landing){
+                }
+                // find a good square to land on. If you are on the best square around you, land
+                else if(landing){
                     Direction dir = lookForBetterSquare(rc);
                     if(dir == Direction.CENTER){
                         if(rc.canTransform() && flying){
@@ -169,7 +185,10 @@ public strictfp class Archon {
                         move(rc, dir);
                     }
 
-                } else if(!pathfinder.targetWithinRadius(curTarget, 34)){
+                }
+                //path from far away with bf
+                else if(!pathfinder.targetWithinRadius(curTarget, 34)){
+                    //if you haven't started mvoing, start moving
                     if(!flying){
                         if(rc.canTransform()){
                             rc.transform();
@@ -178,7 +197,10 @@ public strictfp class Archon {
                     } else{
                         move(rc, pathfinder.pathToTarget(curTarget, false));
                     }
-                } else if(!pathfinder.targetWithinRadius(curTarget, 20)){
+                }
+                //path close with greedy
+                else if(!pathfinder.targetWithinRadius(curTarget, 20)){
+                    //if you haven't started mvoing, start moving
                     if(!flying){
                         if(rc.canTransform()){
                             rc.transform();
@@ -189,6 +211,7 @@ public strictfp class Archon {
                     }
 
                 } else {
+                    //within 20 squares, start looking for a place to land
                     landing = true;
                     movesUntilLand = 2;
                 }
@@ -196,14 +219,15 @@ public strictfp class Archon {
 
         }
 
-
+        // not moving
         if(!moving){
+            // see if we need to move
             if(enemyCount < 2 && healingCount < 2 && moveCooldown <= 0){
 
                 readComms(rc);
             }
 
-            //dicatorString(enemyCount + " "+ commandCooldown[1]);
+            //Send defense command to defend me, not currently used
             if( ((enemyCount >= allyCount && enemyCount >= 1)  || (enemyCount > 2)) && commandCooldown[1] <= 0){
                 Communications.sendDefenseCommand(rc, rc.getLocation(), RobotType.ARCHON);
                 commandCooldown[1] = Communications.getCommandCooldown(rc, RobotType.ARCHON, false);
@@ -235,14 +259,12 @@ public strictfp class Archon {
             int minerCount = units[0];
             int soldierCount = units[1];
             if(gameState == 0){
-                //rc.setIndicatorString(5 * MAP_SCALER+" "+ (double)soldierCount / rc.getArchonCount());
                 if(commandCooldown[0] < 0 && (double)soldierCount / initArchonCount >= 5 * MAP_SCALER){
                     rushArchon(rc);
                 }
             } else if (gameState == 1){
-
+                // get enemy archon location
                 if(Communications.getEnemyArchonLocationByIndex(rc, attackingArchon).x < 60){
-                    //rc.setIndicatorString("destroyed");
                     attackingArchon = -1;
                     gameState = 0;
                     if(soldierCount / rc.getArchonCount() >= 10 * MAP_SCALER){
@@ -263,8 +285,7 @@ public strictfp class Archon {
                 }
             }
 
-            // If there are less than 4 miners per archon
-            // Build a miner in any direction (but take turns)
+            // Build order and token passing
 
             if( rc.isActionReady() && Communications.getArchonTurn(rc)  == curArchonOrder){
 
@@ -291,6 +312,7 @@ public strictfp class Archon {
 
             }
 
+            // heal units around me
             if(rc.isActionReady()){
                 MapLocation toHeal = healUnitsAround(rc, allies);
                 if(toHeal != null){
