@@ -5,6 +5,7 @@ import battlecode.common.*;
 public strictfp class Sage extends Soldier {
 
     public static final int CHARGE_THRESHOLD = 2;
+    public static final int FURY_THRESHOLD = 2; 
     public static final int SAGE_RANGE = 25;
 
     public Sage(RobotController rc) throws GameActionException {
@@ -17,17 +18,23 @@ public strictfp class Sage extends Soldier {
      */
     public void run(RobotController rc) throws GameActionException {
         int enemyCount = 0;
+        int enemyBuildingCount = 0;
 
         Team opponent = rc.getTeam().opponent();
         enemies = rc.senseNearbyRobots(SAGE_RANGE, opponent);
 
         for(RobotInfo robot:enemies){
-            if(robot.getType() == RobotType.SOLDIER || robot.getType() == RobotType.WATCHTOWER){
+            if(robot.getType() == RobotType.SOLDIER){
                 enemyCount++;
+            } else if (robot.getMode() == RobotMode.TURRET) {
+                enemyBuildingCount++;
             }
         }
 
-        if (enemyCount > CHARGE_THRESHOLD && rc.canEnvision(AnomalyType.CHARGE)) {
+        if (enemyBuildingCount >= FURY_THRESHOLD && rc.canEnvision(AnomalyType.FURY)) {
+            rc.envision(AnomalyType.FURY);
+        }
+        else if (enemyCount >= CHARGE_THRESHOLD && rc.canEnvision(AnomalyType.CHARGE)) {
             rc.envision(AnomalyType.CHARGE);
         }
         
