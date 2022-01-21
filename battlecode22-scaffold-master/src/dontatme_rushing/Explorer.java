@@ -1,4 +1,4 @@
-package dontatme_no_healing;
+package dontatme_rushing;
 
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;

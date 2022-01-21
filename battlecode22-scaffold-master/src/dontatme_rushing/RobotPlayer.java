@@ -1,4 +1,4 @@
-package dontatme_kite_old;
+package dontatme_rushing;
 
 import battlecode.common.*;
 

@@ -1,4 +1,4 @@
-package dontatme_kite_old;
+package dontatme_rushing;
 
 import battlecode.common.*;
 
@@ -9,22 +9,30 @@ public class Communications {
     // Indices
     public static final int TURN_INFO = 0;
 
-    private static final int FRIENDLY_ARCHON_OFFSET = 1;
-    private static final int ENEMY_ARCHON_OFFSET = 5;
-    private static final int LEAD_OFFSET = 9;
-    public static final int ATTACK_EVEN_OFFSET = 13;
-    public static final int ATTACK_ODD_OFFSET = 18;
-    public static final int DEFENSE_EVEN_OFFSET = 23;
-    public static final int DEFENSE_ODD_OFFSET = 28;
-    public static final int BUILD_EVEN_OFFSET = 33;
-    public static final int BUILD_ODD_OFFSET = 35;
-    private static final int LEAD_EVEN_OFFSET = 37;
-    private static final int LEAD_ODD_OFFSET = 40;
-    private static final int ANOMOLY = 43;
-    private static final int HAS_WIPED = 60;
-    private static final int NEXT_INDICES = 61;
-    private static final int UNIT_COUNT_OFFSET = 62;
+    private static final int FRIENDLY_ARCHON_OFFSET_EVEN = 1;
+    private static final int FRIENDLY_ARCHON_OFFSET_ODD = 5;
 
+    private static final int ENEMY_ARCHON_OFFSET = 9;
+    private static final int LEAD_OFFSET = 13;
+    public static final int ATTACK_EVEN_OFFSET = 17;
+    public static final int ATTACK_ODD_OFFSET = 27;
+    public static final int DEFENSE_EVEN_OFFSET = 37;
+    public static final int DEFENSE_ODD_OFFSET = 40;
+    public static final int BUILD_EVEN_OFFSET = 43;
+    public static final int BUILD_ODD_OFFSET = 45;
+    private static final int LEAD_EVEN_OFFSET = 47;
+    private static final int LEAD_ODD_OFFSET = 50;
+    private static final int MOVE_TO_EVEN_OFFSET = 53;
+    private static final int MOVE_TO_ODD_OFFSET = 54;
+    private static final int ARCHON_MOVING = 55;
+    private static final int HAS_WIPED = 58;
+    private static final int NEXT_INDICES = 59;
+    private static final int GOLD_UNIT_COUNT_OFFSET = 60;
+    private static final int LEAD_UNIT_COUNT_OFFSET = 62;
+
+    private static final int ATTACK_SIZE = ATTACK_ODD_OFFSET - ATTACK_EVEN_OFFSET;
+    private static final int DEFENSE_SIZE = DEFENSE_ODD_OFFSET - DEFENSE_EVEN_OFFSET;
+    private static final int BUILD_SIZE = BUILD_ODD_OFFSET - BUILD_EVEN_OFFSET;
     private static final int NULL_LOCATION = 61;
 
     // cleans out your previous commands and adds your robot type to the ongoing
@@ -33,9 +41,11 @@ public class Communications {
 
         switch (rc.getType()) {
             case ARCHON:
+                setTeamArchonLocation(rc, rc.getID(), rc.getLocation());
                 if (hasWiped(rc)) {
                     break;
                 }
+                checkTeamArchonDied(rc);
                 wipeAttackCommands(rc);
                 wipeDefCommands(rc);
                 wipeUnitCounts(rc);
@@ -43,6 +53,8 @@ public class Communications {
                 wipeNextIndex(rc);
                 wipeArchonOrder(rc);
                 wipeLeadLocation(rc);
+                wipeMoveToCommands(rc);
+                wipeArchonLocation(rc);
                 setWiped(rc);
                 break;
             case MINER:
@@ -54,6 +66,11 @@ public class Communications {
             case BUILDER:
                 incrementBuilderCount(rc);
                 break;
+            case LABORATORY:
+                incrementLabCount(rc);
+                break;
+            case SAGE:
+                incrementSageCount(rc);
             default:
                 break;
         }
@@ -77,9 +94,10 @@ public class Communications {
         return decode(rc.readSharedArray(TURN_INFO), 1);
     }
 
-    public static void incrementMinerTurn(RobotController rc, int size) throws GameActionException {
+    public static void incrementMinerTurn(RobotController rc, int locInd) throws GameActionException {
         int arrayValue = rc.readSharedArray(TURN_INFO);
-        rc.writeSharedArray(TURN_INFO, encode(decode(arrayValue, 0), (decode(arrayValue, 1) + 1) % size));
+        rc.writeSharedArray(TURN_INFO, encode(decode(arrayValue, 0), decode(arrayValue, 1) + (int) Math.pow(2, locInd)));
+        // System.out.println(decode(arrayValue, 1) + (int) Math.pow(2, locInd));
     }
 
     /**
@@ -147,9 +165,17 @@ public class Communications {
      */
     public static MapLocation getTeamArchonLocation(RobotController rc, int archonID) throws GameActionException {
         int archonIndex = getTeamArchonIndexFromID(rc, archonID);
-        int arrayValue = rc.readSharedArray(archonIndex + FRIENDLY_ARCHON_OFFSET);
-        MapLocation archonLocation = new MapLocation(decode(arrayValue, 0), decode(arrayValue, 1));
-        return archonLocation;
+
+        if(archonIndex != -1){
+            int offset = (rc.getRoundNum() % 2 == 0) ? FRIENDLY_ARCHON_OFFSET_ODD : FRIENDLY_ARCHON_OFFSET_EVEN;
+
+            int arrayValue = rc.readSharedArray(archonIndex + offset);
+            MapLocation archonLocation = new MapLocation(decode(arrayValue, 0), decode(arrayValue, 1));
+            return archonLocation;
+        } else{
+            return null;
+        }
+
     }
 
     /**
@@ -162,7 +188,9 @@ public class Communications {
         if (!(index >= 0 && index < GameConstants.MAX_STARTING_ARCHONS)) {
             throw new IllegalArgumentException();
         }
-        int arrayValue = rc.readSharedArray(index + FRIENDLY_ARCHON_OFFSET);
+        int offset = (rc.getRoundNum() % 2 == 0) ? FRIENDLY_ARCHON_OFFSET_ODD : FRIENDLY_ARCHON_OFFSET_EVEN;
+
+        int arrayValue = rc.readSharedArray(index + offset);
         MapLocation archonLocation = new MapLocation(decode(arrayValue, 0), decode(arrayValue, 1));
         return archonLocation;
     }
@@ -170,15 +198,15 @@ public class Communications {
     public static void setTeamArchonLocation(RobotController rc, int archonID, MapLocation archonLocation)
             throws GameActionException {
         int writeValue = encode(archonLocation.x, archonLocation.y, archonID);
-
+        int offset = (rc.getRoundNum() % 2 == 0) ? FRIENDLY_ARCHON_OFFSET_EVEN : FRIENDLY_ARCHON_OFFSET_ODD;
 
         for (int i = 0; i < GameConstants.MAX_STARTING_ARCHONS; i++) {
-            int arrayValue = rc.readSharedArray(i + FRIENDLY_ARCHON_OFFSET);
+            int arrayValue = rc.readSharedArray(i + offset);
             int arrID = decode(arrayValue, 2);
             int arrX = decode(arrayValue, 0);
 
             if (arrID == archonID || arrX >= 60) {
-                rc.writeSharedArray(i + FRIENDLY_ARCHON_OFFSET, writeValue);
+                rc.writeSharedArray(i + offset, writeValue);
                 return;
 
             }
@@ -190,14 +218,17 @@ public class Communications {
         if (!(index >= 0 && index < GameConstants.MAX_STARTING_ARCHONS)) {
             throw new IllegalArgumentException();
         }
+        int offset = (rc.getRoundNum() % 2 == 0) ? FRIENDLY_ARCHON_OFFSET_EVEN : FRIENDLY_ARCHON_OFFSET_ODD;
         int writeValue = encode(archonLocation.x, archonLocation.y, archonID);
-        rc.writeSharedArray(index + FRIENDLY_ARCHON_OFFSET, writeValue);
+        rc.writeSharedArray(index + offset, writeValue);
 
     }
 
     public static int getTeamArchonIndexFromID(RobotController rc, int archonID) throws GameActionException {
+        int offset = (rc.getRoundNum() % 2 == 0) ? FRIENDLY_ARCHON_OFFSET_ODD : FRIENDLY_ARCHON_OFFSET_EVEN;
+
         for (int i = 0; i < GameConstants.MAX_STARTING_ARCHONS; i++) {
-            int arrayValue = rc.readSharedArray(i + FRIENDLY_ARCHON_OFFSET);
+            int arrayValue = rc.readSharedArray(i + offset);
             int arrID = decode(arrayValue, 2);
             if (arrID == archonID) {
                 return i;
@@ -205,6 +236,20 @@ public class Communications {
         }
         return -1;
     }
+
+    public static int getTeamArchonIDFromIndex(RobotController rc, int index) throws GameActionException {
+        int offset = (rc.getRoundNum() % 2 == 0) ? FRIENDLY_ARCHON_OFFSET_ODD : FRIENDLY_ARCHON_OFFSET_EVEN;
+        return decode(rc.readSharedArray(index + offset), 2);
+    }
+
+
+    public static void wipeArchonLocation(RobotController rc) throws GameActionException {
+        int offset = (rc.getRoundNum() % 2 == 0) ? FRIENDLY_ARCHON_OFFSET_EVEN : FRIENDLY_ARCHON_OFFSET_ODD;
+        for (int i = 0; i < GameConstants.MAX_STARTING_ARCHONS; i++) {
+            rc.writeSharedArray(i + offset, encode(NULL_LOCATION, NULL_LOCATION));
+        }
+    }
+
 
     /**
      * @return MapLocation of Enemy Archon
@@ -278,10 +323,19 @@ public class Communications {
     public static class Command {
         public MapLocation location;
         public RobotType type;
+        public boolean isAttack;
+        public int num;
 
-        public Command(MapLocation location, RobotType type) {
+        public Command(MapLocation location, RobotType type, boolean isAttack) {
             this.location = location;
             this.type = type;
+            this.isAttack = isAttack;
+        }
+
+        public Command(MapLocation location, int num, boolean isAttack) {
+            this.location = location;
+            this.num = num;
+            this.isAttack = isAttack;
         }
 
         @Override
@@ -295,6 +349,10 @@ public class Communications {
         @Override
         public int hashCode() {
             return Objects.hash(location, type);
+        }
+
+        public int priority() {
+            return getCommandPrio(type, isAttack);
         }
     };
 
@@ -320,6 +378,7 @@ public class Communications {
 
             return true;
         }
+        //System.out.println("UGH OH TOO MANY ATTACK COMMANDS!: " + nextIndex);
         return false;
     }
 
@@ -345,8 +404,8 @@ public class Communications {
      */
     public static Command[] getAttackCommands(RobotController rc) throws GameActionException {
         int offset = (rc.getRoundNum() % 2 == 0) ? ATTACK_ODD_OFFSET : ATTACK_EVEN_OFFSET;
-        Command[] commands = new Command[5];
-        for (int i = 0; i < 5; i++) {
+        Command[] commands = new Command[ATTACK_SIZE];
+        for (int i = 0; i < ATTACK_SIZE; i++) {
 
             commands[i] = getCommandFromArray(rc, i + offset);
         }
@@ -397,13 +456,13 @@ public class Communications {
 
     /**
      * Retrieve all defend commands (use turn to determine turn)
-     * 
+     *
      * @throws GameActionException
      */
     public static Command[] getDefenseCommand(RobotController rc) throws GameActionException {
         int offset = (rc.getRoundNum() % 2 == 0) ? DEFENSE_ODD_OFFSET : DEFENSE_EVEN_OFFSET;
-        Command[] commands = new Command[5];
-        for (int i = 0; i < 5; i++) {
+        Command[] commands = new Command[DEFENSE_SIZE];
+        for (int i = 0; i < DEFENSE_SIZE; i++) {
             commands[i] = getCommandFromArray(rc, i + offset);
         }
 
@@ -411,9 +470,46 @@ public class Communications {
     }
 
     /**
+     * Send a command for archons to move to(map location, robot type, robot id)
+     * Commands are only overwriteable after one full turn
+     * (each command is guaranteed one full turn).
+     *
+     * @throws GameActionException
+     */
+    public static boolean sendMoveToCommand(RobotController rc, MapLocation location, int numEnemies) throws GameActionException {
+        int index = (rc.getRoundNum() % 2 == 0) ? MOVE_TO_EVEN_OFFSET : MOVE_TO_ODD_OFFSET;
+        int newCommand = encode(location.x, location.y, Math.max(numEnemies, 15));
+
+        int readVal = rc.readSharedArray(index);
+        if ((decode(readVal, 0) == NULL_LOCATION || decode(readVal, 2) < numEnemies)) {
+            rc.writeSharedArray(index, newCommand);
+
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * Retrieve all moveTo commands (use turn to determine turn)
+     *
+     * @throws GameActionException
+     */
+    public static Command getMoveToCommand(RobotController rc) throws GameActionException {
+        int index = (rc.getRoundNum() % 2 == 0) ? MOVE_TO_ODD_OFFSET : MOVE_TO_EVEN_OFFSET;
+        int readVal = rc.readSharedArray(index);
+        Command command = new Command(
+                new MapLocation(decode(readVal, 0), decode(readVal, 1)),
+                decode(readVal, 2), true
+        );
+
+        return command;
+    }
+
+    /**
      * Returns the priority of the command
      */
-    public static int getCommandPrio(RobotType type, boolean attacking) {
+    private static int getCommandPrio(RobotType type, boolean attacking) {
         if (type == null) {
             return 100;
         }
@@ -534,36 +630,6 @@ public class Communications {
         return false;
     }
 
-    /**
-     * Decodes array value into suedo bytes
-     * 
-     * could be hardcoded to save slight bytecode
-     * 
-     * index 0:
-     * number % 64 / 1
-     * index 1:
-     * number % 64^2 / 64
-     * ...
-     */
-    static int decode(int number, int index) {
-        if (index < 0) {
-            throw new IllegalArgumentException();
-        } else {
-            return (number % (int) Math.pow(64, index + 1) / (int) Math.pow(64, index));
-        }
-    }
-
-    /**
-     * Encodes a variable number of values into a single array value ready to be
-     * written
-     */
-    private static int encode(int... fields) {
-        int result = 0;
-        for (int i = 0; i < fields.length; i++) {
-            result += fields[i] * Math.pow(64, i);
-        }
-        return result;
-    }
 
     /**
      * Gets the command at the given index in the shared array.
@@ -574,12 +640,14 @@ public class Communications {
         MapLocation location = new MapLocation(decode(arrayValue, 0), decode(arrayValue, 1));
 
         int targetTypeOrdinal = decode(arrayValue, 2);
+        
         RobotType targetType = null;
+        
         if (targetTypeOrdinal <= 6) {
             targetType = RobotType.values()[targetTypeOrdinal];
         }
 
-        return new Command(location, targetType);
+        return new Command(location, targetType, index < DEFENSE_EVEN_OFFSET);
     }
 
     /**
@@ -600,7 +668,8 @@ public class Communications {
      * Wipes unit counts to prepare for current round of incrementing unit counts.
      */
     public static void wipeUnitCounts(RobotController rc) throws GameActionException {
-        rc.writeSharedArray(rc.getRoundNum() % 2 + UNIT_COUNT_OFFSET, 0);
+        rc.writeSharedArray(rc.getRoundNum() % 2 + LEAD_UNIT_COUNT_OFFSET, 0);
+        rc.writeSharedArray(rc.getRoundNum() % 2 + GOLD_UNIT_COUNT_OFFSET, 0);
     }
 
     /**
@@ -611,12 +680,16 @@ public class Communications {
      * @throws GameActionException
      */
     public static int[] getUnitCounts(RobotController rc) throws GameActionException {
-        int readVal = rc.readSharedArray(((rc.getRoundNum() + 1) % 2) + UNIT_COUNT_OFFSET);
+        int readValLead = rc.readSharedArray(((rc.getRoundNum() + 1) % 2) + LEAD_UNIT_COUNT_OFFSET);
+        int readValGold = rc.readSharedArray(((rc.getRoundNum() + 1) % 2) + GOLD_UNIT_COUNT_OFFSET);
 
-        int minerCount = decode(readVal, 0);
-        int soldierCount = decode(readVal, 1);
-        int builderCount = decode(readVal, 2);
-        return new int[] { minerCount, soldierCount, builderCount };
+        int minerCount = decode(readValLead, 0);
+        int soldierCount = decode(readValLead, 1);
+        int builderCount = decode(readValLead, 2);
+        int labCount = decode(readValGold, 0);
+        int sageCount = decode(readValGold, 1); 
+
+        return new int[] { minerCount, soldierCount, builderCount, labCount, sageCount };
 
     }
 
@@ -627,7 +700,7 @@ public class Communications {
      * @throws GameActionException
      */
     public static void incrementMinerCount(RobotController rc) throws GameActionException {
-        int readVal = rc.readSharedArray((rc.getRoundNum() % 2) + UNIT_COUNT_OFFSET);
+        int readVal = rc.readSharedArray((rc.getRoundNum() % 2) + LEAD_UNIT_COUNT_OFFSET);
 
         int minerCount = decode(readVal, 0);
         int soldierCount = decode(readVal, 1);
@@ -636,7 +709,7 @@ public class Communications {
         if (minerCount < 63) {
             int writeVal = encode(minerCount + 1, soldierCount, builderCount);
 
-            rc.writeSharedArray(rc.getRoundNum() % 2 + UNIT_COUNT_OFFSET, writeVal);
+            rc.writeSharedArray(rc.getRoundNum() % 2 + LEAD_UNIT_COUNT_OFFSET, writeVal);
         }
 
     }
@@ -648,7 +721,7 @@ public class Communications {
      * @throws GameActionException
      */
     public static void incrementSoldierCount(RobotController rc) throws GameActionException {
-        int readVal = rc.readSharedArray(rc.getRoundNum() % 2 + UNIT_COUNT_OFFSET);
+        int readVal = rc.readSharedArray(rc.getRoundNum() % 2 + LEAD_UNIT_COUNT_OFFSET);
 
         int minerCount = decode(readVal, 0);
         int soldierCount = decode(readVal, 1);
@@ -658,7 +731,7 @@ public class Communications {
 
             int writeVal = encode(minerCount, soldierCount + 1, builderCount);
 
-            rc.writeSharedArray(rc.getRoundNum() % 2 + UNIT_COUNT_OFFSET, writeVal);
+            rc.writeSharedArray(rc.getRoundNum() % 2 + LEAD_UNIT_COUNT_OFFSET, writeVal);
         }
 
     }
@@ -670,7 +743,7 @@ public class Communications {
      * @throws GameActionException
      */
     public static void incrementBuilderCount(RobotController rc) throws GameActionException {
-        int readVal = rc.readSharedArray(rc.getRoundNum() % 2 + UNIT_COUNT_OFFSET);
+        int readVal = rc.readSharedArray(rc.getRoundNum() % 2 + LEAD_UNIT_COUNT_OFFSET);
 
         int minerCount = decode(readVal, 0);
         int soldierCount = decode(readVal, 1);
@@ -679,8 +752,41 @@ public class Communications {
         if (builderCount < 15) {
             int writeVal = encode(minerCount, soldierCount, builderCount + 1);
 
-            rc.writeSharedArray(rc.getRoundNum() % 2 + UNIT_COUNT_OFFSET, writeVal);
+            rc.writeSharedArray(rc.getRoundNum() % 2 + LEAD_UNIT_COUNT_OFFSET, writeVal);
         }
+    }
+
+    /**
+     * Increments the overall laboratory count of team by 1.
+     * 
+     * @param rc
+     * @throws GameActionException
+     */
+    public static void incrementLabCount(RobotController rc) throws GameActionException {
+        int readVal = rc.readSharedArray(rc.getRoundNum() % 2 + GOLD_UNIT_COUNT_OFFSET);
+
+        int labCount = decode(readVal, 0);
+        int sageCount = decode(readVal, 1);
+
+        int writeVal = encode(labCount + 1, sageCount);
+        rc.writeSharedArray(rc.getRoundNum() % 2 + LEAD_UNIT_COUNT_OFFSET, writeVal);
+    }
+
+    /**
+     * Increments the overall sage count of team by 1.
+     * 
+     * @param rc
+     * @throws GameActionException
+     */
+    public static void incrementSageCount(RobotController rc) throws GameActionException {
+        int readVal = rc.readSharedArray(rc.getRoundNum() % 2 + GOLD_UNIT_COUNT_OFFSET);
+
+        int labCount = decode(readVal, 0);
+        int sageCount = decode(readVal, 1);
+
+        int writeVal = encode(labCount, sageCount + 1);
+
+        rc.writeSharedArray(rc.getRoundNum() % 2 + LEAD_UNIT_COUNT_OFFSET, writeVal);
     }
 
     /**
@@ -721,7 +827,7 @@ public class Communications {
      */
     public static void wipeAttackCommands(RobotController rc) throws GameActionException {
         int offset = (rc.getRoundNum() % 2 == 0) ? ATTACK_EVEN_OFFSET : ATTACK_ODD_OFFSET;
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < ATTACK_SIZE; i++) {
             rc.writeSharedArray(i + offset, NULL_LOCATION);
         }
     }
@@ -731,7 +837,7 @@ public class Communications {
      */
     public static void wipeDefCommands(RobotController rc) throws GameActionException {
         int offset = (rc.getRoundNum() % 2 == 0) ? DEFENSE_EVEN_OFFSET : DEFENSE_ODD_OFFSET;
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < DEFENSE_SIZE; i++) {
             rc.writeSharedArray(i + offset, NULL_LOCATION);
         }
     }
@@ -749,6 +855,15 @@ public class Communications {
     /**
      * Wipes unit counts to prepare for current round of incrementing unit counts.
      */
+    public static void wipeMoveToCommands(RobotController rc) throws GameActionException {
+        int index = (rc.getRoundNum() % 2 == 0) ? MOVE_TO_EVEN_OFFSET : MOVE_TO_ODD_OFFSET;
+        rc.writeSharedArray(index, NULL_LOCATION);
+
+    }
+
+    /**
+     * Wipes unit counts to prepare for current round of incrementing unit counts.
+     */
     public static void wipeNextIndex(RobotController rc) throws GameActionException {
         rc.writeSharedArray(NEXT_INDICES, 0);
     }
@@ -760,10 +875,12 @@ public class Communications {
      * @throws GameActionException
      */
     public static boolean setWiped(RobotController rc) throws GameActionException {
-        if (hasWiped(rc)) {
+        int arrValue = rc.readSharedArray(HAS_WIPED);
+        if (decode(arrValue, 0) == rc.getRoundNum()) {
             return false;
         }
-        rc.writeSharedArray(HAS_WIPED, encode(rc.getRoundNum() % 2));
+        rc.writeSharedArray(HAS_WIPED, encode(rc.getRoundNum() % 2,
+                decode(arrValue, 1), decode(arrValue, 2)));
         return true;
     }
 
@@ -778,6 +895,64 @@ public class Communications {
             return true;
         }
         return false;
+    }
+
+    public static void checkTeamArchonDied(RobotController rc) throws GameActionException {
+        if(Communications.isArchonMoving(rc)){
+            for(int i = 0; i< 4; i++){
+
+                if(getTeamArchonLocation(rc, Communications.getArchonMovingID(rc))==null){
+                    setArchonMoving(rc, 0, false, 0);
+                    return;
+                }
+            }
+
+        }
+
+
+
+    }
+
+    /**
+     * Toggles whether an archon is moving this round.
+     *
+     * @throws GameActionException
+     */
+    public static void setArchonMoving(RobotController rc, int dist, boolean moving, int id) throws GameActionException {
+        int arrValue = rc.readSharedArray(ARCHON_MOVING);
+        int writeVal = (moving) ? 1 : 0;
+        rc.writeSharedArray(ARCHON_MOVING, encode(
+                dist, id,  writeVal));
+    }
+
+    /**
+     * Toggles whether an archon is moving this round.
+     *
+     * @throws GameActionException
+     */
+    public static int getArchonMovingDistToTarget(RobotController rc) throws GameActionException {
+        int arrValue = rc.readSharedArray(ARCHON_MOVING);
+        return decode(arrValue, 0);
+    }
+
+    /**
+     * Return if there is an archon moving
+     *
+     * @throws GameActionException
+     */
+    public static int getArchonMovingID(RobotController rc) throws GameActionException {
+        int arrValue = rc.readSharedArray(ARCHON_MOVING);
+        return decode(arrValue, 1);
+    }
+
+    /**
+     * Return if there is an archon moving
+     *
+     * @throws GameActionException
+     */
+    public static boolean isArchonMoving(RobotController rc) throws GameActionException {
+        int arrValue = rc.readSharedArray(ARCHON_MOVING);
+        return decode(arrValue, 2) == 1;
     }
 
     /**
@@ -800,7 +975,7 @@ public class Communications {
         int attackIndex = decode(readVal, 0);
         int defIndex = decode(readVal, 1);
         int buildIndex = decode(readVal, 2);
-        rc.writeSharedArray(NEXT_INDICES, encode((attackIndex + 1) % 5, defIndex, buildIndex));
+        rc.writeSharedArray(NEXT_INDICES, encode((attackIndex + 1) % ATTACK_SIZE, defIndex, buildIndex));
     }
 
     /**
@@ -823,7 +998,7 @@ public class Communications {
         int attackIndex = decode(readVal, 0);
         int defIndex = decode(readVal, 1);
         int buildIndex = decode(readVal, 2);
-        rc.writeSharedArray(NEXT_INDICES, encode(attackIndex, (defIndex + 1) % 5, buildIndex));
+        rc.writeSharedArray(NEXT_INDICES, encode(attackIndex, (defIndex + 1) % DEFENSE_SIZE, buildIndex));
     }
 
     /**
@@ -898,5 +1073,45 @@ public class Communications {
         for (int i = 0; i < 5; i++) {
             rc.writeSharedArray(i + offset, NULL_LOCATION);
         }
+    }
+
+
+
+
+
+
+
+
+
+
+    /**
+     * Decodes array value into suedo bytes
+     * 
+     * could be hardcoded to save slight bytecode
+     * 
+     * index 0:
+     * number % 64 / 1
+     * index 1:
+     * number % 64^2 / 64
+     * ...
+     */
+    static int decode(int number, int index) {
+        if (index < 0) {
+            throw new IllegalArgumentException();
+        } else {
+            return (number % (int) Math.pow(64, index + 1) / (int) Math.pow(64, index));
+        }
+    }
+
+    /**
+     * Encodes a variable number of values into a single array value ready to be
+     * written
+     */
+    private static int encode(int... fields) {
+        int result = 0;
+        for (int i = 0; i < fields.length; i++) {
+            result += fields[i] * Math.pow(64, i);
+        }
+        return result;
     }
 }

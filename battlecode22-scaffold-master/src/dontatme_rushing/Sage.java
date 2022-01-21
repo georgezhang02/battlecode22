@@ -1,14 +1,13 @@
-package dontatme_kite_old;
+package dontatme_rushing;
 
 import battlecode.common.*;
 
-public strictfp class Laboratory {
+public strictfp class Sage {
     /**
-     * Run a single turn for a Laboratory.
+     * Run a single turn for a Sage.
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
      */
     public static void run(RobotController rc) throws GameActionException {
-
+        Communications.runStart(rc);
     }
 }
-    
