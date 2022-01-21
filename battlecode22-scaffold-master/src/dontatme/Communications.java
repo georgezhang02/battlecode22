@@ -17,17 +17,18 @@ public class Communications {
     public static final int ATTACK_EVEN_OFFSET = 17;
     public static final int ATTACK_ODD_OFFSET = 27;
     public static final int DEFENSE_EVEN_OFFSET = 37;
-    public static final int DEFENSE_ODD_OFFSET = 42;
-    public static final int BUILD_EVEN_OFFSET = 47;
-    public static final int BUILD_ODD_OFFSET = 49;
-    private static final int LEAD_EVEN_OFFSET = 51;
-    private static final int LEAD_ODD_OFFSET = 54;
-    private static final int MOVE_TO_EVEN_OFFSET = 57;
-    private static final int MOVE_TO_ODD_OFFSET = 58;
-    private static final int ARCHON_MOVING = 59;
-    private static final int HAS_WIPED = 60;
-    private static final int NEXT_INDICES = 61;
-    private static final int UNIT_COUNT_OFFSET = 62;
+    public static final int DEFENSE_ODD_OFFSET = 40;
+    public static final int BUILD_EVEN_OFFSET = 43;
+    public static final int BUILD_ODD_OFFSET = 45;
+    private static final int LEAD_EVEN_OFFSET = 47;
+    private static final int LEAD_ODD_OFFSET = 50;
+    private static final int MOVE_TO_EVEN_OFFSET = 53;
+    private static final int MOVE_TO_ODD_OFFSET = 54;
+    private static final int ARCHON_MOVING = 55;
+    private static final int HAS_WIPED = 58;
+    private static final int NEXT_INDICES = 59;
+    private static final int GOLD_UNIT_COUNT_OFFSET = 60;
+    private static final int LEAD_UNIT_COUNT_OFFSET = 62;
 
     private static final int ATTACK_SIZE = ATTACK_ODD_OFFSET - ATTACK_EVEN_OFFSET;
     private static final int DEFENSE_SIZE = DEFENSE_ODD_OFFSET - DEFENSE_EVEN_OFFSET;
@@ -91,7 +92,7 @@ public class Communications {
     public static void incrementMinerTurn(RobotController rc, int locInd) throws GameActionException {
         int arrayValue = rc.readSharedArray(TURN_INFO);
         rc.writeSharedArray(TURN_INFO, encode(decode(arrayValue, 0), decode(arrayValue, 1) + (int) Math.pow(2, locInd)));
-        System.out.println(decode(arrayValue, 1) + (int) Math.pow(2, locInd));
+        // System.out.println(decode(arrayValue, 1) + (int) Math.pow(2, locInd));
     }
 
     /**
@@ -662,7 +663,8 @@ public class Communications {
      * Wipes unit counts to prepare for current round of incrementing unit counts.
      */
     public static void wipeUnitCounts(RobotController rc) throws GameActionException {
-        rc.writeSharedArray(rc.getRoundNum() % 2 + UNIT_COUNT_OFFSET, 0);
+        rc.writeSharedArray(rc.getRoundNum() % 2 + LEAD_UNIT_COUNT_OFFSET, 0);
+        rc.writeSharedArray(rc.getRoundNum() % 2 + GOLD_UNIT_COUNT_OFFSET, 0);
     }
 
     /**
@@ -673,12 +675,16 @@ public class Communications {
      * @throws GameActionException
      */
     public static int[] getUnitCounts(RobotController rc) throws GameActionException {
-        int readVal = rc.readSharedArray(((rc.getRoundNum() + 1) % 2) + UNIT_COUNT_OFFSET);
+        int readValLead = rc.readSharedArray(((rc.getRoundNum() + 1) % 2) + LEAD_UNIT_COUNT_OFFSET);
+        int readValGold = rc.readSharedArray(((rc.getRoundNum() + 1) % 2) + GOLD_UNIT_COUNT_OFFSET);
 
-        int minerCount = decode(readVal, 0);
-        int soldierCount = decode(readVal, 1);
-        int builderCount = decode(readVal, 2);
-        return new int[] { minerCount, soldierCount, builderCount };
+        int minerCount = decode(readValLead, 0);
+        int soldierCount = decode(readValLead, 1);
+        int builderCount = decode(readValLead, 2);
+        int labCount = decode(readValGold, 0);
+        int sageCount = decode(readValGold, 1); 
+
+        return new int[] { minerCount, soldierCount, builderCount, labCount, sageCount };
 
     }
 
@@ -689,7 +695,7 @@ public class Communications {
      * @throws GameActionException
      */
     public static void incrementMinerCount(RobotController rc) throws GameActionException {
-        int readVal = rc.readSharedArray((rc.getRoundNum() % 2) + UNIT_COUNT_OFFSET);
+        int readVal = rc.readSharedArray((rc.getRoundNum() % 2) + LEAD_UNIT_COUNT_OFFSET);
 
         int minerCount = decode(readVal, 0);
         int soldierCount = decode(readVal, 1);
@@ -698,7 +704,7 @@ public class Communications {
         if (minerCount < 63) {
             int writeVal = encode(minerCount + 1, soldierCount, builderCount);
 
-            rc.writeSharedArray(rc.getRoundNum() % 2 + UNIT_COUNT_OFFSET, writeVal);
+            rc.writeSharedArray(rc.getRoundNum() % 2 + LEAD_UNIT_COUNT_OFFSET, writeVal);
         }
 
     }
@@ -710,7 +716,7 @@ public class Communications {
      * @throws GameActionException
      */
     public static void incrementSoldierCount(RobotController rc) throws GameActionException {
-        int readVal = rc.readSharedArray(rc.getRoundNum() % 2 + UNIT_COUNT_OFFSET);
+        int readVal = rc.readSharedArray(rc.getRoundNum() % 2 + LEAD_UNIT_COUNT_OFFSET);
 
         int minerCount = decode(readVal, 0);
         int soldierCount = decode(readVal, 1);
@@ -720,7 +726,7 @@ public class Communications {
 
             int writeVal = encode(minerCount, soldierCount + 1, builderCount);
 
-            rc.writeSharedArray(rc.getRoundNum() % 2 + UNIT_COUNT_OFFSET, writeVal);
+            rc.writeSharedArray(rc.getRoundNum() % 2 + LEAD_UNIT_COUNT_OFFSET, writeVal);
         }
 
     }
@@ -732,7 +738,7 @@ public class Communications {
      * @throws GameActionException
      */
     public static void incrementBuilderCount(RobotController rc) throws GameActionException {
-        int readVal = rc.readSharedArray(rc.getRoundNum() % 2 + UNIT_COUNT_OFFSET);
+        int readVal = rc.readSharedArray(rc.getRoundNum() % 2 + LEAD_UNIT_COUNT_OFFSET);
 
         int minerCount = decode(readVal, 0);
         int soldierCount = decode(readVal, 1);
@@ -741,8 +747,41 @@ public class Communications {
         if (builderCount < 15) {
             int writeVal = encode(minerCount, soldierCount, builderCount + 1);
 
-            rc.writeSharedArray(rc.getRoundNum() % 2 + UNIT_COUNT_OFFSET, writeVal);
+            rc.writeSharedArray(rc.getRoundNum() % 2 + LEAD_UNIT_COUNT_OFFSET, writeVal);
         }
+    }
+
+    /**
+     * Increments the overall laboratory count of team by 1.
+     * 
+     * @param rc
+     * @throws GameActionException
+     */
+    public static void incrementLabCount(RobotController rc) throws GameActionException {
+        int readVal = rc.readSharedArray(rc.getRoundNum() % 2 + GOLD_UNIT_COUNT_OFFSET);
+
+        int labCount = decode(readVal, 0);
+        int sageCount = decode(readVal, 1);
+
+        int writeVal = encode(labCount + 1, sageCount);
+        rc.writeSharedArray(rc.getRoundNum() % 2 + LEAD_UNIT_COUNT_OFFSET, writeVal);
+    }
+
+    /**
+     * Increments the overall sage count of team by 1.
+     * 
+     * @param rc
+     * @throws GameActionException
+     */
+    public static void incrementSageCount(RobotController rc) throws GameActionException {
+        int readVal = rc.readSharedArray(rc.getRoundNum() % 2 + GOLD_UNIT_COUNT_OFFSET);
+
+        int labCount = decode(readVal, 0);
+        int sageCount = decode(readVal, 1);
+
+        int writeVal = encode(labCount, sageCount + 1);
+
+        rc.writeSharedArray(rc.getRoundNum() % 2 + LEAD_UNIT_COUNT_OFFSET, writeVal);
     }
 
     /**
