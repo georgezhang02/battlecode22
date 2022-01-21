@@ -66,6 +66,11 @@ public class Communications {
             case BUILDER:
                 incrementBuilderCount(rc);
                 break;
+            case LABORATORY:
+                incrementLabCount(rc);
+                break;
+            case SAGE:
+                incrementSageCount(rc);
             default:
                 break;
         }

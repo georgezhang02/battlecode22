@@ -13,6 +13,7 @@ public strictfp class Laboratory {
 
     static Pathfinder pathfinder;
     public static void run(RobotController rc) throws GameActionException {
+        Communications.runStart(rc);
         moveIfHighRubble(rc);
         transmuteIfPossible(rc);
     }
