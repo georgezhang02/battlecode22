@@ -30,9 +30,9 @@ public class Communications {
     private static final int GOLD_UNIT_COUNT_OFFSET = 60;
     private static final int LEAD_UNIT_COUNT_OFFSET = 62;
 
-    private static final int ATTACK_SIZE = ATTACK_ODD_OFFSET - ATTACK_EVEN_OFFSET;
-    private static final int DEFENSE_SIZE = DEFENSE_ODD_OFFSET - DEFENSE_EVEN_OFFSET;
-    private static final int BUILD_SIZE = BUILD_ODD_OFFSET - BUILD_EVEN_OFFSET;
+    public static final int ATTACK_SIZE = ATTACK_ODD_OFFSET - ATTACK_EVEN_OFFSET;
+    public static final int DEFENSE_SIZE = DEFENSE_ODD_OFFSET - DEFENSE_EVEN_OFFSET;
+    public static final int BUILD_SIZE = BUILD_ODD_OFFSET - BUILD_EVEN_OFFSET;
     private static final int NULL_LOCATION = 61;
 
     // cleans out your previous commands and adds your robot type to the ongoing

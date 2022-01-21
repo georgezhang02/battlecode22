@@ -1,7 +1,6 @@
 package dontatme;
 
 import java.util.Arrays;
-import java.util.Map;
 
 import battlecode.common.*;
 
@@ -69,15 +68,18 @@ public strictfp class Archon {
                 Communications.setEnemyArchonLocationByIndex(rc, 15, i, new MapLocation(60, 60));
 
             }
-            for(int i = 0; i< 10; i++){
+            for(int i = 0; i < Communications.ATTACK_SIZE; i++){
                 rc.writeSharedArray(i + Communications.ATTACK_EVEN_OFFSET, 61);
-                rc.writeSharedArray(i + Communications.DEFENSE_EVEN_OFFSET, 61);
-
             }
 
-            for(int i = 0; i < 4; i++){
+            for(int i = 0; i < Communications.DEFENSE_SIZE; i++){
+                rc.writeSharedArray(i + Communications.DEFENSE_EVEN_OFFSET, 61);
+            }
+
+            for(int i = 0; i < Communications.BUILD_SIZE; i++){
                 rc.writeSharedArray(i + Communications.BUILD_EVEN_OFFSET, 61);
             }
+
             firstTurn = false;
         }
 
