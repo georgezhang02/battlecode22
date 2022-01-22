@@ -154,12 +154,10 @@ public strictfp class Archon {
             }
         }
 
-
         // If you are currently flying, skip your turn
         if(flying && Communications.getArchonTurn(rc)  == curArchonOrder){
             Communications.incrementArchonTurn(rc);
         }
-
 
         // flight code
         if(moving){
@@ -244,7 +242,7 @@ public strictfp class Archon {
 
             if(moveCooldown <= 0){
 
-                readComms(rc);
+                readCommsMove(rc);
             }
 
             //Send defense command to defend me, not currently used
@@ -309,6 +307,8 @@ public strictfp class Archon {
                 }
             }
 
+            Communications.Command[]buildCommands = Communications.getBuildCommands(rc);
+
             // Build order and token passing
 
             if( rc.isActionReady() && Communications.getArchonTurn(rc)  == curArchonOrder){
@@ -333,7 +333,7 @@ public strictfp class Archon {
                     }
                 }
 
-                else if(labCount < 1){
+                else if(labCount < 1 && buildCommands[0] != null){
                     // waiting on getting enough lead
                 }else if (soldierCount / rc.getArchonCount() < 5  * MAP_SCALER) {
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
@@ -380,7 +380,7 @@ public strictfp class Archon {
         }
     }
 
-    static void readComms(RobotController rc) throws GameActionException {
+    static void readCommsMove(RobotController rc) throws GameActionException {
         MapLocation dest = Communications.getMoveToCommand(rc).location;
         double maxDist = Communications.getArchonMovingDistToTarget(rc);
         int curMoving = Communications.getNumArchonMoving(rc);
@@ -401,6 +401,7 @@ public strictfp class Archon {
 
         }
     }
+
 
     static Direction lookForBetterSquare(RobotController rc) throws GameActionException{
         for(Direction dir: Direction.allDirections()){

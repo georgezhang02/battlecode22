@@ -505,6 +505,32 @@ public class Communications {
         return command;
     }
 
+    public static boolean sendBuildCommand(RobotController rc, MapLocation location, RobotType t)
+            throws GameActionException {
+        int offset = (rc.getRoundNum() % 2 == 0) ? BUILD_EVEN_OFFSET : BUILD_ODD_OFFSET;
+        int newCommand = encode(location.x, location.y, t.ordinal());
+
+        int nextIndex = getNextBuildIndex(rc) + offset;
+        int readVal = rc.readSharedArray(nextIndex);
+        if (decode(readVal, 0) >= 60 || rc.getType().equals(RobotType.ARCHON)) {
+            rc.writeSharedArray(nextIndex, newCommand);
+            incrementBuildIndex(rc);
+            return true;
+        }
+        return false;
+    }
+
+
+    public static Command[] getBuildCommands(RobotController rc) throws GameActionException {
+        int offset = (rc.getRoundNum() % 2 == 0) ? BUILD_ODD_OFFSET : BUILD_EVEN_OFFSET;
+        Command[] commands = new Command[BUILD_SIZE];
+        for (int i = 0; i < BUILD_SIZE; i++) {
+            commands[i] = getCommandFromArray(rc, i + offset);
+        }
+
+        return commands;
+    }
+
     /**
      * Returns the priority of the command
      */

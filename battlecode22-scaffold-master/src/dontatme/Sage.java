@@ -248,7 +248,7 @@ public strictfp class Sage {
             if(enemyCount > 0){
                 Communications.sendMoveToCommand(rc, rc.getLocation(), enemyCount );
             }
-            if(!rc.isActionReady() &&  closestEnemy <= 13){ // action not ready
+            if(!rc.isActionReady() &&  closestEnemy <= 20){ // action not ready
                 dir = pathfinder.pathAwayFrom(enemyPos, 0); // kite
             } else if(enemyCount >= allyCount){
                 dir = lookForBetterSquare();

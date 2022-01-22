@@ -14,6 +14,10 @@ public strictfp class Builder {
     static MapLocation curTarget;
     static int moves = 0;
     static int turn = 0;
+
+    static Direction[]buildDir = new Direction[]{Direction.SOUTH, Direction.NORTHEAST, Direction.NORTHWEST,
+            Direction.SOUTHWEST, Direction.SOUTH, Direction.SOUTHEAST, Direction. NORTHEAST, Direction.NORTHEAST,
+            Direction.NORTHWEST, Direction.NORTHWEST, Direction.SOUTHWEST, Direction.SOUTHWEST};
     public static void run(RobotController rc) throws GameActionException {
         turn++;
 
@@ -38,8 +42,10 @@ public strictfp class Builder {
 
         RobotInfo[] robots = rc.senseNearbyRobots();
 
-        if(labCount < builderCount){
-            if(moves < 5 && (curTarget== null || !pathfinder.targetWithinRadius(curTarget, 20))){
+        if(labCount < 1){
+            if(robots.length > 3
+                    && moves < 5
+                    && (curTarget== null || !pathfinder.targetWithinRadius(curTarget, 20))){
                 curTarget = getClosestCorner(rc);
                 move(rc, pathfinder.pathToTarget(curTarget, false));
                 rc.setIndicatorString("moving");
@@ -54,7 +60,11 @@ public strictfp class Builder {
                 }
                 move(rc, pathfinder.pathAwayFrom(nearby));
             } else{
+                if(robots.length <= 3){
+                    Communications.sendBuildCommand(rc, rc.getLocation(), RobotType.LABORATORY);
+                }
                 if(rc.isActionReady() && rc.getTeamLeadAmount(rc.getTeam()) >= 180){
+
                     Direction dir = findDirLowestRubble(rc, rc.getLocation());
                     if(dir != null && rc.canBuildRobot(RobotType.LABORATORY, dir)){
                         rc.buildRobot(RobotType.LABORATORY, dir);
@@ -62,6 +72,8 @@ public strictfp class Builder {
                 }
             }
         } else{
+
+
             MapLocation toRepair = findBuildingToRepair(rc, robots);
             if(toRepair!= null){
                 if(rc.getLocation().distanceSquaredTo(toRepair) > 5){
@@ -169,4 +181,5 @@ public strictfp class Builder {
             return null;
         return dir;
     }
+
 }
