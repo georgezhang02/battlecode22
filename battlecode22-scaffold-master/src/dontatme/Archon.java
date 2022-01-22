@@ -276,6 +276,9 @@ public strictfp class Archon {
             int minerCount = units[0];
             int soldierCount = units[1];
             int builderCount = units[2];
+
+            int labCount = units[3];
+            int sageCount = units[4];
             if(gameState == 0){
                 if(commandCooldown[0] < 0 && (double)soldierCount / initArchonCount >= 5 * MAP_SCALER){
                     rushArchon(rc);
@@ -330,6 +333,8 @@ public strictfp class Archon {
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
                         buildTowardsLowRubble(rc, RobotType.SOLDIER);
                     }
+                } else if(labCount < builderCount){
+                    // waiting on getting enough lead
                 } else if (minerCount / rc.getArchonCount() < 5 *  MAP_SCALER){
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
                         buildTowardsLowRubble(rc, RobotType.MINER);

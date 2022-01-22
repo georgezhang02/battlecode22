@@ -23,6 +23,7 @@ public strictfp class Builder {
     public static void run(RobotController robotController) throws GameActionException {
 
         Communications.runStart(rc);
+
         turn++;
         if(pathfinder == null){
             pathfinder = new BFPathing20(rc);
