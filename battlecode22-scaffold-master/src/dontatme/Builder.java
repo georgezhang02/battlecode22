@@ -5,54 +5,65 @@ import battlecode.common.*;
 import java.awt.*;
 
 public strictfp class Builder {
-    /**
-     * Run a single turn for a Builder.
-     * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
-     */
 
     //checks if the builder has moved towards the center already
-    static boolean movedTowardsCenter = false;
-    static boolean hasBuiltTower = false;
     static Pathfinder pathfinder;
 
-    static RobotController rc;
 
     static MapLocation curTarget;
     static int moves = 0;
     static int turn = 0;
-    public static void run(RobotController robotController) throws GameActionException {
-
-        Communications.runStart(rc);
-
+    public static void run(RobotController rc) throws GameActionException {
         turn++;
+
         if(pathfinder == null){
             pathfinder = new BFPathing20(rc);
         }
 
-        if(rc == null){
-            rc = robotController;
-        }
+
+        Communications.runStart(rc);
+
+        int[] units = Communications.getUnitCounts(rc);
+
+        // deciding to rush
+        int minerCount = units[0];
+        int soldierCount = units[1];
+        int builderCount = units[2];
+
+        int labCount = units[3];
+        int sageCount = units[4];
+
+
 
         RobotInfo[] robots = rc.senseNearbyRobots();
 
-        if(turn < 5  && (curTarget== null || !pathfinder.targetWithinRadius(curTarget, 20))){
-            curTarget = getClosestCorner(rc);
-            move(pathfinder.pathToTarget(curTarget, false));
+        if(labCount < builderCount){
+            if((curTarget== null || !pathfinder.targetWithinRadius(curTarget, 20))){
+                curTarget = getClosestCorner(rc);
+                move(rc, pathfinder.pathToTarget(curTarget, false));
+                rc.setIndicatorString("moving");
 
-        }
-        else if (robots.length > 1  && moves < 10){
-            int index = 0;
-            MapLocation[]nearby = new MapLocation[10];
-            for(int i = 0; i< robots.length && index < 10; i++){
-
-                nearby[index++] = robots[i].getLocation();
             }
-            move(pathfinder.pathAwayFrom(nearby));
+            else if (robots.length > 1  && moves < 30){
+                int index = 0;
+                MapLocation[]nearby = new MapLocation[10];
+                for(int i = 0; i< robots.length && index < 10; i++){
+
+                    nearby[index++] = robots[i].getLocation();
+                }
+                move(rc, pathfinder.pathAwayFrom(nearby));
+            } else{
+                if(rc.isActionReady() && rc.getTeamLeadAmount(rc.getTeam()) >= 180){
+                    Direction dir = findDirLowestRubble(rc, rc.getLocation());
+                    if(dir != null && rc.canBuildRobot(RobotType.LABORATORY, dir)){
+                        rc.buildRobot(RobotType.LABORATORY, dir);
+                    }
+                }
+            }
         } else{
-            if(rc.isActionReady() && rc.getTeamLeadAmount(rc.getTeam()) >= 180){
-                rc.buildRobot(RobotType.LABORATORY, findDirLowestRubble(rc, rc.getLocation()));
-            }
+            if()
         }
+
 
 
 
@@ -94,7 +105,7 @@ public strictfp class Builder {
 
     }
 
-    static void move(Direction dir) throws GameActionException {
+    static void move(RobotController rc, Direction dir) throws GameActionException {
         if(rc.isMovementReady()){
             moves++;
         }

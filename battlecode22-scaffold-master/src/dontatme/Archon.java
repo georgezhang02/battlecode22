@@ -67,7 +67,7 @@ public strictfp class Archon {
         // first turn locations wipes
         if(firstTurn){
             lastNumTeamArchons = rc.getArchonCount();
-            Communications.setArchonMoving(rc, 0, 0, 61);
+            Communications.setArchonMoving(rc, 0, 0, 0);
             for(int i = 0; i < 4; i++){
                 Communications.setTeamArchonLocationByIndex(rc, 15, i, new MapLocation(60, 60));
                 Communications.setEnemyArchonLocationByIndex(rc, 15, i, new MapLocation(60, 60));
@@ -160,13 +160,14 @@ public strictfp class Archon {
             Communications.incrementArchonTurn(rc);
         }
 
-        rc.setIndicatorString(Communications.getNumArchonMoving(rc)+" ");
+
         // flight code
         if(moving){
             // you have landed
             if(landing && !flying){
                 moving = false;
-                Communications.setArchonMoving(rc, 0, Math.max(0, Communications.getNumArchonMoving(rc)-1), 61);
+                rc.setIndicatorString(Communications.getNumArchonMoving(rc)+"");
+                Communications.setArchonMoving(rc, 0, Math.max(0, Communications.getNumArchonMoving(rc)-1), 0);
                 curTarget = null;
                 moveCooldown = 100;
             }
@@ -176,7 +177,7 @@ public strictfp class Archon {
                     rc.transform();
                     flying = false;
                     Communications.setArchonMoving(rc, 0, Math.max(0,
-                            Communications.getNumArchonMoving(rc)-1), 61);
+                            Communications.getNumArchonMoving(rc)-1), 0);
                     curTarget = null;
                 }
             } else {
@@ -194,7 +195,7 @@ public strictfp class Archon {
                             rc.transform();
                             flying = false;
                             Communications.setArchonMoving(rc, 0, Math.max(0,
-                                    Communications.getNumArchonMoving(rc)-1), 61);
+                                    Communications.getNumArchonMoving(rc)-1), 0);
                             curTarget = null;
 
                         }
@@ -308,6 +309,8 @@ public strictfp class Archon {
 
             // Build order and token passing
 
+            rc.setIndicatorString(builderCount+" "+labCount);
+
             if( rc.isActionReady() && Communications.getArchonTurn(rc)  == curArchonOrder){
 
                 if (miners < 5 * MAP_SCALER) {
@@ -315,16 +318,20 @@ public strictfp class Archon {
                         buildTowardsLowRubble(rc, RobotType.MINER);
                     }
                 }
+
                 if (minerCount / rc.getArchonCount() < 1){
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
                         buildTowardsLowRubble(rc, RobotType.MINER);
 
                     }
-                } else if (soldierCount / rc.getArchonCount() < 5  * MAP_SCALER) {
+                } else if (rc.getTeamGoldAmount(rc.getTeam()) >= 50) {
+                    buildTowardsLowRubble(rc, RobotType.MINER);
+
+                }else if (soldierCount / rc.getArchonCount() < 5  * MAP_SCALER) {
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
                         buildTowardsLowRubble(rc, RobotType.SOLDIER);
                     }
-                }  else if(builderCount == 0){
+                }  else if(builderCount < 1){
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 40) {
                         buildTowardsLowRubble(rc, RobotType.BUILDER);
                     }

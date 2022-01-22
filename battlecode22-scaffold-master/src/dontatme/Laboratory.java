@@ -17,6 +17,7 @@ public strictfp class Laboratory {
         if(flying){
 
         } else{
+            rc.setIndicatorString(rc.getTransmutationRate()+" "+rc.canTransmute());
             if(rc.canTransmute()){
                 rc.transmute();
             }
