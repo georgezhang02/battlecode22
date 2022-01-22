@@ -328,7 +328,7 @@ public strictfp class Archon {
                 else if (rc.getTeamGoldAmount(rc.getTeam()) >= 20) {
                     buildTowardsLowRubble(rc, RobotType.SAGE);
 
-                }else if (soldiers < 1  ) {
+                }else if (soldiers < 4 * MAP_SCALER  ) {
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
                         buildTowardsLowRubble(rc, RobotType.SOLDIER);
                     }
@@ -397,7 +397,7 @@ public strictfp class Archon {
             double dist = Math.sqrt(rc.getLocation().distanceSquaredTo(dest));
 
 
-            if(dist > 10 && dist > cross /4 && (maxDist == 0 || dist < maxDist)){
+            if(dist > 10 &&  (maxDist == 0 || dist < maxDist)){
 
                 Communications.setArchonMoving(rc, (int)dist, Math.min(rc.getArchonCount(),
                         curMoving + 1), 0);

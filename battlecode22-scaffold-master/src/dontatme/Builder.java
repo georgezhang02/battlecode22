@@ -43,7 +43,7 @@ public strictfp class Builder {
         RobotInfo[] robots = rc.senseNearbyRobots();
 
         if(labCount < 1){
-            if(robots.length > 3
+            if(robots.length > 1
                     && moves < 5
                     && (curTarget== null || !pathfinder.targetWithinRadius(curTarget, 20))){
                 curTarget = getClosestCorner(rc);
@@ -51,7 +51,7 @@ public strictfp class Builder {
                 rc.setIndicatorString("moving");
 
             }
-            else if (robots.length > 3  && moves < 30){
+            else if (robots.length > 3  && moves < 10){
                 int index = 0;
                 MapLocation[]nearby = new MapLocation[10];
                 for(int i = 0; i< robots.length && index < 10; i++){
@@ -60,18 +60,27 @@ public strictfp class Builder {
                 }
                 move(rc, pathfinder.pathAwayFrom(nearby));
             } else{
-                if(robots.length <= 3){
-                    Communications.sendBuildCommand(rc, rc.getLocation(), RobotType.LABORATORY);
-                }
-                if(rc.isActionReady() && rc.getTeamLeadAmount(rc.getTeam()) >= 180){
+                Direction better = lookForBetterSquare(rc);
 
-                    Direction dir = findDirLowestRubble(rc, rc.getLocation());
-                    if(dir != null && rc.canBuildRobot(RobotType.LABORATORY, dir)){
-                        rc.buildRobot(RobotType.LABORATORY, dir);
+                if(moves < 10 && better != null){
+                    move(rc, better);
+                    moves += 4;
+                } else{
+                    if(robots.length <= 3){
+                        Communications.sendBuildCommand(rc, rc.getLocation(), RobotType.LABORATORY);
+                    }
+                    if(rc.isActionReady() && rc.getTeamLeadAmount(rc.getTeam()) >= 180){
+
+                        Direction dir = findDirLowestRubble(rc, rc.getLocation());
+                        if(dir != null && rc.canBuildRobot(RobotType.LABORATORY, dir)){
+                            rc.buildRobot(RobotType.LABORATORY, dir);
+                        }
                     }
                 }
+
             }
         } else{
+
 
 
             MapLocation toRepair = findBuildingToRepair(rc, robots);
@@ -157,6 +166,16 @@ public strictfp class Builder {
             rc.move(dir);
             pathfinder.explorer.updateVisited();;
         }
+    }
+
+    static Direction lookForBetterSquare(RobotController rc) throws GameActionException{
+        for(Direction dir: Direction.allDirections()){
+            if(rc.canMove(dir) && 1.5 * (rc.senseRubble(rc.getLocation().add(dir) ) + 10)
+                    <= rc.senseRubble(rc.getLocation())+ 10){
+                return dir;
+            }
+        }
+        return Direction.CENTER;
     }
     
 
