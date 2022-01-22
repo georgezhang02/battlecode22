@@ -1,5 +1,6 @@
 package dontatme;
 
+import java.nio.file.OpenOption;
 import java.util.Map;
 
 import battlecode.common.*;
@@ -12,6 +13,7 @@ public strictfp class Miner {
     static MapLocation heading = null;
     static Pathfinder pathfinder = null;
     static MapLocation exploreLoc = null;
+    static MapLocation optimizeLoc = null;
 
     static int runAwayTimer = 0;
     static MapLocation[] currentEnemies = null;
@@ -32,10 +34,16 @@ public strictfp class Miner {
         RobotInfo[] robotInfo = rc.senseNearbyRobots();
 
         MapLocation[] leads = rc.senseNearbyLocationsWithLead(20);
-        int[][] leadAmounts = leadAmounts(rc, me, leads);
-        
-        double selfRate = mineRate(rc, me, 0, 0, leadAmounts);
 
+        int[][] leadAmounts = null;
+        double selfRate = -1;
+        if (optimizeLoc != null && friendlyMinerAt(rc, optimizeLoc)) {
+            optimizeLoc = null;
+        }
+        if (optimizeLoc == null) {
+            leadAmounts = leadAmounts(rc, me, leads);
+            selfRate = mineRate(rc, me, 0, 0, leadAmounts);
+        }
 
         // Initialize pathfinding and archon index
         if (pathfinder == null){
@@ -136,6 +144,7 @@ public strictfp class Miner {
                 Communications.sendAttackCommand(rc, currentEnemies[0], RobotType.MINER);
                 rc.setIndicatorString("Help me");
             }
+            optimizeLoc = null;
         }
 
         // Otherwise, if not on mineable lead, go mining
@@ -167,28 +176,51 @@ public strictfp class Miner {
                     }
                 }
             }
+            optimizeLoc = null;
         }
 
         // If on lead, try to optimize mine rate by moving around if possible
-        else {
-            double maxRate = 0;
-            MapLocation bestLocation = null;
+        else if (optimizeLoc == null) {
+            double localMaxRate = 0;
+            MapLocation localMax = null;
+            double farMaxRate = 0;
+            MapLocation farMax = null;
             for (int dx = -2; dx <= 2; dx++) {
                 for (int dy = -2; dy <= 2; dy++) {
-                    MapLocation possLocation = new MapLocation(me.x + dx, me.y + dy);
-                    if (rc.canSenseLocation(possLocation)) {
-                        double targetMineRate = mineRate(rc, possLocation, dx, dy, leadAmounts);
-                        System.out.println(possLocation + " " + targetMineRate);
-                        if (targetMineRate > 1.75 + selfRate && targetMineRate > maxRate) {
-                            maxRate = targetMineRate;
-                            bestLocation = possLocation;
+                    if (dx != 0 && dy != 0) {
+                        MapLocation possLocation = new MapLocation(me.x + dx, me.y + dy);
+                        if (rc.canSenseLocation(possLocation)) {
+                            double targetMineRate = mineRate(rc, possLocation, dx, dy, leadAmounts);
+                            if (dx >= -1 && dx <= 1 && dy >= -1 && dy <= 1) {
+                                if (targetMineRate > localMaxRate && !friendlyMinerAt(rc, possLocation)) {
+                                    localMaxRate = targetMineRate;
+                                    localMax = possLocation;
+                                }
+                            }                        
+                            else {
+                                if (targetMineRate > farMaxRate && !friendlyMinerAt(rc, possLocation)) {
+                                    farMaxRate = targetMineRate;
+                                    farMax = possLocation;
+                                }
+                            }
                         }
+                    } else {
+                        if (selfRate > localMaxRate) {
+                            localMaxRate = selfRate;
+                            localMax = me;
+                        }    
                     }
                 }
             }
-            if (bestLocation != null) {
-                tryMove(rc, me, bestLocation, true);
+            if (farMaxRate > 3 * localMaxRate) {
+                optimizeLoc = farMax;
+            } else {
+                optimizeLoc = localMax;
             }
+        }
+        else {
+            tryMove(rc, me, optimizeLoc, false);
+            optimizeLoc = null;
         }
     }
 
