@@ -129,14 +129,22 @@ public strictfp class Laboratory {
 
 
 
-
-            if (rc.senseRubble(bestCoord) <= rc.senseRubble(rc.getLocation()) - 10) {
+            int actCDCurr = calculateActionCooldownAtSquare(rc, rc.getLocation());
+            int bestCD = calculateActionCooldownAtSquare(rc, bestCoord);
+            if (bestCD * 3 < actCDCurr) {
                 if (rc.canTransform()&& !rc.getMode().equals(RobotMode.PORTABLE))
                     rc.transform();
                 pathfinder = new BFPathing20(rc);
                 pathfinder.bfPathToTarget(bestCoord);
             }
         }
+    }
+
+    static int calculateActionCooldownAtSquare(RobotController rc, MapLocation loc)
+            throws GameActionException{
+        int rubbleAmount = rc.senseRubble(loc);
+        int transmuteC = 10;
+        return ((1 + rubbleAmount / 10) * transmuteC);
     }
 
     static MapLocation checkIfLowRubble(RobotController rc, MapLocation loc, MapLocation bestLoc) throws GameActionException {
