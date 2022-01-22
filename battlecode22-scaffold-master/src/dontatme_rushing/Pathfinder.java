@@ -1,9 +1,6 @@
-package pathplanner;
+package dontatme_rushing;
 
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotController;
+import battlecode.common.*;
 
 
 public abstract class Pathfinder {
@@ -16,18 +13,19 @@ public abstract class Pathfinder {
 
     public Pathfinder(RobotController rc) throws GameActionException{
         this.rc = rc;
-        this.explorer = new Explorer(rc);
+        this.explorer = new Explorer(rc, rc.getType().equals(RobotType.MINER));
         lastPos = rc.getLocation();
     }
 
 
 
-    boolean targetWithinRadius(MapLocation target, int minDistToTarget){
-        return rc.getLocation().distanceSquaredTo(target) < minDistToTarget * minDistToTarget;
+    boolean targetWithinRadius(MapLocation target, int minDistToTargetSquared){
+        return rc.getLocation().distanceSquaredTo(target) <= minDistToTargetSquared;
     }
 
+    //randomly choose unvisited locations to path to
     Direction pathToExplore() throws GameActionException{
-        if(!exploring || rc.getLocation().equals(explorer.target)){
+        if(!exploring || rc.getLocation().distanceSquaredTo(explorer.target) <= 4){
             int width = rc.getMapWidth();
             int height =rc.getMapHeight();
             explorer.getExploreTarget(10, width, height);
@@ -38,22 +36,48 @@ public abstract class Pathfinder {
 
     }
 
+    // Runs away from given mapLocations, with nearer locations weighted higher
     Direction pathAwayFrom(MapLocation[]mapLocations) throws GameActionException {
         exploring = false;
         MapLocation curPos = rc.getLocation();
         int x = curPos.x;
         int y = curPos.y;
         for(MapLocation ml : mapLocations){
-            double vect = 4.5/Math.sqrt(curPos.distanceSquaredTo(ml));
-            int xdiff = curPos.x - ml.x;
-            int ydiff = curPos.y - ml.y;
+            if(ml != null){
+                double vect = 10/Math.sqrt(curPos.distanceSquaredTo(ml));
+                int xdiff = curPos.x - ml.x;
+                int ydiff = curPos.y - ml.y;
 
-            x += (int)(xdiff * vect);
-            y += (int)(ydiff * vect);
+                x += (int)(xdiff * vect);
+                y += (int)(ydiff * vect);
+            }
+
         }
         MapLocation target = new MapLocation(x, y);
         return pathToTargetGreedy(target);
     }
+
+    Direction pathAwayFrom(MapLocation[]mapLocations, int depth) throws GameActionException {
+        exploring = false;
+        MapLocation curPos = rc.getLocation();
+        int x = curPos.x;
+        int y = curPos.y;
+        for(MapLocation ml : mapLocations){
+            if(ml != null){
+                double vect = 10/Math.sqrt(curPos.distanceSquaredTo(ml));
+                int xdiff = curPos.x - ml.x;
+                int ydiff = curPos.y - ml.y;
+
+                x += (int)(xdiff * vect);
+                y += (int)(ydiff * vect);
+            }
+
+        }
+        MapLocation target = new MapLocation(x, y);
+        return pathToTargetGreedy(target, depth);
+    }
+
+    //Sets last location visited with bf so that you can't go there, then paths to location with chosen alg
     Direction pathToTarget(MapLocation target, boolean useGreedy) throws GameActionException {
         exploring = false;
         if(rc.isMovementReady()){
@@ -63,17 +87,14 @@ public abstract class Pathfinder {
 
             } else{
                 Direction dir = bfPathToTarget(target);
-                if(lastPos!= null){
-                    MapLocation move = rc.getLocation().add(dir);
-                    rc.setIndicatorString(lastPos.x+" "+lastPos.y+" "+move.x+" "+move.y);
 
-                }
-                lastPos = rc.getLocation();
-                if(lastPos != null && rc.getLocation().add(dir).equals(lastPos)) {
+
+                if(lastPos != null && dir != null && rc.getLocation().add(dir).equals(lastPos)) {
 
                     dir = pathToTargetGreedy(target, 0);
                     lastPos = null;
                 }
+                lastPos = rc.getLocation();
 
 
 
@@ -86,12 +107,14 @@ public abstract class Pathfinder {
 
     }
 
+    //Path using recursive depth 1
     Direction pathToTargetGreedy(MapLocation target)
             throws GameActionException {
         return pathToTargetGreedy(target, 1);
 
     }
 
+    // Path to target using given recursive depth
     Direction pathToTargetGreedy(MapLocation target, int depth)
             throws GameActionException {
         exploring = false;
@@ -123,13 +146,14 @@ public abstract class Pathfinder {
 
     }
 
+    // Helper recursive method for greedy
     int getCost( MapLocation target, MapLocation cur, int depth) throws GameActionException{
         if(cur.equals(target)){
             return 0;
         }
         else {
             int curCost = (!rc.onTheMap(cur) || rc.isLocationOccupied(cur)) ? 2000: rc.senseRubble(cur) + 10;
-            if(depth==0){
+            if(depth<=0){
                 return curCost;
             } else {
                 MapLocation ml;
@@ -153,5 +177,6 @@ public abstract class Pathfinder {
         }
     }
 
+    //Uses Bellman-ford pathing towards target
     abstract Direction bfPathToTarget(MapLocation target) throws GameActionException;
 }

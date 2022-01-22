@@ -1,7 +1,6 @@
-package pathplanner;
+package dontatme_rushing;
 
 import battlecode.common.*;
-
 
 public class BFPathing20 extends Pathfinder {
     static Direction dir9;
@@ -354,6 +353,67 @@ public class BFPathing20 extends Pathfinder {
         dist67 = 10000;
         dist68 = 10000;
 
+        cost9 = 0;
+        cost10 = 0;
+        cost11 = 0;
+        cost12 = 0;
+        cost13 = 0;
+        cost14 = 0;
+        cost15 = 0;
+        cost16 = 0;
+        cost17 = 0;
+        cost18 = 0;
+        cost19 = 0;
+        cost20 = 0;
+        cost21 = 0;
+        cost22 = 0;
+        cost23 = 0;
+        cost24 = 0;
+        cost25 = 0;
+        cost26 = 0;
+        cost27 = 0;
+        cost28 = 0;
+        cost29 = 0;
+        cost30 = 0;
+        cost31 = 0;
+        cost32 = 0;
+        cost33 = 0;
+        cost34 = 0;
+        cost35 = 0;
+        cost36 = 0;
+        cost37 = 0;
+        cost38 = 0;
+        cost39 = 0;
+        cost40 = 0;
+        cost41 = 0;
+        cost42 = 0;
+        cost43 = 0;
+        cost44 = 0;
+        cost45 = 0;
+        cost46 = 0;
+        cost47 = 0;
+        cost48 = 0;
+        cost49 = 0;
+        cost50 = 0;
+        cost51 = 0;
+        cost52 = 0;
+        cost53 = 0;
+        cost54 = 0;
+        cost55 = 0;
+        cost56 = 0;
+        cost57 = 0;
+        cost58 = 0;
+        cost59 = 0;
+        cost60 = 0;
+        cost61 = 0;
+        cost62 = 0;
+        cost63 = 0;
+        cost64 = 0;
+        cost65 = 0;
+        cost66 = 0;
+        cost67 = 0;
+        cost68 = 0;
+
         ml1 = ml0.add(Direction.SOUTH);
         ml2 = ml1.add(Direction.EAST);
         ml3 = ml2.add(Direction.NORTH);
@@ -561,10 +621,6 @@ public class BFPathing20 extends Pathfinder {
 
             if(cost15 + dist3 < dist15){
                 dist15 = cost15 + dist3;
-
-
-
-
                 dir15 = dir3;
             }
 
@@ -695,7 +751,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist9 < 10000){
+        if(cost9 != 0){
 
             if(cost9 + dist10 < dist9){
                 dist9 = cost9 + dist10;
@@ -703,7 +759,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist11 < 10000){
+        if(cost11 != 0){
 
             if(cost11 + dist10 < dist11){
                 dist11 = cost11 + dist10;
@@ -711,7 +767,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist12 < 10000){
+        if(cost12 != 0){
 
             if(cost12 + dist11 < dist12){
                 dist12 = cost12 + dist11;
@@ -724,7 +780,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist13 < 10000){
+        if(cost13 != 0){
 
             if(cost13 + dist14 < dist13){
                 dist13 = cost13 + dist14;
@@ -732,7 +788,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist15 < 10000){
+        if(cost15 != 0){
 
             if(cost15 + dist14 < dist15){
                 dist15 = cost15 + dist14;
@@ -740,7 +796,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist16 < 10000){
+        if(cost16 != 0){
 
             if(cost16 + dist17 < dist16){
                 dist16 = cost16 + dist17;
@@ -753,7 +809,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist17 < 10000){
+        if(cost17 != 0){
 
             if(cost17 + dist18 < dist17){
                 dist17 = cost17 + dist18;
@@ -761,7 +817,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist19 < 10000){
+        if(cost19 != 0){
 
             if(cost19 + dist18 < dist19){
                 dist19 = cost19 + dist18;
@@ -769,7 +825,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist20 < 10000){
+        if(cost20 != 0){
 
             if(cost20 + dist21 < dist20){
                 dist20 = cost20 + dist21;
@@ -782,7 +838,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist21 < 10000){
+        if(cost21 != 0){
 
             if(cost21 + dist22 < dist21){
                 dist21 = cost21 + dist22;
@@ -790,7 +846,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist23 < 10000){
+        if(cost23 != 0){
 
             if(cost23 + dist22 < dist23){
                 dist23 = cost23 + dist22;
@@ -798,7 +854,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist24 < 10000){
+        if(cost24 != 0){
 
             if(cost24 + dist23 < dist24){
                 dist24 = cost24 + dist23;
@@ -1160,7 +1216,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist25 < 10000){
+        if(cost25 != 0){
 
             if(cost25 + dist26 < dist25){
                 dist25 = cost25 + dist26;
@@ -1168,7 +1224,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist26 < 10000){
+        if(cost26 != 0){
 
             if(cost26 + dist27 < dist26){
                 dist26 = cost26 + dist27;
@@ -1176,7 +1232,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist28 < 10000){
+        if(cost28 != 0){
 
             if(cost28 + dist27 < dist28){
                 dist28 = cost28 + dist27;
@@ -1184,7 +1240,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist29 < 10000){
+        if(cost29 != 0){
 
             if(cost29 + dist28 < dist29){
                 dist29 = cost29 + dist28;
@@ -1192,7 +1248,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist30 < 10000){
+        if(cost30 != 0){
 
             if(cost30 + dist31 < dist30){
                 dist30 = cost30 + dist31;
@@ -1200,7 +1256,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist31 < 10000){
+        if(cost31 != 0){
 
             if(cost31 + dist32 < dist31){
                 dist31 = cost31 + dist32;
@@ -1208,7 +1264,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist33 < 10000){
+        if(cost33 != 0){
 
             if(cost33 + dist32 < dist33){
                 dist33 = cost33 + dist32;
@@ -1216,7 +1272,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist34 < 10000){
+        if(cost34 != 0){
 
             if(cost34 + dist33 < dist34){
                 dist34 = cost34 + dist33;
@@ -1224,7 +1280,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist35 < 10000){
+        if(cost35 != 0){
 
             if(cost35 + dist36 < dist35){
                 dist35 = cost35 + dist36;
@@ -1232,7 +1288,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist36 < 10000){
+        if(cost36 != 0){
 
             if(cost36 + dist37 < dist36){
                 dist36 = cost36 + dist37;
@@ -1240,7 +1296,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist38 < 10000){
+        if(cost38 != 0){
 
             if(cost38 + dist37 < dist38){
                 dist38 = cost38 + dist37;
@@ -1248,7 +1304,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist39 < 10000){
+        if(cost39 != 0){
 
             if(cost39 + dist38 < dist39){
                 dist39 = cost39 + dist38;
@@ -1256,7 +1312,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist40 < 10000){
+        if(cost40 != 0){
 
             if(cost40 + dist41 < dist40){
                 dist40 = cost40 + dist41;
@@ -1264,7 +1320,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist41 < 10000){
+        if(cost41 != 0){
 
             if(cost41 + dist42 < dist41){
                 dist41 = cost41 + dist42;
@@ -1272,7 +1328,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist43 < 10000){
+        if(cost43 != 0){
 
             if(cost43 + dist42 < dist43){
                 dist43 = cost43 + dist42;
@@ -1280,7 +1336,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist44 < 10000){
+        if(cost44 != 0){
 
             if(cost44 + dist43 < dist44){
                 dist44 = cost44 + dist43;
@@ -1288,7 +1344,7 @@ public class BFPathing20 extends Pathfinder {
             }
         }
 
-        if(dist45 < 10000){
+        if(cost45 != 0){
 
             if(cost45 + dist44 < dist45){
                 dist45 = cost45 + dist44;

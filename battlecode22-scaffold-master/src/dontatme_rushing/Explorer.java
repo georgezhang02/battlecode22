@@ -1,4 +1,4 @@
-package pathplanner;
+package dontatme_rushing;
 
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
@@ -14,54 +14,51 @@ public class Explorer {
 
     static MapLocation target;
 
+    static boolean fastExplore;
 
-    public Explorer(RobotController rc){
+
+    public Explorer(RobotController rc, boolean fastExplore){
         this.rc = rc;
-        visited = new boolean[rc.getMapWidth()][rc.getMapHeight()];
+        this.fastExplore = fastExplore;
+        this.target = rc.getLocation();
+        if (!fastExplore){
+            visited = new boolean[rc.getMapWidth()][rc.getMapHeight()];
+        }
+
     }
 
+    // Choose random unvisited location through visited array, if can't find in tries moves
+    //chooses random on radius
     public void getExploreTarget(int tries, int mapWidth, int mapHeight){
-        int count = tries;
-        MapLocation ml = null;
-        while(ml == null && count > 0) {
-            int x = (int) (mapWidth * Math.random());
-            int y = (int) (mapHeight * Math.random());
-            if(!visited[x][y]){
-                target = new MapLocation(x, y);
-            }
-            count--;
-        }
-        if(ml == null){
+        if(fastExplore){
             getExploreTargetRandom(mapWidth, mapHeight);
+        } else{
+            int count = tries;
+            MapLocation ml = null;
+            while(ml == null && count > 0) {
+                int x = (int) (10000* Math.random()) %mapWidth;
+                int y = (int) (10000 * Math.random()) % mapHeight;
+                if(!visited[x][y]){
+                    target = new MapLocation(x, y);
+                }
+                count--;
+            }
+            if(ml == null){
+                getExploreTargetRandom(mapWidth, mapHeight);
+            }
         }
+
+
     }
 
+    // returns random target towards the edges a larger distance away
     public void getExploreTargetRandom(int mapWidth, int mapHeight){
-        MapLocation curPos = rc.getLocation();
+        int x = (int) (10000* Math.random()) %mapWidth;
+        int y = (int) (10000 * Math.random()) % mapHeight;
 
-        boolean closeLeft = curPos.x < mapWidth;
-        boolean closeBot = curPos.y < mapHeight;
+        target = new MapLocation(x, y);
 
-        int angle;
-        if(closeBot){
-            if(closeLeft){
-                angle = (int) (90 * Math.random());
-            } else{
-                angle = (int) (90 * Math.random()) + 90;
-            }
 
-        } else{
-            if(closeLeft){
-                angle = (int) (90 * Math.random()) + 270;
-            } else{
-                angle = (int) (90 * Math.random()) + 360;
-            }
-        }
-
-        int maxDim = Math.max(mapWidth, mapHeight);
-
-        int x = Math.max(Math.min((int) (maxDim/2 * Math.cos(angle)), mapWidth), 0);
-        int y = Math.max(Math.min((int) (maxDim/2 * Math.sin(angle)), mapHeight), 0);
 
     }
 

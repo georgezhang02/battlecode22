@@ -26,11 +26,15 @@ public strictfp class RobotPlayer {
     @SuppressWarnings("unused")
 
     static Soldier soldier;
+    static Sage sage;
     public static void run(RobotController rc) throws GameActionException {
         // You can also use indicators to save debug notes in replays.
         while (true) {
             if(soldier == null && rc.getType().equals(RobotType.SOLDIER)){
                 soldier = new Soldier(rc);
+            }
+            if(sage == null && rc.getType().equals(RobotType.SAGE)){
+                sage = new Sage(rc);
             }
             // This code runs during the entire lifespan of the robot, which is why it is in an infinite
             // loop. If we ever leave this loop and return from run(), the robot dies! At the end of the
@@ -51,7 +55,7 @@ public strictfp class RobotPlayer {
                     case LABORATORY: Laboratory.run(rc); break;
                     case WATCHTOWER: Watchtower.run(rc); break;
                     case BUILDER:    Builder.run(rc); break;
-                    case SAGE:       Sage.run(rc); break;
+                    case SAGE:       sage.run(); break;
                 }
             } catch (GameActionException e) {
                 // Oh no! It looks like we did something illegal in the Battlecode world. You should

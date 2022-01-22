@@ -5,11 +5,42 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fcd8da0b-c6fd-442f-8ac6-769e91da29e8" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_rushing/Archon.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_rushing/BFPathing34.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_rushing/Builder.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_rushing/Communications.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_rushing/Helper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_rushing/Laboratory.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_rushing/Miner.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_rushing/Sage.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_rushing/Soldier.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_rushing/Watchtower.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme/Archon.java" beforeDir="false" afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme/Archon.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme/Communications.java" beforeDir="false" afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme/Communications.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme/Soldier.java" beforeDir="false" afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme/Soldier.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/version.txt" beforeDir="false" afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/version.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme/Builder.java" beforeDir="false" afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme/Builder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme/Laboratory.java" beforeDir="false" afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme/Laboratory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme/RobotPlayer.java" beforeDir="false" afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme/RobotPlayer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme/Sage.java" beforeDir="false" afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme/Sage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/examplefuncsplayer/RobotPlayer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/karthiktest/ArchonStrategy.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/karthiktest/BuilderStrategy.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/karthiktest/MinerStrategy.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/karthiktest/RobotPlayer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/karthiktest/WatchTowerStrategy.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/karthiktestp/ArchonAccelStrategy.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/karthiktestp/ArchonStrategy.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/karthiktestp/BuilderStrategy.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/karthiktestp/FollowMinersSoldierStrategy.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/karthiktestp/MinerStrategy.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/karthiktestp/Pathing.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/karthiktestp/RandomSoldierStrategy.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/karthiktestp/RobotPlayer.java" beforeDir="false" afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_rushing/RobotPlayer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/karthiktestp/RushSoldierStrategy.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/karthiktestp/WatchTowerStrategy.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/pathplanner/BFPathing20.java" beforeDir="false" afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_rushing/BFPathing20.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/pathplanner/Explorer.java" beforeDir="false" afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_rushing/Explorer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/pathplanner/Pathfinder.java" beforeDir="false" afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_rushing/Pathfinder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/pathplanner/RobotPlayer.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -88,12 +119,12 @@
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_old" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/battlecode22-scaffold-master/src" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\henry\OneDrive\Documents\Grind\battlecode22\battlecode22-scaffold-master\src\dontatme_old" />
       <recent name="C:\Users\henry\OneDrive\Documents\Grind\battlecode22\battlecode22-scaffold-master\src" />
+      <recent name="C:\Users\henry\OneDrive\Documents\Grind\battlecode22\battlecode22-scaffold-master\src\dontatme_old" />
       <recent name="C:\Users\henry\OneDrive\Documents\Grind\battlecode22\battlecode22-scaffold-master\src\dontatmeNOKITING" />
     </key>
   </component>
@@ -135,6 +166,17 @@
       <updated>1642288755664</updated>
     </task>
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
