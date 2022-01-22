@@ -248,7 +248,7 @@ public strictfp class Sage {
             if(enemyCount > 0){
                 Communications.sendMoveToCommand(rc, rc.getLocation(), enemyCount );
             }
-            if(!rc.isActionReady() || closestEnemy <= 20){ // action not ready
+            if(!rc.isActionReady() || closestEnemy <= RobotType.SAGE.actionRadiusSquared){ // action not ready
                 dir = pathfinder.pathAwayFrom(enemyPos, 0); // kite
             } else if(enemyCount >= allyCount){
                 dir = lookForBetterSquare();
@@ -376,7 +376,7 @@ public strictfp class Sage {
             int buildingCount = 0;
             if(enemyCount > 0){
                 for(RobotInfo robotInfo : enemies){
-                    if(robotInfo.location.distanceSquaredTo(rc.getLocation()) <= 20){
+                    if(robotInfo.location.distanceSquaredTo(rc.getLocation()) <= RobotType.SAGE.actionRadiusSquared){
                         if(robotInfo.getType() == RobotType.SAGE || robotInfo.getType() == RobotType.SOLDIER){
                             droidCount ++;
                         } else if(robotInfo.getType() == RobotType.WATCHTOWER || robotInfo.getType() == RobotType.ARCHON){
@@ -387,7 +387,13 @@ public strictfp class Sage {
                 }
 
                 rc.setIndicatorString(droidCount+" "+buildingCount);
-                if(droidCount >= 2 || buildingCount >= 2 ||
+                if (droidCount <= 3) {
+                    // System.out.println("RAW ATTACK!");
+                    rawAttack(1);
+                } else if  (droidCount == 0 && buildingCount <= 2){
+                    rawAttack(3);
+                }
+                else if(droidCount > 3 || buildingCount > 2 ||
                         buildingCount <= droidCount ||  (allyCount == 1 && enemyCount > 0)){
                     if(droidCount >= buildingCount){
                         rc.envision(AnomalyType.CHARGE);
@@ -397,12 +403,90 @@ public strictfp class Sage {
                 }
             }
         }
+    }
 
+    static MapLocation rawAttack(int attackType) throws GameActionException {
+        RobotInfo attackLoc;
 
+        if(attackType == 0){ // attack all (droids, buildings, archons, miners)
+            attackLoc = getAttack(3, 1, 0, 2);
+        } else if(attackType == 1){ //attack droids (droids, miners, buildings, archons)
+            attackLoc = getAttack(3, 2, 1, 0);
+        }  else if (attackType == 3){// attack army (buidings, droids, miners, archons))
+            attackLoc = getAttack(1, 3, 2, 0);
+        }  else { // attack eco (miners, buildings, droids, archons)
+            attackLoc = getAttack(2, 1, 3, 0);
+        }
+        if(attackLoc != null && rc.canAttack(attackLoc.getLocation())){
+            rc.attack(attackLoc.getLocation());
+        }
+        if(attackLoc != null){
+            return attackLoc.getLocation();
+        }
+        return null;
+    }
 
+    static RobotInfo getAttack(int prio1, int prio2, int prio3, int prio4) throws GameActionException {
+        RobotInfo[] ml = new RobotInfo[4];
+        int[] minHealth = {2000,2000,2000,2000};
+        int[] maxID = {0,0,0,0};
 
+        for(RobotInfo robot : enemies){
+            RobotType type = robot.getType();
+            int health = robot.getHealth();
+            int id = robot.getID();
+            if(rc.getLocation().distanceSquaredTo(robot.getLocation()) <= RobotType.SAGE.actionRadiusSquared){
+                if(type.isBuilding()){
+                    if(type.equals(RobotType.ARCHON)){
+                        if(health < minHealth[0]){
+                            ml[0] = robot;
+                            minHealth[0] = health;
+                            Communications.setEnemyArchonLocation(rc, robot.getID(), robot.getLocation());
+                        } else if(health == minHealth[0] && id > maxID[0]){
+                            ml[0] = robot;
+                            maxID[0] = id;
+                        }
+                    } else{
+                        if(health < minHealth[1]){
+                            ml[1] = robot;
+                            minHealth[1] = health;
+                        }else if(health == minHealth[1] && id > maxID[1]){
+                            ml[1] = robot;
+                            maxID[1] = id;
+                        }
+                    }
+                } else{
+                    if(type.equals(RobotType.MINER)){
+                        if(health < minHealth[2]){
+                            ml[2] = robot;
+                            minHealth[2] = health;
+                        }else if(health == minHealth[2] && id > maxID[2]){
+                            ml[2] = robot;
+                            maxID[2] = id;
+                        }
+                    } else {
+                        if(health < minHealth[3]){
+                            ml[3] = robot;
+                            minHealth[3] = health;
+                        }else if(health == minHealth[3] && id > maxID[3]){
+                            ml[3] = robot;
+                            maxID[3] = id;
+                        }
+                    }
+                }
+            }
+        }
 
-
+        if(ml[prio1] != null){
+            return ml[prio1];
+        }
+        if(ml[prio2] != null){
+            return ml[prio2];
+        }
+        if(ml[prio3] != null){
+            return ml[prio3];
+        }
+        return ml[prio4];
     }
 
 
