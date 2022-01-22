@@ -39,13 +39,13 @@ public strictfp class Builder {
         RobotInfo[] robots = rc.senseNearbyRobots();
 
         if(labCount < builderCount){
-            if(moves < 10 && (curTarget== null || !pathfinder.targetWithinRadius(curTarget, 20))){
+            if(moves < 5 && (curTarget== null || !pathfinder.targetWithinRadius(curTarget, 20))){
                 curTarget = getClosestCorner(rc);
                 move(rc, pathfinder.pathToTarget(curTarget, false));
                 rc.setIndicatorString("moving");
 
             }
-            else if (robots.length > 1  && moves < 30){
+            else if (robots.length > 3  && moves < 30){
                 int index = 0;
                 MapLocation[]nearby = new MapLocation[10];
                 for(int i = 0; i< robots.length && index < 10; i++){

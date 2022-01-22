@@ -417,7 +417,8 @@ public strictfp class Sage {
         }  else { // attack eco (miners, buildings, droids, archons)
             attackLoc = getAttack(2, 1, 3, 0);
         }
-        if(attackLoc != null && rc.canAttack(attackLoc.getLocation())){
+        if(attackLoc != null && rc.senseRobotAtLocation(attackLoc.getLocation()).getHealth() > 30 &&
+                rc.canAttack(attackLoc.getLocation())){
             rc.attack(attackLoc.getLocation());
         }
         if(attackLoc != null){

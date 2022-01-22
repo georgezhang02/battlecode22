@@ -28,7 +28,7 @@ public strictfp class Laboratory {
         if(flying){
 
         } else{
-            if(soldierCount/rc.getArchonCount() > 3 && soldierCount >   sageCount){
+            if(soldierCount/rc.getArchonCount() > 1){
                 rc.setIndicatorString(rc.getTransmutationRate()+" "+rc.canTransmute());
                 if(rc.canTransmute()){
                     rc.transmute();
