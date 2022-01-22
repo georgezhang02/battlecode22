@@ -9,7 +9,7 @@ public strictfp class Builder {
      * Run a single turn for a Builder.
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
      */
-
+    static int turnsAlive = 0;
     //checks if the builder has moved towards the center already
     static boolean movedTowardsCenter = false;
     static boolean hasBuiltTower = false;
@@ -20,24 +20,31 @@ public strictfp class Builder {
         //adding the ability to store lead for builders to use
         //adding the ability to store gold -> is it hte responsibility of the builder to check lead amounts
         //adding decision-making on the builder end that's separate from command structure(?)
-
+        turnsAlive++;
+        detonate(rc);
     }
     
     //blow up for lead resources
     static void detonate(RobotController rc) throws GameActionException {
         //search areas near me in cardinal directions
         int lowestRubble = Integer.MAX_VALUE;
-        int lowestIndex = Integer.MAX_VALUE;
+        int lowestIndex = 0;
         for (int i = 0; i < Helper.directions.length; i++) {
-            int amountRubble = rc.senseRubble(rc.getLocation().add(Helper.directions[i]));
-            if (amountRubble < lowestRubble && rc.canMove(Helper.directions[i])) {
-                lowestRubble = amountRubble;
-                lowestIndex = i;
+            if (rc.canMove(Helper.directions[i])) {
+                int amountRubble = rc.senseRubble(rc.getLocation().add(Helper.directions[i]));
+                if (amountRubble < lowestRubble) {
+                    lowestRubble = amountRubble;
+                    lowestIndex = i;
+                }
             }
         }
         Direction dir = Helper.directions[lowestIndex];
-        rc.move(dir);
-        rc.disintegrate();
+        if (rc.canMove(dir))
+            rc.move(dir);
+        if (turnsAlive > 10 && rc.senseLead(rc.getLocation()) == 0) {
+            if (rc.isActionReady())
+                rc.disintegrate();
+        }
 
     }
 
