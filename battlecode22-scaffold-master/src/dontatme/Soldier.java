@@ -405,7 +405,7 @@ public strictfp class Soldier {
 
     void healAt(MapLocation target) throws GameActionException {
 
-        if(rc.getHealth() >=50){
+        if(rc.getHealth() >=40){
             currentState = SoldierState.Exploring;
             clearCommand();
             this.run();

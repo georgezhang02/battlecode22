@@ -387,13 +387,13 @@ public strictfp class Sage {
                 }
 
                 rc.setIndicatorString(droidCount+" "+buildingCount);
-                if (droidCount <= 1) {
+                if (droidCount <= 2) {
                     // System.out.println("RAW ATTACK!");
                     rawAttack(1);
                 } else if  (droidCount == 0 && buildingCount <= 1){
                     rawAttack(3);
                 }
-                else if(droidCount > 1 || buildingCount > 1 ||
+                else if(droidCount > 2 || buildingCount > 1 ||
                         buildingCount <= droidCount ||  (allyCount == 1 && enemyCount > 0)){
                     if(droidCount >= buildingCount){
                         rc.envision(AnomalyType.CHARGE);
