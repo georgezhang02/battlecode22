@@ -337,19 +337,42 @@ public strictfp class Archon {
                     }
                 }
                 else if (soldierCount / rc.getArchonCount() < 5 ){
-                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
-                        buildTowardsLowRubble(rc, RobotType.SOLDIER);
+                    int x = (int)(100000 * Math.random()) % 4;
+
+                    if( x == 0){
+                        if (rc.getTeamLeadAmount(rc.getTeam()) >=50) {
+                            buildTowardsLowRubble(rc, RobotType.MINER);
+                        }
+                    } else{
+                        if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
+                            buildTowardsLowRubble(rc, RobotType.SOLDIER);
+                        }
                     }
+
                 } else if(labCount < builderCount){
                     // waiting on getting enough lead
                 } else if (minerCount / rc.getArchonCount() < 5 *  MAP_SCALER){
-                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
-                        buildTowardsLowRubble(rc, RobotType.MINER);
+                    int x = (int)(100000 * Math.random()) % 4;
 
+                    if( x <=2){
+                        if (rc.getTeamLeadAmount(rc.getTeam()) >=50) {
+                            buildTowardsLowRubble(rc, RobotType.MINER);
+                        }
+                    } else{
+                        if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
+                            buildTowardsLowRubble(rc, RobotType.SOLDIER);
+                        }
                     }
                 } else {
-                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 75 * MAP_SCALER) {
-                        buildTowardsLowRubble(rc, RobotType.SOLDIER);
+                    int x = (int)(100000 * Math.random()) % 4;
+                    if( x == 0){
+                        if (rc.getTeamLeadAmount(rc.getTeam()) >=50) {
+                            buildTowardsLowRubble(rc, RobotType.MINER);
+                        }
+                    } else{
+                        if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
+                            buildTowardsLowRubble(rc, RobotType.SOLDIER);
+                        }
                     }
                 }
 
