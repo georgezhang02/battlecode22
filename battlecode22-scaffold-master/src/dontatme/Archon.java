@@ -273,11 +273,11 @@ public strictfp class Archon {
                         rushArchon(rc);
                         if(attackingArchon == -1){
                             Communications.sendStopAttackCommand(rc, commands[0].location);
-                            System.out.println("Stop Attacking");
+                            // System.out.println("Stop Attacking");
                         }
                     } else{
                         Communications.sendStopAttackCommand(rc, commands[0].location);
-                        System.out.println("Stop Attacking");
+                        // System.out.println("Stop Attacking");
                     }
 
 
@@ -287,10 +287,68 @@ public strictfp class Archon {
                 }
             }
 
-            // Build order and token passing
+            // find which archon is close to the action
+            Communications.Command[] attackCommands = Communications.getAttackCommands(rc);
 
-            if( rc.isActionReady() && Communications.getArchonTurn(rc)  == curArchonOrder){
+            MapLocation[] archons = new MapLocation[GameConstants.MAX_STARTING_ARCHONS];
 
+            int[] count = new int[GameConstants.MAX_STARTING_ARCHONS];
+
+            // get team archon locations
+            for (int i = 0; i < GameConstants.MAX_STARTING_ARCHONS; i++) {
+                archons[i] = Communications.getTeamArchonLocationByIndex(rc, i);
+                // if archon is dead set count to -1
+                if (archons[i].x > 59) {
+                    count[i] = -1;
+                }
+            }
+
+            // find how many attacks each archon is near
+            for (int i = 0; i < attackCommands.length; i++) {
+                Communications.Command c = attackCommands[i];
+                int minDistance = 1000;
+                int minArchon = -1;
+                for (int j = 0; j < GameConstants.MAX_STARTING_ARCHONS; j++) {
+                    // dont calculate if dead
+                    if (count[j] > -1) {
+                        if (c.location.distanceSquaredTo(archons[j]) < minDistance) {
+                            minDistance = c.location.distanceSquaredTo(archons[j]); 
+                            minArchon = j;
+                        }
+                    }
+                }
+                // add command to archon index if found
+                if (minArchon > -1) {
+                    count[minArchon]++;
+                }
+            }
+            
+            // find archon index with most action
+            int maxIndex = -1;
+            int maxCount = 0;
+            for (int i = 0; i < GameConstants.MAX_STARTING_ARCHONS; i++) {
+                if (count[i] > maxCount) {
+                    maxIndex = i;
+                    maxCount = count[i];
+                }
+            }
+
+            // Soldier Build Order (if found appropriate archon)
+            if(rc.isActionReady() && maxIndex != -1 && maxIndex == Communications.getTeamArchonIndexFromID(rc, id)) {
+                if (soldierCount / rc.getArchonCount() < 5 ){
+                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
+                        buildTowardsLowRubble(rc, RobotType.SOLDIER);
+    
+                    }
+                } else {
+                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 75 * MAP_SCALER) {
+                        buildTowardsLowRubble(rc, RobotType.SOLDIER);
+                    }
+                }
+            }
+
+            // Miner Build Order and token passing
+            else if( rc.isActionReady() && Communications.getArchonTurn(rc)  == curArchonOrder){
                 if (miners < 3) {
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
                         buildTowardsLowRubble(rc, RobotType.MINER);
@@ -299,19 +357,20 @@ public strictfp class Archon {
                 else if (soldierCount / rc.getArchonCount() < 5 ){
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
                         buildTowardsLowRubble(rc, RobotType.SOLDIER);
-
+    
                     }
-                } else if (minerCount / rc.getArchonCount() < 5 *  MAP_SCALER){
+                }
+                else if (minerCount / rc.getArchonCount() < 5 *  MAP_SCALER){
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
                         buildTowardsLowRubble(rc, RobotType.MINER);
 
                     }
-                } else {
+                }
+                else {
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 75 * MAP_SCALER) {
                         buildTowardsLowRubble(rc, RobotType.SOLDIER);
                     }
                 }
-
             }
 
             // heal units around me
@@ -367,7 +426,7 @@ public strictfp class Archon {
 
         for(int i = 0; i<4 && attackingArchon == -1; i++){
             if(Communications.getEnemyArchonLocationByIndex(rc, i).x < 60){ // found
-                System.out.println("rush"+ Communications.getEnemyArchonLocationByIndex(rc, i));
+                // System.out.println("rush"+ Communications.getEnemyArchonLocationByIndex(rc, i));
                 MapLocation attackLoc = Communications.getEnemyArchonLocationByIndex(rc, i);
                 Communications.sendAttackCommand(rc, attackLoc, RobotType.ARCHON);
                 attackingArchon = i;
