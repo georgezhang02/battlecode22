@@ -333,23 +333,12 @@ public strictfp class Archon {
                 }
             }
 
-            // Soldier Build Order (if found appropriate archon)
-            if(rc.isActionReady() && maxIndex != -1 && maxIndex == Communications.getTeamArchonIndexFromID(rc, id)) {
-                if (soldierCount / rc.getArchonCount() < 5 ){
-                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
-                        buildTowardsLowRubble(rc, RobotType.SOLDIER);
-    
-                    }
-                } else {
-                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 75 * MAP_SCALER) {
-                        buildTowardsLowRubble(rc, RobotType.SOLDIER);
-                    }
-                }
-            }
+            Boolean shouldSpawnSoldiers = maxIndex == Communications.getTeamArchonIndexFromID(rc, id);
 
-            // Miner Build Order and token passing
-            else if( rc.isActionReady() && Communications.getArchonTurn(rc)  == curArchonOrder){
-                if (miners < 3) {
+            // if no action just use normal builder order
+            if (maxIndex < 0 && rc.isActionReady() && Communications.getArchonTurn(rc)  == curArchonOrder) {
+                // System.out.println("normal spawn");
+                if (miners < 3 ) {
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
                         buildTowardsLowRubble(rc, RobotType.MINER);
                     }
@@ -369,6 +358,34 @@ public strictfp class Archon {
                 else {
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 75 * MAP_SCALER) {
                         buildTowardsLowRubble(rc, RobotType.SOLDIER);
+                    }
+                }
+            }
+            // Soldier Build Order (if found appropriate archon)
+            else if(rc.isActionReady() && shouldSpawnSoldiers) {
+                // System.out.println("concentrated spawn");
+                if (soldierCount / rc.getArchonCount() < 5 ){
+                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
+                        buildTowardsLowRubble(rc, RobotType.SOLDIER);
+    
+                    }
+                } else {
+                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 75 * MAP_SCALER) {
+                        buildTowardsLowRubble(rc, RobotType.SOLDIER);
+                    }
+                }
+            }
+            // Miner Build Order and token passing (if not spawning soldier)
+            else if(rc.isActionReady() && Communications.getArchonTurn(rc)  == curArchonOrder && !shouldSpawnSoldiers) {
+                if (miners < 3) {
+                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
+                        buildTowardsLowRubble(rc, RobotType.MINER);
+                    }
+                }
+                else if (minerCount / rc.getArchonCount() < 5 *  MAP_SCALER){
+                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
+                        buildTowardsLowRubble(rc, RobotType.MINER);
+
                     }
                 }
             }
