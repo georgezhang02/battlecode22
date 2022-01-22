@@ -245,7 +245,7 @@ public strictfp class Sage {
 
 
         if(enemyCount > 0 || !rc.isActionReady()){ // in combat
-            if(enemyCount <= allyCount){
+            if(enemyCount > 0){
                 Communications.sendMoveToCommand(rc, rc.getLocation(), enemyCount );
             }
             if(!rc.isActionReady() || closestEnemy <= 20){ // action not ready
@@ -265,7 +265,7 @@ public strictfp class Sage {
             currentState = SageState.Exploring;
         }
         if(rc.canMove(dir) && rc.senseRubble(rc.getLocation().add(dir)) + 10
-                <= 1.5 * (rc.senseRubble(rc.getLocation())+ 10) ){
+                <=  2 * (rc.senseRubble(rc.getLocation())+ 10) ){
             move(dir); // path to target from far away
         }
 
@@ -309,7 +309,7 @@ public strictfp class Sage {
         else if(target != null && !pathfinder.targetWithinRadius(target, minDistance)){
             move(pathfinder.pathToTarget(target, false));
         } else{
-            if(enemies[0]== null){
+            if(enemies == null || enemies.length == 0 || enemies[0]== null){
                 clearCommand();
             }
         }
@@ -374,7 +374,7 @@ public strictfp class Sage {
         if(rc.isActionReady()){
             int droidCount = 0;
             int buildingCount = 0;
-            if(enemyCount > 2 || (allyCount == 1 && enemyCount > 0)){
+            if(enemyCount > 0){
                 for(RobotInfo robotInfo : enemies){
                     if(robotInfo.location.distanceSquaredTo(rc.getLocation()) <= 20){
                         if(robotInfo.getType() == RobotType.SAGE || robotInfo.getType() == RobotType.SOLDIER){
@@ -385,7 +385,9 @@ public strictfp class Sage {
                     }
 
                 }
-                if(droidCount > 2 || buildingCount > 2 ||
+
+                rc.setIndicatorString(droidCount+" "+buildingCount);
+                if(droidCount >= 2 || buildingCount >= 2 ||
                         buildingCount <= droidCount ||  (allyCount == 1 && enemyCount > 0)){
                     if(droidCount >= buildingCount){
                         rc.envision(AnomalyType.CHARGE);

@@ -3,6 +3,7 @@ package dontatme;
 import battlecode.common.*;
 
 import java.awt.*;
+import java.util.Map;
 
 public strictfp class Builder {
 
@@ -38,7 +39,7 @@ public strictfp class Builder {
         RobotInfo[] robots = rc.senseNearbyRobots();
 
         if(labCount < builderCount){
-            if((curTarget== null || !pathfinder.targetWithinRadius(curTarget, 20))){
+            if(moves < 10 && (curTarget== null || !pathfinder.targetWithinRadius(curTarget, 20))){
                 curTarget = getClosestCorner(rc);
                 move(rc, pathfinder.pathToTarget(curTarget, false));
                 rc.setIndicatorString("moving");
@@ -61,7 +62,14 @@ public strictfp class Builder {
                 }
             }
         } else{
-            if()
+            MapLocation toRepair = findBuildingToRepair(rc, robots);
+            if(toRepair!= null){
+                if(rc.getLocation().distanceSquaredTo(toRepair) > 5){
+                    move(rc, pathfinder.pathToTarget(toRepair, false));
+                } else if(rc.canRepair(toRepair)){
+                    rc.repair(toRepair);
+                }
+            }
         }
 
 
@@ -69,6 +77,30 @@ public strictfp class Builder {
 
 
 
+    }
+
+    static MapLocation findBuildingToRepair(RobotController rc, RobotInfo[]robotInfo) {
+
+        MapLocation ans = null;
+        int dist = 1000000;
+        for(int i = 0; i< robotInfo.length; i++){
+            if(robotInfo[i].getLocation().distanceSquaredTo(rc.getLocation()) < dist){
+                if(robotInfo[i].getType()== RobotType.LABORATORY && robotInfo[i].getHealth() < 100) {
+                    dist = robotInfo[i].getLocation().distanceSquaredTo(rc.getLocation());
+                    ans = robotInfo[i].getLocation();
+                }
+                else if(robotInfo[i].getType()== RobotType.WATCHTOWER && robotInfo[i].getHealth() < 600) {
+                    dist = robotInfo[i].getLocation().distanceSquaredTo(rc.getLocation());
+                    ans = robotInfo[i].getLocation();
+                }
+                else if(robotInfo[i].getType()== RobotType.ARCHON && robotInfo[i].getHealth() < 150) {
+                    dist = robotInfo[i].getLocation().distanceSquaredTo(rc.getLocation());
+                    ans = robotInfo[i].getLocation();
+                }
+
+            }
+        }
+        return ans;
     }
 
     private static MapLocation getClosestCorner(RobotController rc){
@@ -127,7 +159,7 @@ public strictfp class Builder {
 
             //checks if there is a robot on a square and if it has a lower rubble count
             //than what is currently stored
-            if (rc.senseRobotAtLocation(tempLoc) == null && rc.senseRubble(tempLoc) < minRubble) {
+            if (rc.onTheMap(tempLoc) && !rc.isLocationOccupied(tempLoc) && rc.senseRubble(tempLoc) < minRubble) {
                 dir = Helper.directions[i];
                 minRubble = rc.senseRubble(tempLoc);
             }

@@ -180,7 +180,7 @@ public strictfp class Soldier {
 
     static MapLocation findHealingArchon() throws GameActionException {
         MapLocation ans = null;
-        if(rc.getHealth() <= 10){
+        if(rc.getHealth() <= 15){
             double lowestDist = 120;
             for(int i = 0; i< 4; i++){
                 MapLocation archonLoc = Communications.getTeamArchonLocationByIndex(rc, i);
@@ -277,7 +277,7 @@ public strictfp class Soldier {
 
 
         if(enemyCount > 0 || !rc.isActionReady()){ // in combat
-            if(enemyCount <= allyCount){
+            if(enemyCount > 0){
                 Communications.sendMoveToCommand(rc, rc.getLocation(), enemyCount );
             }
             if(!rc.isActionReady() ){ // action not ready
