@@ -92,7 +92,7 @@ public strictfp class Archon {
 
 
         // on round start
-
+        rc.setIndicatorString(Communications.getNumArchonMoving(rc)+"");
         if( !moving && curTarget != null){
             moving = true;
             landing = false;
@@ -166,7 +166,7 @@ public strictfp class Archon {
             // you have landed
             if(landing && !flying){
                 moving = false;
-                rc.setIndicatorString(Communications.getNumArchonMoving(rc)+"");
+
                 Communications.setArchonMoving(rc, 0, Math.max(0, Communications.getNumArchonMoving(rc)-1), 0);
                 curTarget = null;
                 moveCooldown = 100;
@@ -205,7 +205,7 @@ public strictfp class Archon {
 
                 }
                 //path from far away with bf
-                else if(!pathfinder.targetWithinRadius(curTarget, 34)){
+                else if(!pathfinder.targetWithinRadius(curTarget, 52)){
                     //if you haven't started mvoing, start moving
                     if(!flying){
                         if(rc.canTransform()){
@@ -217,7 +217,7 @@ public strictfp class Archon {
                     }
                 }
                 //path close with greedy
-                else if(!pathfinder.targetWithinRadius(curTarget, 20)){
+                else if(!pathfinder.targetWithinRadius(curTarget, 52)){
                     //if you haven't started mvoing, start moving
                     if(!flying){
                         if(rc.canTransform()){
@@ -240,7 +240,9 @@ public strictfp class Archon {
         // not moving
         if(!moving){
             // see if we need to move
-            if(enemyCount < 2 && healingCount < 2 && moveCooldown <= 0){
+
+
+            if(moveCooldown <= 0){
 
                 readComms(rc);
             }
@@ -309,8 +311,6 @@ public strictfp class Archon {
 
             // Build order and token passing
 
-            rc.setIndicatorString(builderCount+" "+labCount);
-
             if( rc.isActionReady() && Communications.getArchonTurn(rc)  == curArchonOrder){
 
                 if (miners < 5 * MAP_SCALER) {
@@ -364,7 +364,7 @@ public strictfp class Archon {
                         }
                     }
                 } else {
-                    int x = (int)(100000 * Math.random()) % 4;
+                    int x = (int)(100000 * Math.random()) % 10;
                     if( x == 0){
                         if (rc.getTeamLeadAmount(rc.getTeam()) >=50) {
                             buildTowardsLowRubble(rc, RobotType.MINER);
@@ -396,6 +396,7 @@ public strictfp class Archon {
         MapLocation dest = Communications.getMoveToCommand(rc).location;
         double maxDist = Communications.getArchonMovingDistToTarget(rc);
         int curMoving = Communications.getNumArchonMoving(rc);
+
         if(curMoving < (rc.getArchonCount() +1)/2 && dest.x < 60){
 
             double cross = (int) Math.sqrt(rc.getMapWidth() *rc.getMapHeight() + rc.getMapWidth() * rc.getMapWidth());
@@ -403,7 +404,7 @@ public strictfp class Archon {
             double dist = Math.sqrt(rc.getLocation().distanceSquaredTo(dest));
 
 
-            if(dist > 10 && (maxDist == 0 || dist < maxDist)){
+            if((maxDist == 0 || dist < maxDist)){
 
                 Communications.setArchonMoving(rc, (int)dist, Math.min(rc.getArchonCount(),
                         curMoving + 1), 0);

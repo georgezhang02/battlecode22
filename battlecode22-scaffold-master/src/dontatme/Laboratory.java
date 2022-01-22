@@ -14,13 +14,28 @@ public strictfp class Laboratory {
     static MapLocation curTarget;
     public static void run(RobotController rc) throws GameActionException {
         Communications.runStart(rc);
+
+        int[] units = Communications.getUnitCounts(rc);
+
+        // deciding to rush
+        int minerCount = units[0];
+        int soldierCount = units[1];
+        int builderCount = units[2];
+
+        int labCount = units[3];
+        int sageCount = units[4];
+
         if(flying){
 
         } else{
-            rc.setIndicatorString(rc.getTransmutationRate()+" "+rc.canTransmute());
-            if(rc.canTransmute()){
-                rc.transmute();
+            if(soldierCount/rc.getArchonCount() > 3 && soldierCount >   sageCount){
+                rc.setIndicatorString(rc.getTransmutationRate()+" "+rc.canTransmute());
+                if(rc.canTransmute()){
+                    rc.transmute();
+                }
             }
+
+
         }
 
     }

@@ -180,7 +180,7 @@ public strictfp class Soldier {
 
     static MapLocation findHealingArchon() throws GameActionException {
         MapLocation ans = null;
-        if(rc.getHealth() <= 15){
+        if(rc.getHealth() <= 17){
             double lowestDist = 120;
             for(int i = 0; i< 4; i++){
                 MapLocation archonLoc = Communications.getTeamArchonLocationByIndex(rc, i);
@@ -405,7 +405,7 @@ public strictfp class Soldier {
 
     void healAt(MapLocation target) throws GameActionException {
 
-        if(rc.getHealth() >=45){
+        if(rc.getHealth() >=50){
             currentState = SoldierState.Exploring;
             clearCommand();
             this.run();
