@@ -23,7 +23,7 @@ public strictfp class Builder {
     public static void run(RobotController rc) throws GameActionException {
         turn++;
 
-        if (rc.getRoundNum() <= 26) {
+        if (rc.getRoundNum() <= 66) {
             detonate(rc);
         }
 
@@ -120,9 +120,19 @@ public strictfp class Builder {
                     if (robots.length != 0 && nearbyArchons[0] != null) {
                         targetMovement = nearbyArchons[0];
                         //System.out.println("I got here");
+                        if (rc.getTeamLeadAmount(rc.getTeam()) >= 150 &&
+                                rc.senseRobotAtLocation(nearbyArchons[0]).getLevel() == 2) {
+                            if (rc.canMutate(nearbyArchons[0])) {
+                                rc.mutate(nearbyArchons[0]);
+                            }
+                        }
                     }
                     else {
-                        targetMovement = new MapLocation(GameConstants.MAP_MAX_WIDTH / 2, GameConstants.MAP_MAX_HEIGHT / 2);
+                        MapLocation pickArchonToFollow = Communications.getTeamArchonLocationByIndex(rc, (int)(Math.floor(Math.random() * rc.getArchonCount())));
+                        while (pickArchonToFollow.x > 59)
+                            pickArchonToFollow = Communications.getTeamArchonLocationByIndex(rc, (int)(Math.floor(Math.random() * rc.getArchonCount())));
+
+                        targetMovement = pickArchonToFollow;
                     }
                     move(rc, pathfinder.bfPathToTarget(targetMovement));
                 }
@@ -281,7 +291,7 @@ public strictfp class Builder {
         Direction dir = Helper.directions[lowestIndex];
         if (rc.canMove(dir))
             rc.move(dir);
-        if (turn > 6 && rc.senseLead(rc.getLocation()) == 0) {
+        if (turn > 2 && rc.senseLead(rc.getLocation()) == 0) {
             if (rc.isActionReady())
                 rc.disintegrate();
         }
