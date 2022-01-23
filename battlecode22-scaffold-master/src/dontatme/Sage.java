@@ -27,7 +27,8 @@ public strictfp class Sage {
 
     static int enemyCount;
     static int allyCount;
-    static int droidCount;
+    static int soldierCount;
+    static int sageCount;
     static int buildingCount;
 
 
@@ -40,8 +41,8 @@ public strictfp class Sage {
         Communications.runStart(rc);
 
         Team opponent = rc.getTeam().opponent();
-        enemies = rc.senseNearbyRobots(RobotType.SAGE.visionRadiusSquared, opponent);
-        allies = rc.senseNearbyRobots(RobotType.SAGE.visionRadiusSquared, rc.getTeam());
+        enemies = rc.senseNearbyRobots(RobotType.SAGE.actionRadiusSquared, opponent);
+        allies = rc.senseNearbyRobots(RobotType.SAGE.actionRadiusSquared, rc.getTeam());
 
         combatCooldown--;
 
@@ -218,9 +219,12 @@ public strictfp class Sage {
                 }
                 enemyCount++;
             }
-            if(robot.getType() == RobotType.SAGE || robot.getType() == RobotType.SOLDIER){
-                droidCount ++;
-            } else if(robot.getType() == RobotType.WATCHTOWER || robot.getType() == RobotType.ARCHON){
+            if(robot.getType() == RobotType.SAGE){
+                sageCount++;
+            } else if (robot.getType() == RobotType.SOLDIER) {
+                soldierCount++;
+            } 
+            else if(robot.getType() == RobotType.WATCHTOWER || robot.getType() == RobotType.ARCHON){
                 buildingCount ++;
             }
         }
@@ -304,8 +308,10 @@ public strictfp class Sage {
                 }
                 enemyCount++;
             }
-            if(robot.getType() == RobotType.SAGE || robot.getType() == RobotType.SOLDIER){
-                droidCount ++;
+            if(robot.getType() == RobotType.SAGE){
+                sageCount++;
+            } else if (robot.getType() == RobotType.SOLDIER) {
+                soldierCount++;
             } else if(robot.getType() == RobotType.WATCHTOWER || robot.getType() == RobotType.ARCHON){
                 buildingCount ++;
             }
@@ -354,8 +360,10 @@ public strictfp class Sage {
                 }
                 enemyCount++;
             }
-            if(robot.getType() == RobotType.SAGE || robot.getType() == RobotType.SOLDIER){
-                droidCount ++;
+            if(robot.getType() == RobotType.SAGE){
+                sageCount++;
+            } else if (robot.getType() == RobotType.SOLDIER) {
+                soldierCount++;
             } else if(robot.getType() == RobotType.WATCHTOWER || robot.getType() == RobotType.ARCHON){
                 buildingCount ++;
             }
@@ -392,23 +400,26 @@ public strictfp class Sage {
 
 
     static void attack() throws GameActionException {
+        int droidCount = (soldierCount + sageCount);
         if(rc.isActionReady()){
             if(enemyCount > 0){
+                int totalEnemyMaxHealth = soldierCount * 50 + sageCount * 100;
 
-                rc.setIndicatorString(droidCount+" "+buildingCount);
-                if (droidCount <= 2) {
-                    // System.out.println("RAW ATTACK!");
+                // if deals more damage just purely attacking
+                if (totalEnemyMaxHealth * 0.22f < 45) {
+                    System.out.println("raw attack " + totalEnemyMaxHealth * 0.22f);
                     rawAttack(1);
-                } else if  (droidCount == 0 && buildingCount <= 1){
+                }
+                // if one building exists
+                else if (droidCount == 0 && buildingCount <= 1){
                     rawAttack(3);
                 }
-                else if(droidCount > 2 || buildingCount > 1 ||
-                        buildingCount <= droidCount ||  (allyCount == 1 && enemyCount > 0)){
-                    if(droidCount >= buildingCount){
-                        rc.envision(AnomalyType.CHARGE);
-                    } else{
-                        rc.envision(AnomalyType.FURY);
-                    }
+                // if there are more than 2 droids
+                else if(droidCount > 2){
+                    rc.envision(AnomalyType.CHARGE);
+                // if there are more than 1 building
+                } else if (buildingCount > 1) {
+                    rc.envision(AnomalyType.FURY);
                 }
             }
         }
