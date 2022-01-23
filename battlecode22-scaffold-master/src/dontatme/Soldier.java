@@ -239,7 +239,7 @@ public strictfp class Soldier {
         int closestEnemy = 21;
 
         for(RobotInfo robot:enemies){
-            if(isAttackableEnemy(robot.getType())){
+            if(isAttackableDroid(robot.getType())){
                 int dist =  robot.getLocation().distanceSquaredTo(rc.getLocation());
                 if(dist < closestEnemy){
                     closestEnemy = dist;
@@ -249,7 +249,7 @@ public strictfp class Soldier {
             }
         }
         for(RobotInfo robot: allies){
-            if(robot.getType() == RobotType.SOLDIER){
+            if(isAttackableDroid(robot.getType())){
                 allyCount++;
             }
         }
@@ -320,7 +320,7 @@ public strictfp class Soldier {
         MapLocation[] enemyPos = new MapLocation[5];
 
         for(RobotInfo robot:enemies){
-            if(isAttackableEnemy(robot.getType())){
+            if(isAttackableDroid(robot.getType())){
                 enemyCount++;
                 if(enemyCount < 5){
                     enemyPos[enemyCount] = robot.getLocation();
@@ -328,7 +328,7 @@ public strictfp class Soldier {
             }
         }
         for(RobotInfo robot: allies){
-            if(robot.getType() == RobotType.SOLDIER){
+            if(isAttackableDroid(robot.getType())){
                 allyCount++;
             }
         }
@@ -363,7 +363,7 @@ public strictfp class Soldier {
         MapLocation[] enemyPos = new MapLocation[5];
 
         for(RobotInfo robot:enemies){
-            if(isAttackableEnemy(robot.getType())){
+            if(isAttackableDroid(robot.getType())){
 
                 if(enemyCount < 5){
                     enemyPos[enemyCount] = robot.getLocation();
@@ -372,7 +372,7 @@ public strictfp class Soldier {
             }
         }
         for(RobotInfo robot: allies){
-            if(robot.getType() == RobotType.SOLDIER){
+            if(isAttackableDroid(robot.getType())){
                 allyCount++;
             }
         }
@@ -405,7 +405,7 @@ public strictfp class Soldier {
 
     void healAt(MapLocation target) throws GameActionException {
 
-        if(rc.getHealth() >=40){
+        if(rc.getHealth() >= RobotType.SOLDIER.getMaxHealth(1) * 0.8){
             currentState = SoldierState.Exploring;
             clearCommand();
             this.run();
@@ -421,7 +421,7 @@ public strictfp class Soldier {
             int closestEnemy = 21;
 
             for(RobotInfo robot:enemies){
-                if(isAttackableEnemy(robot.getType())){
+                if(isAttackableDroid(robot.getType())){
                     int dist =  robot.getLocation().distanceSquaredTo(rc.getLocation());
                     if(dist < closestEnemy){
                         closestEnemy = dist;
@@ -431,7 +431,7 @@ public strictfp class Soldier {
                 }
             }
             for(RobotInfo robot: allies){
-                if(robot.getType() == RobotType.SOLDIER){
+                if(isAttackableDroid(robot.getType())){
                     allyCount++;
                 }
             }
@@ -584,7 +584,7 @@ public strictfp class Soldier {
 
     }
 
-    static Boolean isAttackableEnemy(RobotType t) {
+    static Boolean isAttackableDroid(RobotType t) {
         return t == RobotType.SOLDIER || t == RobotType.WATCHTOWER || t == RobotType.SAGE;
     }
 }
