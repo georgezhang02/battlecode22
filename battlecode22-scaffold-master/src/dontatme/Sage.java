@@ -40,8 +40,8 @@ public strictfp class Sage {
         Communications.runStart(rc);
 
         Team opponent = rc.getTeam().opponent();
-        enemies = rc.senseNearbyRobots(20, opponent);
-        allies = rc.senseNearbyRobots(20, rc.getTeam());
+        enemies = rc.senseNearbyRobots(RobotType.SAGE.visionRadiusSquared, opponent);
+        allies = rc.senseNearbyRobots(RobotType.SAGE.visionRadiusSquared, rc.getTeam());
 
         combatCooldown--;
 
@@ -210,7 +210,7 @@ public strictfp class Sage {
         int closestEnemy = 35;
 
         for(RobotInfo robot:enemies){
-            if(robot.getType() == RobotType.SOLDIER || robot.getType() == RobotType.WATCHTOWER || robot.getType() == RobotType.SAGE){
+            if(isAttackableEnemy(robot.getType())){
                 int dist =  robot.getLocation().distanceSquaredTo(rc.getLocation());
                 if(dist < closestEnemy){
                     closestEnemy = dist;
@@ -296,7 +296,7 @@ public strictfp class Sage {
         MapLocation[] enemyPos = new MapLocation[5];
 
         for(RobotInfo robot:enemies){
-            if(robot.getType() == RobotType.SOLDIER || robot.getType() == RobotType.WATCHTOWER || robot.getType() == RobotType.SAGE){
+            if(isAttackableEnemy(robot.getType())){
                 int dist =  robot.getLocation().distanceSquaredTo(rc.getLocation());
                 if(dist < closestEnemy){
                     closestEnemy = dist;
@@ -346,7 +346,7 @@ public strictfp class Sage {
         MapLocation[] enemyPos = new MapLocation[5];
 
         for(RobotInfo robot:enemies){
-            if(robot.getType() == RobotType.SOLDIER || robot.getType() == RobotType.WATCHTOWER || robot.getType() == RobotType.SAGE){
+            if(isAttackableEnemy(robot.getType())){
                 int dist =  robot.getLocation().distanceSquaredTo(rc.getLocation());
                 if(dist < closestEnemy){
                     closestEnemy = dist;
@@ -506,5 +506,7 @@ public strictfp class Sage {
         }
     }
 
-
+    static Boolean isAttackableEnemy(RobotType t) {
+        return t == RobotType.SOLDIER || t == RobotType.WATCHTOWER || t == RobotType.SAGE;
+    }
 }
