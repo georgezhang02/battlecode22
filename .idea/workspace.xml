@@ -5,20 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fcd8da0b-c6fd-442f-8ac6-769e91da29e8" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_sage_rush/Archon.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_sage_rush/BFPathing20.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_sage_rush/BFPathing34.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_sage_rush/Builder.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_sage_rush/Communications.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_sage_rush/Explorer.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_sage_rush/Helper.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_sage_rush/Laboratory.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_sage_rush/Miner.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_sage_rush/Pathfinder.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_sage_rush/RobotPlayer.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_sage_rush/Sage.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_sage_rush/Soldier.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_sage_rush/Watchtower.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme/Sage.java" beforeDir="false" afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme/Sage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_sage_rush/Builder.java" beforeDir="false" afterPath="$PROJECT_DIR$/battlecode22-scaffold-master/src/dontatme_sage_rush/Builder.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -101,6 +90,7 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\henry\OneDrive\Documents\Grind\battlecode22\battlecode22-scaffold-master\src\dontatme_sage_rush" />
       <recent name="C:\Users\henry\OneDrive\Documents\Grind\battlecode22\battlecode22-scaffold-master\src" />
       <recent name="C:\Users\henry\OneDrive\Documents\Grind\battlecode22\battlecode22-scaffold-master\src\dontatme_old" />
       <recent name="C:\Users\henry\OneDrive\Documents\Grind\battlecode22\battlecode22-scaffold-master\src\dontatmeNOKITING" />
