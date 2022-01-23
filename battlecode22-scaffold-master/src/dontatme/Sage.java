@@ -32,6 +32,8 @@ public strictfp class Sage {
     static int sageCount;
     static int buildingCount;
 
+    static int counter = 0;
+
 
     public Sage (RobotController rc) throws GameActionException {
         this.rc = rc;
@@ -51,6 +53,8 @@ public strictfp class Sage {
         soldierCount = 0;
         sageCount = 0;
         buildingCount = 0;
+
+
 
         if(commandTimer <= 0){
             clearCommand();
@@ -234,10 +238,13 @@ public strictfp class Sage {
 
 
         if(enemyCount > 0 || !rc.isActionReady()){ // in combat
-            if(enemyCount > 0){
+            if(enemyCount < allyCount && counter >= 10){
                 Communications.sendMoveToCommand(rc, rc.getLocation(), enemyCount );
+                counter = 0;
+            } else if(enemyCount < allyCount){
+                counter++;
             }
-            if(!rc.isActionReady() &&  closestEnemy <= 20){ // action not ready
+            if(!rc.isActionReady() &&  closestEnemy <= 13){ // action not ready
                 dir = pathfinder.pathAwayFrom(enemyPos, 0); // kite
             } else if(enemyCount >= allyCount){
                 dir = lookForBetterSquare();
@@ -248,10 +255,13 @@ public strictfp class Sage {
         } // travelling
         else if(target != null && !pathfinder.targetWithinRadius(target, 52)){
             move(pathfinder.pathToTarget(target, false)); // path to target from far away
+            counter = 0;
         } else if(target != null && pathfinder.targetWithinRadius(target, 52)){
             dir = pathfinder.pathToTargetGreedy(target, 0); // path to target close
+            counter = 0;
         }else{
             currentState = SageState.Exploring;
+            counter = 0;
         }
         if(rc.canMove(dir) && rc.senseRubble(rc.getLocation().add(dir)) + 10
                 <=  1.5 * (rc.senseRubble(rc.getLocation())+ 10) ){

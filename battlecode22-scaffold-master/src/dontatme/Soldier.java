@@ -25,6 +25,7 @@ public strictfp class Soldier {
     static MapLocation archonDef;
 
     static int combatCooldown = 0;
+    static int counter = 0;
 
 
 
@@ -277,8 +278,11 @@ public strictfp class Soldier {
 
 
         if(enemyCount > 0 || !rc.isActionReady()){ // in combat
-            if(enemyCount > 0){
+            if(enemyCount < allyCount && counter >= 20){
                 Communications.sendMoveToCommand(rc, rc.getLocation(), enemyCount );
+                counter = 0;
+            } else if(enemyCount < allyCount){
+                counter++;
             }
             if(!rc.isActionReady() ){ // action not ready
                 dir = pathfinder.pathAwayFrom(enemyPos, 0); // kite
@@ -290,11 +294,14 @@ public strictfp class Soldier {
             }
         } // travelling
         else if(target != null && !pathfinder.targetWithinRadius(target, 34)){
-            move(pathfinder.pathToTarget(target, false)); // path to target from far away
+            move(pathfinder.pathToTarget(target, false)); // path to target from far awa
+            counter = 0;// y
         } else if(target != null && pathfinder.targetWithinRadius(target, 34)){
             dir = pathfinder.pathToTargetGreedy(target, 0); // path to target close
+            counter = 0;
         }else{
             currentState = SoldierState.Exploring;
+            counter = 0;
         }
         if(rc.canMove(dir) && rc.senseRubble(rc.getLocation().add(dir)) + 10
                 <= 1.5 * (rc.senseRubble(rc.getLocation())+ 10) ){
