@@ -46,7 +46,9 @@ public strictfp class Sage {
 
         combatCooldown--;
 
-
+        soldierCount = 0;
+        sageCount = 0;
+        buildingCount = 0;
 
         if(commandTimer <= 0){
             clearCommand();
@@ -70,23 +72,18 @@ public strictfp class Sage {
         switch (currentState){
             case Rushing:
                 offense(currentTarget, 0);
-                rc.setIndicatorString("Rushing ");
                 break;
             case PURSUING:
                 offense(currentTarget, 1);
-                rc.setIndicatorString("Pursuing");
                 break;
             case Defending:
                 defense(currentTarget, 6);
-                rc.setIndicatorString("Defending");
                 break;
             case Exploring:
                 explore();
-                rc.setIndicatorString("Exploring");
                 break;
             case ArchonDefense:
                 defense(currentTarget, 10);
-                rc.setIndicatorString("ArchonDefense");
                 break;
             case Anomaly:
                 rc.setIndicatorString("Anomaly");
@@ -145,28 +142,7 @@ public strictfp class Sage {
                 }
             }
         }
-/*
-        // for all defend commmand
-        for(int i = 0; i < defendCommands.length; i++){
-            Communications.Command dc = defendCommands[i];
-            // if location is valid
-            if(dc.location.x < 60){
-                // if command is a stop defending command and we're defending
-                if(dc.type == null && dc.location.equals(currentTarget) && !currentlyAttacking()){
-                    // stop doing whatever we are doing
-                    clearCommand();
-                    return;
-                    // if its not a stop defending command
-                } else{
-                    // get the command with the highest priority that is within our range
-                    if(dc.priority() > maxPrio && Communications.inCommandRadius(rc, dc.type, dc.location, false)){
-                        maxPrio = dc.priority();
 
-                        setCommand(dc);
-                    }
-                }
-            }
-        }*/
 
 
     }
@@ -401,6 +377,7 @@ public strictfp class Sage {
 
     static void attack() throws GameActionException {
         int droidCount = (soldierCount + sageCount);
+        rc.setIndicatorString(soldierCount+" "+sageCount);
         if(rc.isActionReady()){
             if(enemyCount > 0){
                 int totalEnemyMaxHealth = soldierCount * 50 + sageCount * 100;
@@ -415,7 +392,7 @@ public strictfp class Sage {
                     rawAttack(3);
                 }
                 // if there are more than 2 droids
-                else if(droidCount > 2){
+                else if(droidCount > 1){
                     rc.envision(AnomalyType.CHARGE);
                 // if there are more than 1 building
                 } else if (buildingCount > 1) {
