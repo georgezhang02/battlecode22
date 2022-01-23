@@ -733,7 +733,6 @@ public class Communications {
 
         if (minerCount < 63) {
             int writeVal = encode(minerCount + 1, soldierCount, builderCount);
-
             rc.writeSharedArray(rc.getRoundNum() % 2 + LEAD_UNIT_COUNT_OFFSET, writeVal);
         }
 
@@ -774,10 +773,8 @@ public class Communications {
         int soldierCount = decode(readVal, 1);
         int builderCount = decode(readVal, 2);
 
-
         if (builderCount < 15) {
             int writeVal = encode(minerCount, soldierCount, builderCount + 1);
-
             rc.writeSharedArray(rc.getRoundNum() % 2 + LEAD_UNIT_COUNT_OFFSET, writeVal);
         }
 
@@ -924,6 +921,27 @@ public class Communications {
         return false;
     }
 
+    /**
+     * Set one builder flag
+     *
+     * @throws GameActionException
+     */
+    public static boolean setOneBuilder(RobotController rc) throws GameActionException {
+        int arrValue = rc.readSharedArray(HAS_WIPED);
+        rc.writeSharedArray(HAS_WIPED, encode(decode(arrValue, 0),
+                1, decode(arrValue, 2)));
+        return true;
+    }
+
+    /**
+     * Return if a builder has been built already
+     *
+     * @throws GameActionException
+     */
+    public static boolean hasOneBuilder(RobotController rc) throws GameActionException {
+        int arrValue = rc.readSharedArray(HAS_WIPED);
+        return decode(arrValue, 1) == 1;
+    }
 
     /**
      * Toggles whether an archon is moving this round.

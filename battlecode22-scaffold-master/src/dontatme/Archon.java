@@ -318,33 +318,34 @@ public strictfp class Archon {
                         buildTowardsLowRubble(rc, RobotType.MINER);
                     }
                 }
-
+                else if(builderCount < 1 && !Communications.hasOneBuilder(rc)){
+                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 40) {
+                        buildTowardsLowRubble(rc, RobotType.BUILDER);
+                        Communications.setOneBuilder(rc);
+                    }
+                }
+                else if(labCount < 1 && buildCommands[0] != null){
+                    // waiting on getting enough lead
+                }
                 else if (minerCount / rc.getArchonCount() < 1){
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
                         buildTowardsLowRubble(rc, RobotType.MINER);
-
                     }
                 }
                 else if (rc.getTeamGoldAmount(rc.getTeam()) >= 20) {
                     buildTowardsLowRubble(rc, RobotType.SAGE);
-
-                }else if (soldiers < 4 * MAP_SCALER  ) {
+                }
+                else if (soldiers < 4 * MAP_SCALER  ) {
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
                         buildTowardsLowRubble(rc, RobotType.SOLDIER);
-                    }
-                }else if(builderCount < 1){
-                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 40) {
-                        buildTowardsLowRubble(rc, RobotType.BUILDER);
                     }
                 }
-
-                else if(labCount < 1 && buildCommands[0] != null){
-                    // waiting on getting enough lead
-                }else if (soldierCount / rc.getArchonCount() < 5  * MAP_SCALER) {
+                else if (soldierCount / rc.getArchonCount() < 5  * MAP_SCALER) {
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
                         buildTowardsLowRubble(rc, RobotType.SOLDIER);
                     }
-                }    else if (minerCount / rc.getArchonCount() < 5 *  MAP_SCALER){
+                }
+                else if (minerCount / rc.getArchonCount() < 5 *  MAP_SCALER){
                     int x = (int)(100000 * Math.random()) % 4;
 
                     if( x <=2){
