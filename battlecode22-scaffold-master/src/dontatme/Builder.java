@@ -9,11 +9,13 @@ public strictfp class Builder {
 
     //checks if the builder has moved towards the center already
     static Pathfinder pathfinder;
-
+    boolean toDetonate;
 
     static MapLocation curTarget;
     static int moves = 0;
     static int turn = 0;
+
+    static MapLocation lastSeenArchon;
 
     static Direction[]buildDir = new Direction[]{Direction.SOUTH, Direction.NORTHEAST, Direction.NORTHWEST,
             Direction.SOUTHWEST, Direction.SOUTH, Direction.SOUTHEAST, Direction. NORTHEAST, Direction.NORTHEAST,
@@ -21,98 +23,111 @@ public strictfp class Builder {
     public static void run(RobotController rc) throws GameActionException {
         turn++;
 
-        if(pathfinder == null){
-            pathfinder = new BFPathing20(rc);
+        if (rc.getRoundNum() <= 26) {
+            detonate(rc);
         }
 
-
-        Communications.runStart(rc);
-
-        int[] units = Communications.getUnitCounts(rc);
-
-        // deciding to rush
-        int minerCount = units[0];
-        int soldierCount = units[1];
-        int builderCount = units[2];
-
-        int labCount = units[3];
-        int sageCount = units[4];
-
-
-
-        RobotInfo[] robots = rc.senseNearbyRobots();
-
-        //detect if there's a nearby archon and fix it if it's low health
-        /*MapLocation [] nearbyArchons = findNearbyArchons(rc, robots);
-        if (nearbyArchons[0] != null) { //there is a nearby archon
-            int lowestHealthArchon = findLowerHealthArchon(rc, nearbyArchons);
-            if (lowestHealthArchon != -1) {
-                if (rc.canRepair(nearbyArchons[lowestHealthArchon])) {
-                    rc.repair(nearbyArchons[lowestHealthArchon]);
-                }
-                else {
-                    pathfinder.bfPathToTarget(nearbyArchons[lowestHealthArchon]);
-                }
+        else {
+            if(pathfinder == null){
+                pathfinder = new BFPathing20(rc);
             }
-        }*/
 
 
-        if(labCount < 1){
-            if(robots.length > 1
-                    && moves < 5
-                    && (curTarget== null || !pathfinder.targetWithinRadius(curTarget, 20))){
-                curTarget = getClosestCorner(rc);
-                move(rc, pathfinder.pathToTarget(curTarget, false));
-                rc.setIndicatorString("moving");
+            Communications.runStart(rc);
 
-            }
-            else if (robots.length > 3  && moves < 10){
-                int index = 0;
-                MapLocation[]nearby = new MapLocation[10];
-                for(int i = 0; i< robots.length && index < 10; i++){
+            int[] units = Communications.getUnitCounts(rc);
 
-                    nearby[index++] = robots[i].getLocation();
-                }
-                move(rc, pathfinder.pathAwayFrom(nearby));
-            } else{
-                Direction better = lookForBetterSquare(rc);
+            // deciding to rush
+            int minerCount = units[0];
+            int soldierCount = units[1];
+            int builderCount = units[2];
 
-                if(moves < 10 && better != null){
-                    move(rc, better);
-                    moves += 4;
-                } else{
-                    if(robots.length <= 3){
-                        Communications.sendBuildCommand(rc, rc.getLocation(), RobotType.LABORATORY);
+            int labCount = units[3];
+            int sageCount = units[4];
+
+
+
+            RobotInfo[] robots = rc.senseNearbyRobots();
+
+            //detect if there's a nearby archon and fix it if it's low health
+            MapLocation [] nearbyArchons = findNearbyArchons(rc, robots);
+            if (robots.length != 0 && nearbyArchons[0] != null) { //there is a nearby archon
+                lastSeenArchon = nearbyArchons[0];
+                //System.out.println(lastSeenArchon.x + " " + lastSeenArchon.y);
+                int lowestHealthArchon = findLowerHealthArchon(rc, nearbyArchons);
+                if (lowestHealthArchon != -1) {
+                    if (rc.canRepair(nearbyArchons[lowestHealthArchon])) {
+                        rc.repair(nearbyArchons[lowestHealthArchon]);
                     }
-                    if(rc.isActionReady() && rc.getTeamLeadAmount(rc.getTeam()) >= 180){
+                    else {
+                        move(rc, pathfinder.bfPathToTarget(nearbyArchons[lowestHealthArchon]));
+                    }
+                }
+            }
 
-                        Direction dir = findDirLowestRubble(rc, rc.getLocation());
-                        if(dir != null && rc.canBuildRobot(RobotType.LABORATORY, dir)){
-                            rc.buildRobot(RobotType.LABORATORY, dir);
+
+            if(labCount < 1){
+                if(robots.length > 1
+                        && moves < 5
+                        && (curTarget== null || !pathfinder.targetWithinRadius(curTarget, 20))){
+                    curTarget = getClosestCorner(rc);
+                    move(rc, pathfinder.pathToTarget(curTarget, false));
+                    rc.setIndicatorString("moving");
+
+                }
+                else if (robots.length > 3  && moves < 10){
+                    int index = 0;
+                    MapLocation[]nearby = new MapLocation[10];
+                    for(int i = 0; i< robots.length && index < 10; i++){
+
+                        nearby[index++] = robots[i].getLocation();
+                    }
+                    move(rc, pathfinder.pathAwayFrom(nearby));
+                } else{
+                    Direction better = lookForBetterSquare(rc);
+
+                    if(moves < 10 && better != null){
+                        move(rc, better);
+                        moves += 4;
+                    } else{
+                        if(robots.length <= 3){
+                            Communications.sendBuildCommand(rc, rc.getLocation(), RobotType.LABORATORY);
+                        }
+                        if(rc.isActionReady() && rc.getTeamLeadAmount(rc.getTeam()) >= 180){
+
+                            Direction dir = findDirLowestRubble(rc, rc.getLocation());
+                            if(dir != null && rc.canBuildRobot(RobotType.LABORATORY, dir)){
+                                rc.buildRobot(RobotType.LABORATORY, dir);
+                            }
                         }
                     }
+
                 }
-
-            }
-        } else{
+            } else{
 
 
 
-            MapLocation toRepair = findBuildingToRepair(rc, robots);
-            if(toRepair!= null){
-                if(rc.getLocation().distanceSquaredTo(toRepair) > 5){
-                    move(rc, pathfinder.pathToTarget(toRepair, false));
-                } else if(rc.canRepair(toRepair)){
-                    rc.repair(toRepair);
+                MapLocation toRepair = findBuildingToRepair(rc, robots);
+                if(toRepair!= null){
+                    if(rc.getLocation().distanceSquaredTo(toRepair) > 5){
+                        move(rc, pathfinder.pathToTarget(toRepair, false));
+                    } else if(rc.canRepair(toRepair)){
+                        rc.repair(toRepair);
+                    }
+                }
+                else {
+                    MapLocation targetMovement;
+                    if (robots.length != 0 && nearbyArchons[0] != null) {
+                        targetMovement = nearbyArchons[0];
+                        //System.out.println("I got here");
+                    }
+                    else {
+                        targetMovement = new MapLocation(GameConstants.MAP_MAX_WIDTH / 2, GameConstants.MAP_MAX_HEIGHT / 2);
+                    }
+                    move(rc, pathfinder.bfPathToTarget(targetMovement));
                 }
             }
         }
-
-
-
-
-
-
     }
 
     static MapLocation findBuildingToRepair(RobotController rc, RobotInfo[]robotInfo) {
@@ -220,12 +235,14 @@ public strictfp class Builder {
 
         //returns a MapLocations array of archon positions in the overall robots array
         MapLocation [] archonPos = new MapLocation [robots.length];
-        archonPos[0] = null;
-        int archonCounter = 0;
-        for (int i = 0; i < robots.length; i++) {
-            if (robots[i].getType().equals(RobotType.ARCHON)) {
-                archonPos[archonCounter] = robots[i].getLocation();
-                archonCounter++;
+        if (robots.length != 0) {
+            archonPos[0] = null;
+            int archonCounter = 0;
+            for (int i = 0; i < robots.length; i++) {
+                if (robots[i].getType().equals(RobotType.ARCHON)) {
+                    archonPos[archonCounter] = robots[i].getLocation();
+                    archonCounter++;
+                }
             }
         }
         return archonPos;
@@ -248,4 +265,26 @@ public strictfp class Builder {
         return lowestHealthArchon;
     }
 
+    static void detonate(RobotController rc) throws GameActionException {
+        //search areas near me in cardinal directions
+        int lowestRubble = Integer.MAX_VALUE;
+        int lowestIndex = 0;
+        for (int i = 0; i < Helper.directions.length; i++) {
+            if (rc.canMove(Helper.directions[i])) {
+                int amountRubble = rc.senseRubble(rc.getLocation().add(Helper.directions[i]));
+                if (amountRubble < lowestRubble) {
+                    lowestRubble = amountRubble;
+                    lowestIndex = i;
+                }
+            }
+        }
+        Direction dir = Helper.directions[lowestIndex];
+        if (rc.canMove(dir))
+            rc.move(dir);
+        if (turn > 6 && rc.senseLead(rc.getLocation()) == 0) {
+            if (rc.isActionReady())
+                rc.disintegrate();
+        }
+
+    }
 }
