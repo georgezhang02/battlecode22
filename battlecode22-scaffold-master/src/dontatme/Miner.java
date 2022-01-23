@@ -12,6 +12,7 @@ public strictfp class Miner {
     static MapLocation exploreLoc = null;
 
     static boolean searchLocal = true;
+    static MapLocation optimizeLoc = null;
 
     static int runAwayTimer = 0;
     static MapLocation[] currentEnemies = null;
@@ -33,7 +34,9 @@ public strictfp class Miner {
 
         MapLocation[] leads = rc.senseNearbyLocationsWithLead(20);
         int[][] leadAmounts = leadAmounts(rc, me, leads);
-        double selfRate = mineRate(rc, me, 0, 0, leadAmounts);
+        if (optimizeLoc != null && optimizeLoc.equals(me)) {
+            optimizeLoc = null;
+        }
 
         // Initialize pathfinding and archon index
         if (pathfinder == null){
@@ -123,6 +126,8 @@ public strictfp class Miner {
         currentEnemies = Helper.updateEnemyLocations(rc, robotInfo);
         runAwayTimer--;
         if (currentEnemies[0] != null || runAwayTimer > 0){
+            optimizeLoc = null;
+
             Direction dir = pathfinder.pathAwayFrom(currentEnemies);
             if (rc.canMove(dir)){
                 rc.move(dir);
@@ -136,8 +141,12 @@ public strictfp class Miner {
             }
         }
 
+        else if (optimizeLoc != null) {
+            tryMove(rc, me, optimizeLoc, false);
+        }
+
         // Otherwise, if not on mineable lead, go mining
-        else if (selfRate == 0) {
+        else if (!minable(leadAmounts)) {
 
             // If the current heading still has mineable lead and no friendly miner, path there
             if (heading != null && rc.canSenseLocation(heading) && rc.senseLead(heading) > leadThreshold &&
@@ -173,22 +182,21 @@ public strictfp class Miner {
             MapLocation max = null;
             for (int dx = -1; dx <= 1; dx++) {
                 for (int dy = -1; dy <= 1; dy++) {
-                    if (dx != 0 || dy != 0) {
-                        MapLocation possLocation = new MapLocation(me.x + dx, me.y + dy);
-                        if (rc.canSenseLocation(possLocation)) {
-                            double targetMineRate = mineRate(rc, possLocation, dx, dy, leadAmounts);
-                            if ((targetMineRate > maxRate || (targetMineRate == maxRate && leadAmounts[dx+3][dy+3] > leadThreshold)) && !friendlyMinerAt(rc, possLocation)) {
-                                maxRate = targetMineRate;
-                                max = possLocation;
-                            }
+                    MapLocation possLocation = new MapLocation(me.x + dx, me.y + dy);
+                    if (rc.canSenseLocation(possLocation)) {
+                        double targetMineRate = mineRate(rc, possLocation, dx, dy, leadAmounts);
+                        if ((targetMineRate > maxRate || (targetMineRate == maxRate && leadAmounts[dx+3][dy+3] > leadThreshold)) && !friendlyMinerAt(rc, possLocation)) {
+                            maxRate = targetMineRate;
+                            max = possLocation;
                         }
                     }
                 }
             }
-            if (maxRate > selfRate) {
+            if (max != null && !max.equals(me) && maxRate > mineRate(rc, me, 0, 0, leadAmounts)) {
                 tryMove(rc, me, max, false);
+            } else {
+                searchLocal = false;
             }
-            searchLocal = false;
         } else {
             double maxRate = 0;
             MapLocation max = null;
@@ -206,8 +214,9 @@ public strictfp class Miner {
                     }
                 }
             }
-            if (maxRate > 3 * selfRate) {
-                tryMove(rc, me, max, false);
+            if (max != null && maxRate > 3 * mineRate(rc, me, 0, 0, leadAmounts)) {
+                tryMove(rc, me, max, true);
+                optimizeLoc = max;
             }
             searchLocal = true;
         }
@@ -292,6 +301,17 @@ public strictfp class Miner {
         return false;
     }
 
+    static boolean minable(int[][] leadAmounts) {
+        for (int dx = 1; dx <= 5; dx++) {
+            for (int dy = 1; dy <= 5; dy++) {
+                if (leadAmounts[dx][dy] > leadThreshold) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     static int[][] leadAmounts(RobotController rc, MapLocation me, MapLocation[] leads) throws GameActionException {
         int[][] amounts = new int[7][7];
         for (MapLocation lead : leads) {
@@ -319,16 +339,11 @@ public strictfp class Miner {
         return leadCount / (double) (rc.senseRubble(loc) + 1);
     }
 
-    static boolean tryMove(RobotController rc, MapLocation me, MapLocation loc, boolean greedy) throws GameActionException {
-        Direction dir = null;
-        if (loc != null) {
-            dir = pathfinder.pathToTarget(loc, greedy);
-        }
+    static void tryMove(RobotController rc, MapLocation me, MapLocation loc, boolean greedy) throws GameActionException {
+        Direction dir = pathfinder.pathToTarget(loc, greedy);
         if (dir != null && rc.canMove(dir)) {
             rc.move(dir);
             rc.setIndicatorLine(me.add(dir), loc, 0, 255, 0);
-            return true;
         }
-        return false;
     }
 }
