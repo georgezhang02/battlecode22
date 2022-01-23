@@ -465,7 +465,18 @@ public strictfp class Archon {
         MapLocation ans = null;
         for(RobotInfo robot:allies){
             if(rc.getLocation().distanceSquaredTo(robot.getLocation()) <= 20){
-                if(robot.getType() == RobotType.SOLDIER && robot.getHealth() < 50){
+                if(robot.getType() == RobotType.SAGE && robot.getHealth() < RobotType.SAGE.getMaxHealth(1)){
+                    if(robot.getID() == curHealingID ){
+                        return robot.getLocation();
+                    }
+                    else if(robot.getHealth() < lowHealth  || ! foundSoldier){
+                        lowHealth = robot.getHealth();
+                        id = robot.getID();
+                        foundSoldier = true;
+                        ans = robot.getLocation();
+                    }
+                }
+                else if(robot.getType() == RobotType.SOLDIER && robot.getHealth() < RobotType.SOLDIER.getMaxHealth(1)){
                     if(robot.getID() == curHealingID ){
                         return robot.getLocation();
                     }
