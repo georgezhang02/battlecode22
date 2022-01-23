@@ -11,13 +11,16 @@ public strictfp class Miner {
     static Pathfinder pathfinder = null;
     static MapLocation exploreLoc = null;
 
+    static boolean searchLocal = true;
+    static MapLocation optimizeLoc = null;
+
     static int runAwayTimer = 0;
     static MapLocation[] currentEnemies = null;
 
     static int leadThreshold = 1;
 
     private static enum MinerType {
-        None, BaseMiner, ExpandMiner, ExploreMiner
+        None, BaseMiner, ExploreMiner
     }
 
     /**
@@ -26,15 +29,20 @@ public strictfp class Miner {
      */
     static void run(RobotController rc) throws GameActionException {
         Communications.runStart(rc);
-
         MapLocation me = rc.getLocation();
         RobotInfo[] robotInfo = rc.senseNearbyRobots();
+
         MapLocation[] leads = rc.senseNearbyLocationsWithLead(20);
+        int[][] leadAmounts = leadAmounts(rc, me, leads);
+        if (optimizeLoc != null && optimizeLoc.equals(me)) {
+            optimizeLoc = null;
+        }
 
         // Initialize pathfinding and archon index
         if (pathfinder == null){
             pathfinder = new BFPathing20(rc);
         }
+        
         if (archonID == -1) {
             for (RobotInfo info : robotInfo) {
                 if (info.getType() == RobotType.ARCHON) {
@@ -84,7 +92,6 @@ public strictfp class Miner {
                 }
             }
             Communications.incrementMinerTurn(rc, locInd);
-            System.out.println("Explore: " + exploreLoc);
         }
 
         // If just spawned, become base miner if it's the first miner
@@ -113,13 +120,14 @@ public strictfp class Miner {
         // Set exploration as done if found location
         if (exploreLoc != null && rc.canSenseLocation(exploreLoc) && rc.senseLead(exploreLoc) == 0) {
             exploreLoc = null;
-            System.out.println("Done exploring");
         }
 
         // Run away from enemies for 2 moves if necessary
         currentEnemies = Helper.updateEnemyLocations(rc, robotInfo);
         runAwayTimer--;
         if (currentEnemies[0] != null || runAwayTimer > 0){
+            optimizeLoc = null;
+
             Direction dir = pathfinder.pathAwayFrom(currentEnemies);
             if (rc.canMove(dir)){
                 rc.move(dir);
@@ -133,13 +141,17 @@ public strictfp class Miner {
             }
         }
 
+        else if (optimizeLoc != null) {
+            tryMove(rc, me, optimizeLoc, false);
+        }
+
         // Otherwise, if not on mineable lead, go mining
-        else if (mineRate(rc, me) == 0) {
+        else if (!minable(leadAmounts)) {
 
             // If the current heading still has mineable lead and no friendly miner, path there
             if (heading != null && rc.canSenseLocation(heading) && rc.senseLead(heading) > leadThreshold &&
                     !friendlyMinerAt(rc, heading)) {
-                tryMove(rc, me, heading);
+                tryMove(rc, me, heading, false);
             }
 
             // If no current heading, move towards best lead within miner vision if possible
@@ -165,20 +177,48 @@ public strictfp class Miner {
         }
 
         // If on lead, try to optimize mine rate by moving around if possible
-        else {
-            double bestMineRate = mineRate(rc, me);;
-            Direction bestDirection = null;
-            for (Direction dir : Helper.directions) {
-                double targetMineRate = mineRate(rc, me.add(dir));
-                if (rc.canMove(dir) && targetMineRate > bestMineRate) {
-                    bestMineRate = targetMineRate;
-                    bestDirection = dir;
+        else if (searchLocal) {
+            double maxRate = 0;
+            MapLocation max = null;
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dy = -1; dy <= 1; dy++) {
+                    MapLocation possLocation = new MapLocation(me.x + dx, me.y + dy);
+                    if (rc.canSenseLocation(possLocation)) {
+                        double targetMineRate = mineRate(rc, possLocation, dx, dy, leadAmounts);
+                        if ((targetMineRate > maxRate || (targetMineRate == maxRate && leadAmounts[dx+3][dy+3] > leadThreshold)) && !friendlyMinerAt(rc, possLocation)) {
+                            maxRate = targetMineRate;
+                            max = possLocation;
+                        }
+                    }
                 }
             }
-            if (bestDirection != null) {
-                rc.move(bestDirection);
-                rc.setIndicatorDot(me.add(bestDirection), 0, 255, 255);
+            if (max != null && !max.equals(me) && maxRate > mineRate(rc, me, 0, 0, leadAmounts)) {
+                tryMove(rc, me, max, false);
+            } else {
+                searchLocal = false;
             }
+        } else {
+            double maxRate = 0;
+            MapLocation max = null;
+            for (int dx = -2; dx <= 2; dx++) {
+                for (int dy = -2; dy <= 2; dy++) {
+                    if (!(dx <= 1 && dx >= -1 && dy <= 1 && dy >= -1)) {
+                        MapLocation possLocation = new MapLocation(me.x + dx, me.y + dy);
+                        if (rc.canSenseLocation(possLocation)) {
+                            double targetMineRate = mineRate(rc, possLocation, dx, dy, leadAmounts);
+                            if ((targetMineRate > maxRate || (targetMineRate == maxRate && leadAmounts[dx+3][dy+3] > leadThreshold)) && !friendlyMinerAt(rc, possLocation)) {
+                                maxRate = targetMineRate;
+                                max = possLocation;
+                            }
+                        }
+                    }
+                }
+            }
+            if (max != null && maxRate > 3 * mineRate(rc, me, 0, 0, leadAmounts)) {
+                tryMove(rc, me, max, true);
+                optimizeLoc = max;
+            }
+            searchLocal = true;
         }
     }
 
@@ -186,8 +226,7 @@ public strictfp class Miner {
         // Move towards lead location given by archon
         MapLocation archonLead = Communications.getArchonVisionLead(rc, archonID);
         if (archonLead.y != 61 && minersNear(rc, archonLead) < 2) {
-            rc.setIndicatorDot(me, 255, 0, 0);
-            tryMove(rc, me, archonLead);
+            tryMove(rc, me, archonLead, false);
         }
         // If no more resources left, become explorer
         else {
@@ -198,7 +237,7 @@ public strictfp class Miner {
 
     static void exploreMiner(RobotController rc, MapLocation me) throws GameActionException{
         if (exploreLoc != null) {
-            tryMove(rc, me, exploreLoc);
+            tryMove(rc, me, exploreLoc, false);
         } else {
             Direction exploreDir = pathfinder.pathToExplore();
             if (rc.canMove(exploreDir)) {
@@ -226,7 +265,7 @@ public strictfp class Miner {
         for (MapLocation lead : leads) {
             if (rc.senseLead(lead) > leadThreshold && !friendlyMinerAt(rc, lead)
                 && (exploreLoc == null || towards(me, lead, exploreLoc))) {
-                tryMove(rc, me, lead);
+                tryMove(rc, me, lead, false);
                 return lead;
             }
         }
@@ -262,44 +301,46 @@ public strictfp class Miner {
         return false;
     }
 
-    static double mineRate(RobotController rc, MapLocation lead) throws GameActionException {
-        int leadCount = 0;
-        for (Direction dir : Helper.directions) {
-            MapLocation nearby = lead.add(dir);
-            if (rc.canSenseLocation(nearby)) {
-                int nearbyLead = rc.senseLead(nearby);
-                if (nearbyLead != 0) {
-                    leadCount += nearbyLead - leadThreshold;
+    static boolean minable(int[][] leadAmounts) {
+        for (int dx = 1; dx <= 5; dx++) {
+            for (int dy = 1; dy <= 5; dy++) {
+                if (leadAmounts[dx][dy] > leadThreshold) {
+                    return true;
                 }
             }
         }
-        int rubbleCount = 0;
-        if (rc.canSenseLocation(lead)) {
-            int locLead = rc.senseLead(lead);
-            if (locLead != 0) {
-                leadCount += locLead - leadThreshold;
+        return false;
+    }
+
+    static int[][] leadAmounts(RobotController rc, MapLocation me, MapLocation[] leads) throws GameActionException {
+        int[][] amounts = new int[7][7];
+        for (MapLocation lead : leads) {
+            int x = lead.x - me.x + 3;
+            int y = lead.y - me.y + 3;
+            if (x >= 0 && x < 7 && y >= 0 && y < 7) {
+                amounts[x][y] = rc.senseLead(lead);
             }
-            rubbleCount = rc.senseRubble(lead);
+        }
+        return amounts;
+    }
+
+    static double mineRate(RobotController rc, MapLocation loc, int offX, int offY, int[][] leadAmounts) throws GameActionException {
+        int leadCount = 0;
+        for (int x = offX + 2 ; x <= offX + 4; x++) {
+            for (int y = offY + 2; y <= offY + 4; y++) {
+                if (leadAmounts[x][y] > leadThreshold) {
+                    leadCount += leadAmounts[x][y] - leadThreshold;
+                }
+            }
         }
         if (leadCount > 10) {
             leadCount = 10;
         }
-        double cooldown = (1 + ((double) rubbleCount) / 10) * 2;
-        return leadCount / cooldown;
+        return leadCount / (double) (rc.senseRubble(loc) + 1);
     }
 
-    static void tryMove(RobotController rc, MapLocation me, MapLocation loc) throws GameActionException {
-        Direction dir = pathfinder.pathToTarget(loc,false);
-        /*
-        if (dir != null && rc.canMove(dir)) {
-            double targetMineRate = mineRate(rc, loc);
-            double currentMineRate = mineRate(rc, me);
-            if (targetMineRate >= currentMineRate){
-                rc.move(dir);
-                rc.setIndicatorLine(me.add(dir), loc, 0, 255, 0);
-            }
-        }
-         */
+    static void tryMove(RobotController rc, MapLocation me, MapLocation loc, boolean greedy) throws GameActionException {
+        Direction dir = pathfinder.pathToTarget(loc, greedy);
         if (dir != null && rc.canMove(dir)) {
             rc.move(dir);
             rc.setIndicatorLine(me.add(dir), loc, 0, 255, 0);
