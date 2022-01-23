@@ -477,7 +477,7 @@ public class Communications {
      */
     public static boolean sendMoveToCommand(RobotController rc, MapLocation location, int numEnemies) throws GameActionException {
         int index = (rc.getRoundNum() % 2 == 0) ? MOVE_TO_EVEN_OFFSET : MOVE_TO_ODD_OFFSET;
-        int newCommand = encode(location.x, location.y, Math.max(numEnemies, 15));
+        int newCommand = encode(location.x, location.y, Math.min(numEnemies, 15));
 
         int readVal = rc.readSharedArray(index);
         if ((decode(readVal, 0) == NULL_LOCATION || decode(readVal, 2) < numEnemies)) {
