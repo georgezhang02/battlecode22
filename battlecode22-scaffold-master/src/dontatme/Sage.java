@@ -27,6 +27,7 @@ public strictfp class Sage {
 
     static int enemyCount;
     static int allyCount;
+
     static int soldierCount;
     static int sageCount;
     static int buildingCount;
@@ -41,8 +42,9 @@ public strictfp class Sage {
         Communications.runStart(rc);
 
         Team opponent = rc.getTeam().opponent();
-        enemies = rc.senseNearbyRobots(RobotType.SAGE.actionRadiusSquared, opponent);
-        allies = rc.senseNearbyRobots(RobotType.SAGE.actionRadiusSquared, rc.getTeam());
+
+        enemies = rc.senseNearbyRobots(34, opponent);
+        allies = rc.senseNearbyRobots(34, rc.getTeam());
 
         combatCooldown--;
 
@@ -195,12 +197,12 @@ public strictfp class Sage {
                 }
                 enemyCount++;
             }
-            if(robot.getType() == RobotType.SAGE){
+            if(withinActionRadius(robot.getLocation()) && robot.getType() == RobotType.SAGE){
                 sageCount++;
-            } else if (robot.getType() == RobotType.SOLDIER) {
+            } else if (withinActionRadius(robot.getLocation()) && robot.getType() == RobotType.SOLDIER) {
                 soldierCount++;
             } 
-            else if(robot.getType() == RobotType.WATCHTOWER || robot.getType() == RobotType.ARCHON){
+            else if(withinActionRadius(robot.getLocation()) && robot.getType() == RobotType.WATCHTOWER || robot.getType() == RobotType.ARCHON){
                 buildingCount ++;
             }
         }
@@ -284,11 +286,11 @@ public strictfp class Sage {
                 }
                 enemyCount++;
             }
-            if(robot.getType() == RobotType.SAGE){
+            if(withinActionRadius(robot.getLocation()) && robot.getType() == RobotType.SAGE){
                 sageCount++;
-            } else if (robot.getType() == RobotType.SOLDIER) {
+            } else if (withinActionRadius(robot.getLocation()) && robot.getType() == RobotType.SOLDIER) {
                 soldierCount++;
-            } else if(robot.getType() == RobotType.WATCHTOWER || robot.getType() == RobotType.ARCHON){
+            } else if(withinActionRadius(robot.getLocation()) && robot.getType() == RobotType.WATCHTOWER || robot.getType() == RobotType.ARCHON){
                 buildingCount ++;
             }
         }
@@ -336,11 +338,11 @@ public strictfp class Sage {
                 }
                 enemyCount++;
             }
-            if(robot.getType() == RobotType.SAGE){
+            if(withinActionRadius(robot.getLocation()) && robot.getType() == RobotType.SAGE){
                 sageCount++;
-            } else if (robot.getType() == RobotType.SOLDIER) {
+            } else if (withinActionRadius(robot.getLocation()) && robot.getType() == RobotType.SOLDIER) {
                 soldierCount++;
-            } else if(robot.getType() == RobotType.WATCHTOWER || robot.getType() == RobotType.ARCHON){
+            } else if(withinActionRadius(robot.getLocation()) && robot.getType() == RobotType.WATCHTOWER || robot.getType() == RobotType.ARCHON){
                 buildingCount ++;
             }
         }
@@ -496,5 +498,9 @@ public strictfp class Sage {
 
     static Boolean isAttackableDroid(RobotType t) {
         return t == RobotType.SOLDIER || t == RobotType.WATCHTOWER || t == RobotType.SAGE;
+    }
+
+    static Boolean withinActionRadius(MapLocation l) {
+        return rc.getLocation().distanceSquaredTo(l) < 25;
     }
 }
