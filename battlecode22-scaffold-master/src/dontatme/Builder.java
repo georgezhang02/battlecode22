@@ -42,6 +42,21 @@ public strictfp class Builder {
 
         RobotInfo[] robots = rc.senseNearbyRobots();
 
+        //detect if there's a nearby archon and fix it if it's low health
+        /*MapLocation [] nearbyArchons = findNearbyArchons(rc, robots);
+        if (nearbyArchons[0] != null) { //there is a nearby archon
+            int lowestHealthArchon = findLowerHealthArchon(rc, nearbyArchons);
+            if (lowestHealthArchon != -1) {
+                if (rc.canRepair(nearbyArchons[lowestHealthArchon])) {
+                    rc.repair(nearbyArchons[lowestHealthArchon]);
+                }
+                else {
+                    pathfinder.bfPathToTarget(nearbyArchons[lowestHealthArchon]);
+                }
+            }
+        }*/
+
+
         if(labCount < 1){
             if(robots.length > 1
                     && moves < 5
@@ -199,6 +214,38 @@ public strictfp class Builder {
         if (dir == null)
             return null;
         return dir;
+    }
+
+    static MapLocation [] findNearbyArchons(RobotController rc, RobotInfo [] robots) throws GameActionException {
+
+        //returns a MapLocations array of archon positions in the overall robots array
+        MapLocation [] archonPos = new MapLocation [robots.length];
+        archonPos[0] = null;
+        int archonCounter = 0;
+        for (int i = 0; i < robots.length; i++) {
+            if (robots[i].getType().equals(RobotType.ARCHON)) {
+                archonPos[archonCounter] = robots[i].getLocation();
+                archonCounter++;
+            }
+        }
+        return archonPos;
+    }
+
+    static int findLowerHealthArchon(RobotController rc, MapLocation [] archonLocs) throws GameActionException {
+        int counter = 0;
+        int lowestHealthArchon = -1;
+        int highestHealthDiff = 0; //archon health
+        while (counter < archonLocs.length && archonLocs[counter] != null) {
+            RobotInfo tempArch = rc.senseRobotAtLocation(archonLocs[counter]);
+            if (tempArch.getHealth() < RobotType.ARCHON.getMaxHealth(tempArch.getLevel())) {
+                int tempHealthDiff = tempArch.getHealth() - RobotType.ARCHON.getMaxHealth(tempArch.getLevel());
+                if (tempHealthDiff > highestHealthDiff) {
+                    lowestHealthArchon = counter;
+                }
+            }
+            counter++;
+        }
+        return lowestHealthArchon;
     }
 
 }
