@@ -459,35 +459,35 @@ public strictfp class Archon {
     }
 
     static MapLocation healUnitsAround(RobotController rc, RobotInfo[]allies){
-        boolean foundSage = false;
         boolean foundSoldier = false;
+        boolean foundSage = false;
         int id = -1;
         MapLocation ans = null;
         for(RobotInfo robot:allies){
             int lowHealth = robot.getType().getMaxHealth(1) / 3;
             if(rc.getLocation().distanceSquaredTo(robot.getLocation()) <= RobotType.ARCHON.actionRadiusSquared){
-                if(robot.getType() == RobotType.SAGE && robot.getHealth() < RobotType.SAGE.getMaxHealth(1)){
+                if(robot.getType() == RobotType.SOLDIER && robot.getHealth() < RobotType.SOLDIER.getMaxHealth(1)){
                     if(robot.getID() == curHealingID ){
                         return robot.getLocation();
                     }
                     else if(robot.getHealth() < lowHealth){
                         lowHealth = robot.getHealth();
                         id = robot.getID();
-                        foundSage = true;
-                        ans = robot.getLocation();
-                    }
-                }
-                else if(robot.getType() == RobotType.SOLDIER && robot.getHealth() < RobotType.SOLDIER.getMaxHealth(1)){
-                    if(robot.getID() == curHealingID ){
-                        return robot.getLocation();
-                    }
-                    else if(robot.getHealth() < lowHealth && !foundSage){
-                        lowHealth = robot.getHealth();
-                        id = robot.getID();
                         foundSoldier = true;
                         ans = robot.getLocation();
                     }
-                } else if(robot.getType() == RobotType.MINER && robot.getHealth() < 40 && !foundSage && !foundSoldier){
+                } else if(robot.getType() == RobotType.SAGE && robot.getHealth() < RobotType.SAGE.getMaxHealth(1)){
+                    if(robot.getID() == curHealingID ){
+                        return robot.getLocation();
+                    }
+                    else if(robot.getHealth() < lowHealth && !foundSoldier){
+                        lowHealth = robot.getHealth();
+                        id = robot.getID();
+                        foundSage = true;
+                        ans = robot.getLocation();
+                    }
+                } 
+                else if(robot.getType() == RobotType.MINER && robot.getHealth() < 40 && !foundSoldier && !foundSage){
                     if(robot.getID() == curHealingID ){
                         ans = robot.getLocation();
                     }
