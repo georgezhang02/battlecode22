@@ -4,7 +4,7 @@ import battlecode.common.*;
 
 public strictfp class Sage {
     public enum SageState {
-        Rushing, Defending, Exploring, PURSUING, ArchonDefense, Anomaly
+        Rushing, Defending, Exploring, PURSUING, ArchonDefense, Anomaly, Healing
     }
 
     static SageState currentState = SageState.Exploring;
@@ -45,28 +45,34 @@ public strictfp class Sage {
 
         combatCooldown--;
 
-
-
-        if(commandTimer <= 0){
-            clearCommand();
+        MapLocation healingLoc = findHealingArchon();
+        if(currentState == SageState.Healing){
+            currentTarget = healingLoc;
         } else{
-            commandTimer--;
+            if(commandTimer <= 0){
+                clearCommand();
+            } else{
+                commandTimer--;
+            }
+
+            Helper.updateEnemyLocations(rc, enemies);
+            readComms();
+            if(command != null){
+                if(command.type == RobotType.ARCHON){
+                    currentState = command.isAttack ? SageState.Rushing : SageState.ArchonDefense;
+                } else {
+                    currentState = command.isAttack ? SageState.PURSUING : SageState.Defending;
+                }
+            } else {
+                currentState = SageState.Exploring;
+            }
         }
 
-        Helper.updateEnemyLocations(rc, enemies);
-        readComms();
-        if(command != null){
-            if(command.type == RobotType.ARCHON){
-                currentState = command.isAttack ? SageState.Rushing : SageState.ArchonDefense;
-            } else {
-                currentState = command.isAttack ? SageState.PURSUING : SageState.Defending;
-            }
-        } else {
-            currentState = SageState.Exploring;
-            }
-
-
         switch (currentState){
+            case Healing:
+                healAt(currentTarget);
+                rc.setIndicatorString("Healing");
+                break;
             case Rushing:
                 offense(currentTarget, 0);
                 rc.setIndicatorString("Rushing ");
@@ -170,6 +176,27 @@ public strictfp class Sage {
 
     }
 
+    static MapLocation findHealingArchon() throws GameActionException {
+        MapLocation ans = null;
+        if(rc.getHealth() <= RobotType.SAGE.getMaxHealth(1) / 3){
+            double lowestDist = 120;
+            for(int i = 0; i< 4; i++){
+                MapLocation archonLoc = Communications.getTeamArchonLocationByIndex(rc, i);
+
+                if(archonLoc.x < 60){
+                    double dist = Math.sqrt(rc.getLocation().distanceSquaredTo(archonLoc));
+                    if(dist < lowestDist){
+                        if(rc.getHealth() < 600 / dist){
+                            lowestDist = dist;
+                            ans = archonLoc;
+                            currentState = SageState.Healing;
+                        }
+                    }
+                }
+            }
+        }
+        return ans;
+    }
 
     static void checkCurrentAttackingTarget() throws GameActionException {
         if(command != null &&
@@ -210,7 +237,7 @@ public strictfp class Sage {
         int closestEnemy = 35;
 
         for(RobotInfo robot:enemies){
-            if(isAttackableEnemy(robot.getType())){
+            if(isAttackableDroid(robot.getType())){
                 int dist =  robot.getLocation().distanceSquaredTo(rc.getLocation());
                 if(dist < closestEnemy){
                     closestEnemy = dist;
@@ -225,7 +252,7 @@ public strictfp class Sage {
             }
         }
         for(RobotInfo robot: allies){
-            if(robot.getType() == RobotType.SOLDIER){
+            if(isAttackableDroid(robot.getType())){
                 allyCount++;
             }
         }
@@ -296,7 +323,7 @@ public strictfp class Sage {
         MapLocation[] enemyPos = new MapLocation[5];
 
         for(RobotInfo robot:enemies){
-            if(isAttackableEnemy(robot.getType())){
+            if(isAttackableDroid(robot.getType())){
                 int dist =  robot.getLocation().distanceSquaredTo(rc.getLocation());
                 if(dist < closestEnemy){
                     closestEnemy = dist;
@@ -311,7 +338,7 @@ public strictfp class Sage {
             }
         }
         for(RobotInfo robot: allies){
-            if(robot.getType() == RobotType.SOLDIER){
+            if(isAttackableDroid(robot.getType())){
                 allyCount++;
             }
         }
@@ -346,7 +373,7 @@ public strictfp class Sage {
         MapLocation[] enemyPos = new MapLocation[5];
 
         for(RobotInfo robot:enemies){
-            if(isAttackableEnemy(robot.getType())){
+            if(isAttackableDroid(robot.getType())){
                 int dist =  robot.getLocation().distanceSquaredTo(rc.getLocation());
                 if(dist < closestEnemy){
                     closestEnemy = dist;
@@ -361,7 +388,7 @@ public strictfp class Sage {
             }
         }
         for(RobotInfo robot: allies){
-            if(robot.getType() == RobotType.SOLDIER){
+            if(isAttackableDroid(robot.getType())){
                 allyCount++;
             }
         }
@@ -411,6 +438,88 @@ public strictfp class Sage {
                     }
                 }
             }
+        }
+    }
+
+    void healAt(MapLocation target) throws GameActionException {
+
+        if(rc.getHealth() >= RobotType.SAGE.getMaxHealth(1) * 0.8){
+            currentState = SageState.Exploring;
+            clearCommand();
+            this.run();
+        } else{
+            rc.setIndicatorString("Healing");
+
+            // check everything that you can see
+            int enemyCount = 0;
+            int allyCount = 1;
+
+            MapLocation[] enemyPos = new MapLocation[5];
+
+            int closestEnemy = 35;
+
+            for(RobotInfo robot:enemies){
+                if(isAttackableDroid(robot.getType())){
+                    int dist =  robot.getLocation().distanceSquaredTo(rc.getLocation());
+                    if(dist < closestEnemy){
+                        closestEnemy = dist;
+                        enemyPos[0] = robot.getLocation();
+                    }
+                    enemyCount++;
+                }
+            }
+            for(RobotInfo robot: allies){
+                if(isAttackableDroid(robot.getType())){
+                    allyCount++;
+                }
+            }
+
+            if(enemyCount > 0){
+                if(commandTimer <= 0){
+                    Communications.sendAttackCommand(rc, enemyPos[0], RobotType.SOLDIER);
+                    commandTimer = Communications.getCommandCooldown(rc, RobotType.SOLDIER, true);
+                }
+
+
+                currentTarget = enemyPos[0];
+            }
+
+            // initial attack
+            attack();
+
+            // looking for best movement
+            Direction dir = Direction.CENTER;
+
+            if(enemyCount > 0 || !rc.isActionReady() && pathfinder.targetWithinRadius(target, 20)){ // in combat
+                if(!rc.isActionReady() ){ // action not ready
+                    dir = pathfinder.pathAwayFrom(enemyPos, 0); // kite
+                } else if(enemyCount >= allyCount){
+                    dir = lookForBetterSquare();
+                }  else {
+                    if(enemyPos[0]!= null && target != null){
+                        dir = pathfinder.pathToTargetGreedy(target, 0); // path to target close
+                    }
+                }
+            } // travelling
+            else if(target != null && !pathfinder.targetWithinRadius(target, 8)){
+                move(pathfinder.pathToTarget(target, false)); // path to target from far away
+            } else{
+                //move(Direction.allDirections()[(int) (10000 * Math.random()) % 9]);
+
+                // possibly move randomly to create space?
+            }
+            if(rc.isMovementReady()){
+                if(rc.canMove(dir) && rc.senseRubble(rc.getLocation().add(dir)) + 10
+                        <= 1.5 * (rc.senseRubble(rc.getLocation())+ 10) ){
+                    move(dir); // path to target from far away
+                }
+            }
+            if(rc.isActionReady()){
+                attack();
+            }
+
+
+            currentState = SageState.Healing;
         }
     }
 
@@ -506,7 +615,7 @@ public strictfp class Sage {
         }
     }
 
-    static Boolean isAttackableEnemy(RobotType t) {
+    static Boolean isAttackableDroid(RobotType t) {
         return t == RobotType.SOLDIER || t == RobotType.WATCHTOWER || t == RobotType.SAGE;
     }
 }
