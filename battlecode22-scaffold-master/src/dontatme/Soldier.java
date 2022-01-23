@@ -239,7 +239,7 @@ public strictfp class Soldier {
         int closestEnemy = 21;
 
         for(RobotInfo robot:enemies){
-            if(robot.getType() == RobotType.SOLDIER || robot.getType() == RobotType.WATCHTOWER){
+            if(isAttackableEnemy(robot.getType())){
                 int dist =  robot.getLocation().distanceSquaredTo(rc.getLocation());
                 if(dist < closestEnemy){
                     closestEnemy = dist;
@@ -363,7 +363,7 @@ public strictfp class Soldier {
         MapLocation[] enemyPos = new MapLocation[5];
 
         for(RobotInfo robot:enemies){
-            if(robot.getType() == RobotType.SOLDIER || robot.getType() == RobotType.WATCHTOWER){
+            if(isAttackableEnemy(robot.getType())){
 
                 if(enemyCount < 5){
                     enemyPos[enemyCount] = robot.getLocation();
@@ -421,7 +421,7 @@ public strictfp class Soldier {
             int closestEnemy = 21;
 
             for(RobotInfo robot:enemies){
-                if(robot.getType() == RobotType.SOLDIER || robot.getType() == RobotType.WATCHTOWER){
+                if(isAttackableEnemy(robot.getType())){
                     int dist =  robot.getLocation().distanceSquaredTo(rc.getLocation());
                     if(dist < closestEnemy){
                         closestEnemy = dist;
@@ -582,5 +582,9 @@ public strictfp class Soldier {
     static void prepForAnomaly(AnomalyType anomalyType)
     {
 
+    }
+
+    static Boolean isAttackableEnemy(RobotType t) {
+        return t == RobotType.SOLDIER || t == RobotType.WATCHTOWER || t == RobotType.SAGE;
     }
 }
