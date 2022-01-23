@@ -210,7 +210,7 @@ public strictfp class Sage {
         int closestEnemy = 35;
 
         for(RobotInfo robot:enemies){
-            if(isAttackableEnemy(robot.getType())){
+            if(isAttackableDroid(robot.getType())){
                 int dist =  robot.getLocation().distanceSquaredTo(rc.getLocation());
                 if(dist < closestEnemy){
                     closestEnemy = dist;
@@ -225,7 +225,7 @@ public strictfp class Sage {
             }
         }
         for(RobotInfo robot: allies){
-            if(robot.getType() == RobotType.SOLDIER){
+            if(isAttackableDroid(robot.getType())){
                 allyCount++;
             }
         }
@@ -296,7 +296,7 @@ public strictfp class Sage {
         MapLocation[] enemyPos = new MapLocation[5];
 
         for(RobotInfo robot:enemies){
-            if(isAttackableEnemy(robot.getType())){
+            if(isAttackableDroid(robot.getType())){
                 int dist =  robot.getLocation().distanceSquaredTo(rc.getLocation());
                 if(dist < closestEnemy){
                     closestEnemy = dist;
@@ -311,7 +311,7 @@ public strictfp class Sage {
             }
         }
         for(RobotInfo robot: allies){
-            if(robot.getType() == RobotType.SOLDIER){
+            if(isAttackableDroid(robot.getType())){
                 allyCount++;
             }
         }
@@ -346,7 +346,7 @@ public strictfp class Sage {
         MapLocation[] enemyPos = new MapLocation[5];
 
         for(RobotInfo robot:enemies){
-            if(isAttackableEnemy(robot.getType())){
+            if(isAttackableDroid(robot.getType())){
                 int dist =  robot.getLocation().distanceSquaredTo(rc.getLocation());
                 if(dist < closestEnemy){
                     closestEnemy = dist;
@@ -361,7 +361,7 @@ public strictfp class Sage {
             }
         }
         for(RobotInfo robot: allies){
-            if(robot.getType() == RobotType.SOLDIER){
+            if(isAttackableDroid(robot.getType())){
                 allyCount++;
             }
         }
@@ -506,7 +506,7 @@ public strictfp class Sage {
         }
     }
 
-    static Boolean isAttackableEnemy(RobotType t) {
+    static Boolean isAttackableDroid(RobotType t) {
         return t == RobotType.SOLDIER || t == RobotType.WATCHTOWER || t == RobotType.SAGE;
     }
 }
