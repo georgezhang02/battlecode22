@@ -37,8 +37,8 @@ public strictfp class Soldier {
         Communications.runStart(rc);
         
         Team opponent = rc.getTeam().opponent();
-        enemies = rc.senseNearbyRobots(20, opponent);
-        allies = rc.senseNearbyRobots(20, rc.getTeam());
+        enemies = rc.senseNearbyRobots(RobotType.SOLDIER.visionRadiusSquared, opponent);
+        allies = rc.senseNearbyRobots(RobotType.SOLDIER.visionRadiusSquared, rc.getTeam());
 
         combatCooldown--;
 
@@ -180,7 +180,7 @@ public strictfp class Soldier {
 
     static MapLocation findHealingArchon() throws GameActionException {
         MapLocation ans = null;
-        if(rc.getHealth() <= 17){
+        if(rc.getHealth() <= RobotType.SOLDIER.getMaxHealth(1) / 3){
             double lowestDist = 120;
             for(int i = 0; i< 4; i++){
                 MapLocation archonLoc = Communications.getTeamArchonLocationByIndex(rc, i);
@@ -320,7 +320,7 @@ public strictfp class Soldier {
         MapLocation[] enemyPos = new MapLocation[5];
 
         for(RobotInfo robot:enemies){
-            if(robot.getType() == RobotType.SOLDIER || robot.getType() == RobotType.WATCHTOWER){
+            if(isAttackableEnemy(robot.getType())){
                 enemyCount++;
                 if(enemyCount < 5){
                     enemyPos[enemyCount] = robot.getLocation();
