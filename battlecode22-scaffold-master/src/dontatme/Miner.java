@@ -2,8 +2,6 @@ package dontatme;
 
 import battlecode.common.*;
 
-import java.util.Map;
-
 public strictfp class Miner {
 
     static int archonID = -1;
@@ -155,7 +153,7 @@ public strictfp class Miner {
                     MapLocation possLocation = new MapLocation(me.x + dx, me.y + dy);
                     if (rc.canSenseLocation(possLocation)) {
                         double targetMineRate = goldMineRate(rc, possLocation, dx, dy, goldAmounts);
-                        if ((targetMineRate > maxRate || (targetMineRate == maxRate && goldAmounts[dx+3][dy+3] > 0)) && !friendlyMinerAt(rc, possLocation)) {
+                        if ((targetMineRate > maxRate || (targetMineRate == maxRate && goldAmounts[dx+2][dy+2] > 0)) && !friendlyMinerAt(rc, possLocation)) {
                             maxRate = targetMineRate;
                             max = possLocation;
                         }
