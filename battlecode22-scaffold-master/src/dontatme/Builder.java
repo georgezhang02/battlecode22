@@ -59,7 +59,7 @@ public strictfp class Builder {
             }
         }*/
 
-        int maxLab = (int)(.75 * ((rc.getMapWidth() * rc.getMapHeight())/ 3600.0 - 0.1));
+        int maxLab = (int)(6 * (rc.getMapWidth() * rc.getMapHeight())/ 3600.0);
         maxLab = Math.max(Math.min(maxLab, 4), 1);
 
         MapLocation toRepair = findBuildingToRepair(rc, robots);
