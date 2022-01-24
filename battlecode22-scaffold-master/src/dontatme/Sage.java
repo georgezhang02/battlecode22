@@ -30,7 +30,10 @@ public strictfp class Sage {
 
     static int soldierCount;
     static int sageCount;
-    static int buildingCount;
+    static int watchCount;
+    static int archonCount;
+    static int labCount;
+
 
 
     public Sage (RobotController rc) throws GameActionException {
@@ -50,7 +53,9 @@ public strictfp class Sage {
 
         soldierCount = 0;
         sageCount = 0;
-        buildingCount = 0;
+        watchCount = 0;
+        archonCount = 0;
+        labCount = 0;
 
         if(commandTimer <= 0){
             clearCommand();
@@ -189,22 +194,35 @@ public strictfp class Sage {
         int closestEnemy = 35;
 
         for(RobotInfo robot:enemies){
-            if(isAttackableDroid(robot.getType())){
-                int dist =  robot.getLocation().distanceSquaredTo(rc.getLocation());
-                if(dist < closestEnemy){
-                    closestEnemy = dist;
-                    enemyPos[0] = robot.getLocation();
+            if(withinActionRadius(robot.getLocation())){
+                if(isAttackableDroid(robot.getType()) ){
+                    int dist =  robot.getLocation().distanceSquaredTo(rc.getLocation());
+                    if(dist < closestEnemy){
+                        closestEnemy = dist;
+                        enemyPos[0] = robot.getLocation();
+                    }
+                    enemyCount++;
+
+
+
                 }
-                enemyCount++;
+                if( robot.getType() == RobotType.SAGE){
+                    sageCount++;
+                } else if (robot.getType() == RobotType.SOLDIER) {
+                    soldierCount++;
+                }
+                else if(robot.getType() == RobotType.WATCHTOWER){
+                    watchCount ++;
+                } else if (robot.getType() == RobotType.ARCHON){
+                    archonCount++;
+                    enemyCount++;
+                } else {
+                    labCount ++ ;
+                    enemyCount++;
+                }
+
             }
-            if(withinActionRadius(robot.getLocation()) && robot.getType() == RobotType.SAGE){
-                sageCount++;
-            } else if (withinActionRadius(robot.getLocation()) && robot.getType() == RobotType.SOLDIER) {
-                soldierCount++;
-            } 
-            else if(withinActionRadius(robot.getLocation()) && robot.getType() == RobotType.WATCHTOWER || robot.getType() == RobotType.ARCHON){
-                buildingCount ++;
-            }
+
         }
         for(RobotInfo robot: allies){
             if(isAttackableDroid(robot.getType())){
@@ -278,21 +296,36 @@ public strictfp class Sage {
         MapLocation[] enemyPos = new MapLocation[5];
 
         for(RobotInfo robot:enemies){
-            if(isAttackableDroid(robot.getType())){
-                int dist =  robot.getLocation().distanceSquaredTo(rc.getLocation());
-                if(dist < closestEnemy){
-                    closestEnemy = dist;
-                    enemyPos[0] = robot.getLocation();
+            if(withinActionRadius(robot.getLocation())){
+                if(isAttackableDroid(robot.getType())){
+                    int dist =  robot.getLocation().distanceSquaredTo(rc.getLocation());
+                    if(dist < closestEnemy){
+                        closestEnemy = dist;
+                        enemyPos[0] = robot.getLocation();
+                    }
+                    enemyCount++;
+
+
+
                 }
-                enemyCount++;
+                if( robot.getType() == RobotType.SAGE){
+                    sageCount++;
+                } else if (robot.getType() == RobotType.SOLDIER) {
+                    soldierCount++;
+                }
+                else if(robot.getType() == RobotType.WATCHTOWER){
+                    watchCount ++;
+                } else if (robot.getType() == RobotType.ARCHON){
+                    archonCount++;
+                    enemyCount++;
+                } else {
+                    labCount ++ ;
+                    enemyCount++;
+                }
+
+
             }
-            if(withinActionRadius(robot.getLocation()) && robot.getType() == RobotType.SAGE){
-                sageCount++;
-            } else if (withinActionRadius(robot.getLocation()) && robot.getType() == RobotType.SOLDIER) {
-                soldierCount++;
-            } else if(withinActionRadius(robot.getLocation()) && robot.getType() == RobotType.WATCHTOWER || robot.getType() == RobotType.ARCHON){
-                buildingCount ++;
-            }
+
         }
         for(RobotInfo robot: allies){
             if(isAttackableDroid(robot.getType())){
@@ -330,21 +363,36 @@ public strictfp class Sage {
         MapLocation[] enemyPos = new MapLocation[5];
 
         for(RobotInfo robot:enemies){
-            if(isAttackableDroid(robot.getType())){
-                int dist =  robot.getLocation().distanceSquaredTo(rc.getLocation());
-                if(dist < closestEnemy){
-                    closestEnemy = dist;
-                    enemyPos[0] = robot.getLocation();
+            if(withinActionRadius(robot.getLocation())){
+                if(isAttackableDroid(robot.getType())){
+                    int dist =  robot.getLocation().distanceSquaredTo(rc.getLocation());
+                    if(dist < closestEnemy){
+                        closestEnemy = dist;
+                        enemyPos[0] = robot.getLocation();
+                    }
+                    enemyCount++;
+
+
+
                 }
-                enemyCount++;
+                if( robot.getType() == RobotType.SAGE){
+                    sageCount++;
+                } else if (robot.getType() == RobotType.SOLDIER) {
+                    soldierCount++;
+                }
+                else if(robot.getType() == RobotType.WATCHTOWER){
+                    watchCount ++;
+                } else if (robot.getType() == RobotType.ARCHON){
+                    archonCount++;
+                    enemyCount++;
+                } else {
+                    labCount ++ ;
+                    enemyCount++;
+                }
+
+
             }
-            if(withinActionRadius(robot.getLocation()) && robot.getType() == RobotType.SAGE){
-                sageCount++;
-            } else if (withinActionRadius(robot.getLocation()) && robot.getType() == RobotType.SOLDIER) {
-                soldierCount++;
-            } else if(withinActionRadius(robot.getLocation()) && robot.getType() == RobotType.WATCHTOWER || robot.getType() == RobotType.ARCHON){
-                buildingCount ++;
-            }
+
         }
         for(RobotInfo robot: allies){
             if(isAttackableDroid(robot.getType())){
@@ -379,26 +427,24 @@ public strictfp class Sage {
 
     static void attack() throws GameActionException {
         int droidCount = (soldierCount + sageCount);
-        rc.setIndicatorString(soldierCount+" "+sageCount);
+        rc.setIndicatorString(droidCount+""+rc.isActionReady());
         if(rc.isActionReady()){
             if(enemyCount > 0){
                 int totalEnemyMaxHealth = soldierCount * 50 + sageCount * 100;
+                int totalBuildingMaxHealth = archonCount * 600 + labCount * 100 + watchCount * 150;
+
 
                 // if deals more damage just purely attacking
                 if (totalEnemyMaxHealth * 0.22f < 45) {
-                    System.out.println("raw attack " + totalEnemyMaxHealth * 0.22f);
+
                     rawAttack(1);
-                }
-                // if one building exists
-                else if (droidCount == 0 && buildingCount <= 1){
-                    rawAttack(3);
                 }
                 // if there are more than 2 droids
                 else if(droidCount > 1){
                     rc.envision(AnomalyType.CHARGE);
                 // if there are more than 1 building
-                } else if (buildingCount > 1) {
-                    rc.envision(AnomalyType.FURY);
+                } else {
+                    rawAttack(3);
                 }
             }
         }
@@ -497,7 +543,8 @@ public strictfp class Sage {
     }
 
     static Boolean isAttackableDroid(RobotType t) {
-        return t == RobotType.SOLDIER || t == RobotType.WATCHTOWER || t == RobotType.SAGE;
+        return t == RobotType.SOLDIER || t == RobotType.WATCHTOWER ||
+                t == RobotType.SAGE ;
     }
 
     static Boolean withinActionRadius(MapLocation l) {
