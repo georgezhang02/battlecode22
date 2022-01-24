@@ -259,7 +259,7 @@ public strictfp class Sage {
                 dir = pathfinder.pathAwayFrom(enemyPos, 0); // kite
             } else if(enemyCount >= allyCount){
                 dir = lookForBetterSquare();
-            }  else {
+            }  else if (target != null ){
                 //action is ready, but you outnumber all opponents in your attack radius
                 dir = pathfinder.pathToTargetGreedy(target, 0); // path to target close
             }
