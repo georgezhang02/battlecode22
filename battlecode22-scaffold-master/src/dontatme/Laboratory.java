@@ -137,6 +137,10 @@ public strictfp class Laboratory {
                 pathfinder = new BFPathing20(rc);
                 pathfinder.bfPathToTarget(bestCoord);
             }
+            else {
+                if (rc.canTransform() && !rc.getMode().equals(RobotMode.TURRET))
+                    rc.transform();
+            }
         }
     }
 
