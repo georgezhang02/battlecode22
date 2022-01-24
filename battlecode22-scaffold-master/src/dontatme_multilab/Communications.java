@@ -1086,7 +1086,40 @@ public class Communications {
         }
     }
 
+    /**
+     * Set building flag
+     *
+     * @throws GameActionException
+     */
+    public static boolean setBuildingLab(RobotController rc) throws GameActionException {
+        int arrValue = rc.readSharedArray(HAS_WIPED);
+        rc.writeSharedArray(HAS_WIPED, encode(decode(arrValue, 0),
+                1, decode(arrValue, 2)));
+        return true;
+    }
 
+    /**
+     * Remove building flag
+     *
+     * @throws GameActionException
+     */
+    public static boolean setNotBuildingLab(RobotController rc) throws GameActionException {
+        int arrValue = rc.readSharedArray(HAS_WIPED);
+        rc.writeSharedArray(HAS_WIPED, encode(decode(arrValue, 0),
+                0, decode(arrValue, 2)));
+        return true;
+    }
+
+
+    /**
+     * Return if a builder has been built already
+     *
+     * @throws GameActionException
+     */
+    public static boolean isBuildingLab(RobotController rc) throws GameActionException {
+        int arrValue = rc.readSharedArray(HAS_WIPED);
+        return decode(arrValue, 1) == 1;
+    }
 
 
 
