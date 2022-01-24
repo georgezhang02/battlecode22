@@ -1,9 +1,6 @@
-package dontatme;
+package dontatme_base;
 
 import battlecode.common.*;
-
-import java.awt.*;
-import java.util.Map;
 
 public strictfp class Builder {
 
@@ -59,8 +56,8 @@ public strictfp class Builder {
             }
         }*/
 
-        int maxLab = (int)(6 * (rc.getMapWidth() * rc.getMapHeight()/ 3600.0));
-        maxLab = Math.max(Math.min(maxLab, 6), 1);
+        int maxLab = (int)(2 * (.3+ 2 * ((rc.getMapWidth() * rc.getMapHeight())/ 3600.0)));
+        maxLab = Math.max(Math.min(maxLab, 4), 1);
 
         MapLocation toRepair = findBuildingToRepair(rc, robots);
         rc.setIndicatorString("lab cd: " + labCooldown);
