@@ -152,8 +152,9 @@ public strictfp class Laboratory {
     }
 
     static MapLocation checkIfLowRubble(RobotController rc, MapLocation loc, MapLocation bestLoc) throws GameActionException {
-        if (rc.senseRubble(loc) < rc.senseRubble(bestLoc) &&
-            !rc.canSenseRobotAtLocation(loc)) {
+        if (loc.x < GameConstants.MAP_MAX_WIDTH && loc.x > 0 && loc.y < GameConstants.MAP_MAX_HEIGHT &&
+                loc.y > 0 && rc.senseRubble(loc) < rc.senseRubble(bestLoc) &&
+                !rc.canSenseRobotAtLocation(loc)) {
             return loc;
         }
         else {
