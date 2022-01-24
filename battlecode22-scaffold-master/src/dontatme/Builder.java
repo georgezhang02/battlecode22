@@ -88,6 +88,8 @@ public strictfp class Builder {
             } else{
                 Direction better = lookForBetterSquare(rc);
 
+                rc.setIndicatorString("building");
+
                 if(moves < 10 && better != null){
                     move(rc, better);
                     moves += 4;
