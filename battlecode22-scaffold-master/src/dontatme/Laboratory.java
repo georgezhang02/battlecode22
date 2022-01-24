@@ -137,17 +137,24 @@ public strictfp class Laboratory {
             int actCDCurr = calculateActionCooldownAtSquare(rc, rc.getLocation());
             int bestCD = calculateActionCooldownAtSquare(rc, bestCoord);
             if (bestCD * 3 < actCDCurr) {
-                if (rc.canTransform()&& !rc.getMode().equals(RobotMode.PORTABLE))
+                if (rc.getMode().equals(RobotMode.TURRET) && rc.canTransform()) {
                     rc.transform();
+                }
+                
                 pathfinder = new BFPathing20(rc);
-                Direction dir10 = pathfinder.bfPathToTarget(bestCoord);
-                if (rc.canMove(dir10))
-                    rc.move(dir10);
-            }
-            else {
-                if (rc.canTransform() && !rc.getMode().equals(RobotMode.TURRET))
+                Direction dir = pathfinder.bfPathToTarget(bestCoord);
+
+                if(rc.canMove(dir) ){
+                    rc.move(dir);
+                }
+            } else {
+                if (rc.getMode().equals(RobotMode.PORTABLE) && rc.canTransform()) {
                     rc.transform();
+                }
             }
+        }
+        if (rc.canTransform() && !rc.getMode().equals(RobotMode.TURRET)) {
+            rc.transform();
         }
     }
 
