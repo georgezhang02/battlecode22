@@ -215,10 +215,8 @@ public strictfp class Sage {
                     watchCount ++;
                 } else if (robot.getType() == RobotType.ARCHON){
                     archonCount++;
-                    enemyCount++;
                 } else {
                     labCount ++ ;
-                    enemyCount++;
                 }
 
             }
@@ -303,10 +301,6 @@ public strictfp class Sage {
                         closestEnemy = dist;
                         enemyPos[0] = robot.getLocation();
                     }
-                    enemyCount++;
-
-
-
                 }
                 if( robot.getType() == RobotType.SAGE){
                     sageCount++;
@@ -317,10 +311,8 @@ public strictfp class Sage {
                     watchCount ++;
                 } else if (robot.getType() == RobotType.ARCHON){
                     archonCount++;
-                    enemyCount++;
                 } else {
                     labCount ++ ;
-                    enemyCount++;
                 }
 
 
@@ -371,9 +363,6 @@ public strictfp class Sage {
                         enemyPos[0] = robot.getLocation();
                     }
                     enemyCount++;
-
-
-
                 }
                 if( robot.getType() == RobotType.SAGE){
                     sageCount++;
@@ -384,10 +373,8 @@ public strictfp class Sage {
                     watchCount ++;
                 } else if (robot.getType() == RobotType.ARCHON){
                     archonCount++;
-                    enemyCount++;
                 } else {
                     labCount ++ ;
-                    enemyCount++;
                 }
 
 
@@ -429,10 +416,9 @@ public strictfp class Sage {
         int droidCount = (soldierCount + sageCount);
         rc.setIndicatorString(droidCount+""+rc.isActionReady());
         if(rc.isActionReady()){
-            if(enemyCount > 0){
+            if((soldierCount + sageCount + archonCount + labCount + watchCount) > 0){
                 int totalEnemyMaxHealth = soldierCount * 50 + sageCount * 100;
                 int totalBuildingMaxHealth = archonCount * 600 + labCount * 100 + watchCount * 150;
-
 
                 // if deals more damage just purely attacking
                 if (totalEnemyMaxHealth * 0.22f < 45) {
@@ -443,7 +429,10 @@ public strictfp class Sage {
                 else if(droidCount > 1){
                     rc.envision(AnomalyType.CHARGE);
                 // if there are more than 1 building
-                } else {
+                } else if(totalBuildingMaxHealth > 100) {
+                    rc.envision(AnomalyType.FURY);
+                }
+                else {
                     rawAttack(3);
                 }
             }
