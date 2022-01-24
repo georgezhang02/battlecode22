@@ -92,9 +92,8 @@ public strictfp class Builder {
                     move(rc, better);
                     moves += 4;
                 } else{
-                    if(robots.length <= 3){
-                        Communications.sendBuildCommand(rc, rc.getLocation(), RobotType.LABORATORY);
-                    }
+                    Communications.sendBuildCommand(rc, rc.getLocation(), RobotType.LABORATORY);
+
                     if(rc.isActionReady() && rc.getTeamLeadAmount(rc.getTeam()) >= 180){
 
                         Direction dir = findDirLowestRubble(rc, rc.getLocation());
