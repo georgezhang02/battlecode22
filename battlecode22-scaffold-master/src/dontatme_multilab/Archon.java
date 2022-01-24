@@ -1,4 +1,4 @@
-package dontatme;
+package dontatme_multilab;
 
 import java.util.Arrays;
 import java.util.Map;

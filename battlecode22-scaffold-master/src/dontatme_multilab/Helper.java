@@ -1,4 +1,4 @@
-package dontatme;
+package dontatme_multilab;
 
 import battlecode.common.*;
 import java.util.Random;
