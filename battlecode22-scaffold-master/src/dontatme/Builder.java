@@ -123,9 +123,9 @@ public strictfp class Builder {
             }
             if (labCooldown > 0) {
                 labCooldown--;
-                startBuilding = true;
             } else {
                 labCooldown = 100;
+                startBuilding = true;
             }
         }
     }
