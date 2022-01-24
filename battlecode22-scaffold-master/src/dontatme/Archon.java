@@ -432,22 +432,18 @@ public strictfp class Archon {
         Direction [] dirs = Arrays.copyOf(Helper.directions, Helper.directions.length);
         Arrays.sort(dirs, (a, b) -> getRubble(rc, a) - getRubble(rc, b));
         for (Direction d: dirs) {
-            MapLocation loc = rc.getLocation().add(d);
-            if (loc.x < GameConstants.MAP_MAX_WIDTH && loc.x >= 0 && loc.y < GameConstants.MAP_MAX_HEIGHT &&
-            loc.y >= 0) {
-                if (rc.canBuildRobot(type, d)) {
-                    rc.buildRobot(type, d);
-                    Communications.incrementArchonTurn(rc);
-                    switch(type) {
-                        case MINER:
-                            miners++;
-                            break;
-                        case SOLDIER:
-                            soldiers++;
-                            break;
-                        default:
-                            break;
-                    }
+            if (rc.canBuildRobot(type, d)) {
+                rc.buildRobot(type, d);
+                Communications.incrementArchonTurn(rc);
+                switch(type) {
+                    case MINER:
+                        miners++;
+                        break;
+                    case SOLDIER:
+                        soldiers++;
+                        break;
+                    default:
+                        break;
                 }
             }
         }
@@ -506,8 +502,8 @@ public strictfp class Archon {
             return rc.senseRubble(loc);
         }
         catch (GameActionException e) {
-            e.printStackTrace();
-            return 0;
+            // e.printStackTrace();
+            return GameConstants.MAX_RUBBLE;
         }
     }
 

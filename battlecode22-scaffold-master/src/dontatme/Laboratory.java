@@ -168,13 +168,22 @@ public strictfp class Laboratory {
     }
 
     static MapLocation checkIfLowRubble(RobotController rc, MapLocation loc, MapLocation bestLoc) throws GameActionException {
-        if (loc.x < GameConstants.MAP_MAX_WIDTH && loc.x >= 0 && loc.y < GameConstants.MAP_MAX_HEIGHT &&
-                loc.y >= 0 && rc.senseRubble(loc) < rc.senseRubble(bestLoc) &&
+        if (getRubble(rc, loc) < getRubble(rc, bestLoc) &&
                 !rc.canSenseRobotAtLocation(loc)) {
             return loc;
         }
         else {
             return bestLoc;
+        }
+    }
+
+    static int getRubble(RobotController rc, MapLocation loc) {
+        try {
+            return rc.senseRubble(loc);
+        }
+        catch (GameActionException e) {
+            // e.printStackTrace();
+            return GameConstants.MAX_RUBBLE;
         }
     }
 }
