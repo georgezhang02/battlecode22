@@ -64,6 +64,7 @@ public class Communications {
                 break;
             case BUILDER:
                 incrementBuilderCount(rc);
+                setOneBuilder(rc);
                 break;
             case LABORATORY:
                 incrementLabCount(rc);
@@ -1086,7 +1087,27 @@ public class Communications {
         }
     }
 
+    /**
+     * Set one builder flag
+     *
+     * @throws GameActionException
+     */
+    public static boolean setOneBuilder(RobotController rc) throws GameActionException {
+        int arrValue = rc.readSharedArray(HAS_WIPED);
+        rc.writeSharedArray(HAS_WIPED, encode(decode(arrValue, 0),
+                1, decode(arrValue, 2)));
+        return true;
+    }
 
+    /**
+     * Return if a builder has been built already
+     *
+     * @throws GameActionException
+     */
+    public static boolean hasOneBuilder(RobotController rc) throws GameActionException {
+        int arrValue = rc.readSharedArray(HAS_WIPED);
+        return decode(arrValue, 1) == 1;
+    }
 
 
 

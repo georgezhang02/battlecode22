@@ -321,7 +321,7 @@ public strictfp class Archon {
                 if(labCount < 1 && builderCount >= 1){
                     // waiting on getting enough lead
                 }
-                else if(builderCount < 1  && rc.getRoundNum() > 50 ){
+                else if(builderCount < 1  && rc.getRoundNum() > 50 && !Communications.hasOneBuilder(rc)){
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 40) {
                         buildTowardsLowRubble(rc, RobotType.BUILDER);
                     }
@@ -343,7 +343,7 @@ public strictfp class Archon {
 
                     }
                 }
-                else if(builderCount < 1 && labCount < 1){
+                else if(builderCount < 1 && labCount < 1 && !Communications.hasOneBuilder(rc)){
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 40) {
                         buildTowardsLowRubble(rc, RobotType.BUILDER);
                     }
