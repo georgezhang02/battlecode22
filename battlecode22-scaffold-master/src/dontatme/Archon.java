@@ -317,7 +317,7 @@ public strictfp class Archon {
 
             if( rc.isActionReady() && Communications.getArchonTurn(rc)  == curArchonOrder){
 
-                if(buildCommands[0].location.x < 60){
+                if(Communications.isBuildingLab(rc)){
                     rc.setIndicatorString("Bulding");
                     // waiting on getting enough lead
                 }

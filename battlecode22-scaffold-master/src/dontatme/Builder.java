@@ -94,12 +94,13 @@ public strictfp class Builder {
                     move(rc, better);
                     moves += 4;
                 } else{
-                    Communications.sendBuildCommand(rc, rc.getLocation(), RobotType.LABORATORY);
+                    Communications.setBuildingLab(rc);
 
                     if(rc.isActionReady() && rc.getTeamLeadAmount(rc.getTeam()) >= 180){
 
                         Direction dir = findDirLowestRubble(rc, rc.getLocation());
                         if(dir != null && rc.canBuildRobot(RobotType.LABORATORY, dir)){
+                            Communications.setNotBuildingLab(rc);
                             rc.buildRobot(RobotType.LABORATORY, dir);
                             labCooldown = 100;
                         }
@@ -109,11 +110,12 @@ public strictfp class Builder {
             }
         } else if (labCount < maxLab) {
             if (startBuilding) {
-                Communications.sendBuildCommand(rc, rc.getLocation(), RobotType.LABORATORY); 
+                Communications.setBuildingLab(rc);
                 if(rc.isActionReady() && rc.getTeamLeadAmount(rc.getTeam()) >= 180){
 
                     Direction dir = findDirLowestRubble(rc, rc.getLocation());
                     if(dir != null && rc.canBuildRobot(RobotType.LABORATORY, dir)){
+                        Communications.setNotBuildingLab(rc);
                         rc.buildRobot(RobotType.LABORATORY, dir);
                         startBuilding = false;
                     }
