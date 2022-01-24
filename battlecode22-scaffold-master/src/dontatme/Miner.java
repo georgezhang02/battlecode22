@@ -2,6 +2,8 @@ package dontatme;
 
 import battlecode.common.*;
 
+import java.util.Map;
+
 public strictfp class Miner {
 
     static int archonID = -1;
@@ -31,6 +33,9 @@ public strictfp class Miner {
         Communications.runStart(rc);
         MapLocation me = rc.getLocation();
         RobotInfo[] robotInfo = rc.senseNearbyRobots();
+
+        MapLocation[] golds = rc.senseNearbyLocationsWithGold(20);
+        int [][] goldAmounts = goldAmounts(rc, me, golds);
 
         MapLocation[] leads = rc.senseNearbyLocationsWithLead(20);
         int[][] leadAmounts = leadAmounts(rc, me, leads);
@@ -141,12 +146,44 @@ public strictfp class Miner {
             }
         }
 
+        // If there are golds nearby, optimize
+        else if (goldMinable(goldAmounts)) {
+            double maxRate = 0;
+            MapLocation max = null;
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dy = -1; dy <= 1; dy++) {
+                    MapLocation possLocation = new MapLocation(me.x + dx, me.y + dy);
+                    if (rc.canSenseLocation(possLocation)) {
+                        double targetMineRate = goldMineRate(rc, possLocation, dx, dy, goldAmounts);
+                        if ((targetMineRate > maxRate || (targetMineRate == maxRate && goldAmounts[dx+3][dy+3] > 0)) && !friendlyMinerAt(rc, possLocation)) {
+                            maxRate = targetMineRate;
+                            max = possLocation;
+                        }
+                    }
+                }
+            }
+            if (max != null && !max.equals(me) && maxRate > goldMineRate(rc, me, 0, 0, goldAmounts)) {
+                tryMove(rc, me, max, false);
+            }
+        }
+
+        // If there are golds in vision, go towards
+        else if (availableGoldInVision(rc, golds)) {
+            if (heading != null && rc.canSenseLocation(heading) && rc.senseGold(heading) > 0 &&
+                    !friendlyMinerAt(rc, heading)) {
+                tryMove(rc, me, heading, false);
+            }
+            else {
+                heading = goTowardsNearbyGold(rc, me, golds);
+            }
+        }
+
         else if (optimizeLoc != null) {
             tryMove(rc, me, optimizeLoc, false);
         }
 
         // Otherwise, if not on mineable lead, go mining
-        else if (!minable(leadAmounts)) {
+        else if (!leadMinable(leadAmounts)) {
 
             // If the current heading still has mineable lead and no friendly miner, path there
             if (heading != null && rc.canSenseLocation(heading) && rc.senseLead(heading) > leadThreshold &&
@@ -184,7 +221,7 @@ public strictfp class Miner {
                 for (int dy = -1; dy <= 1; dy++) {
                     MapLocation possLocation = new MapLocation(me.x + dx, me.y + dy);
                     if (rc.canSenseLocation(possLocation)) {
-                        double targetMineRate = mineRate(rc, possLocation, dx, dy, leadAmounts);
+                        double targetMineRate = leadMineRate(rc, possLocation, dx, dy, leadAmounts);
                         if ((targetMineRate > maxRate || (targetMineRate == maxRate && leadAmounts[dx+3][dy+3] > leadThreshold)) && !friendlyMinerAt(rc, possLocation)) {
                             maxRate = targetMineRate;
                             max = possLocation;
@@ -192,7 +229,7 @@ public strictfp class Miner {
                     }
                 }
             }
-            if (max != null && !max.equals(me) && maxRate > mineRate(rc, me, 0, 0, leadAmounts)) {
+            if (max != null && !max.equals(me) && maxRate > leadMineRate(rc, me, 0, 0, leadAmounts)) {
                 tryMove(rc, me, max, false);
             } else {
                 searchLocal = false;
@@ -205,7 +242,7 @@ public strictfp class Miner {
                     if (!(dx <= 1 && dx >= -1 && dy <= 1 && dy >= -1)) {
                         MapLocation possLocation = new MapLocation(me.x + dx, me.y + dy);
                         if (rc.canSenseLocation(possLocation)) {
-                            double targetMineRate = mineRate(rc, possLocation, dx, dy, leadAmounts);
+                            double targetMineRate = leadMineRate(rc, possLocation, dx, dy, leadAmounts);
                             if ((targetMineRate > maxRate || (targetMineRate == maxRate && leadAmounts[dx+3][dy+3] > leadThreshold)) && !friendlyMinerAt(rc, possLocation)) {
                                 maxRate = targetMineRate;
                                 max = possLocation;
@@ -214,7 +251,7 @@ public strictfp class Miner {
                     }
                 }
             }
-            if (max != null && maxRate > 3 * mineRate(rc, me, 0, 0, leadAmounts)) {
+            if (max != null && maxRate > 3 * leadMineRate(rc, me, 0, 0, leadAmounts)) {
                 tryMove(rc, me, max, true);
                 optimizeLoc = max;
             }
@@ -254,6 +291,11 @@ public strictfp class Miner {
                 while (rc.canMineGold(mineLocation)) {
                     rc.mineGold(mineLocation);
                 }
+            }
+        }
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                MapLocation mineLocation = new MapLocation(me.x + dx, me.y + dy);
                 while (rc.canMineLead(mineLocation) && rc.senseLead(mineLocation) > leadThreshold) {
                     rc.mineLead(mineLocation);
                 }
@@ -267,6 +309,25 @@ public strictfp class Miner {
                 && (exploreLoc == null || towards(me, lead, exploreLoc))) {
                 tryMove(rc, me, lead, false);
                 return lead;
+            }
+        }
+        return null;
+    }
+
+    static boolean availableGoldInVision(RobotController rc, MapLocation[] golds) throws GameActionException {
+        for (MapLocation gold : golds) {
+            if (!friendlyMinerAt(rc, gold)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static MapLocation goTowardsNearbyGold(RobotController rc, MapLocation me, MapLocation[] golds) throws GameActionException {
+        for (MapLocation gold : golds) {
+            if (!friendlyMinerAt(rc, gold)) {
+                tryMove(rc, me, gold, false);
+                return gold;
             }
         }
         return null;
@@ -301,10 +362,21 @@ public strictfp class Miner {
         return false;
     }
 
-    static boolean minable(int[][] leadAmounts) {
+    static boolean leadMinable(int[][] leadAmounts) {
         for (int dx = 1; dx <= 5; dx++) {
             for (int dy = 1; dy <= 5; dy++) {
                 if (leadAmounts[dx][dy] > leadThreshold) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    static boolean goldMinable(int[][] goldAmounts) {
+        for (int dx = 1; dx <= 3; dx++) {
+            for (int dy = 1; dy <= 3; dy++) {
+                if (goldAmounts[dx][dy] > 0) {
                     return true;
                 }
             }
@@ -324,7 +396,19 @@ public strictfp class Miner {
         return amounts;
     }
 
-    static double mineRate(RobotController rc, MapLocation loc, int offX, int offY, int[][] leadAmounts) throws GameActionException {
+    static int[][] goldAmounts(RobotController rc, MapLocation me, MapLocation[] golds) throws GameActionException {
+        int[][] amounts = new int[5][5];
+        for (MapLocation gold : golds) {
+            int x = gold.x - me.x + 2;
+            int y = gold.y - me.y + 2;
+            if (x >= 0 && x < 5 && y >= 0 && y < 5) {
+                amounts[x][y] = rc.senseGold(gold);
+            }
+        }
+        return amounts;
+    }
+
+    static double leadMineRate(RobotController rc, MapLocation loc, int offX, int offY, int[][] leadAmounts) throws GameActionException {
         int leadCount = 0;
         for (int x = offX + 2 ; x <= offX + 4; x++) {
             for (int y = offY + 2; y <= offY + 4; y++) {
@@ -337,6 +421,21 @@ public strictfp class Miner {
             leadCount = 10;
         }
         return leadCount / (double) (rc.senseRubble(loc) + 1);
+    }
+
+    static double goldMineRate(RobotController rc, MapLocation loc, int offX, int offY, int[][] goldAmounts) throws GameActionException {
+        int goldCount = 0;
+        for (int x = offX + 2 ; x <= offX + 4; x++) {
+            for (int y = offY + 2; y <= offY + 4; y++) {
+                if (goldAmounts[x][y] > 0) {
+                    goldCount += goldAmounts[x][y];
+                }
+            }
+        }
+        if (goldCount > 10) {
+            goldCount = 10;
+        }
+        return goldCount / (double) (rc.senseRubble(loc) + 1);
     }
 
     static void tryMove(RobotController rc, MapLocation me, MapLocation loc, boolean greedy) throws GameActionException {
