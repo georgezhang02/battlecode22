@@ -496,14 +496,10 @@ public strictfp class Archon {
 
     }
 
-    static int getRubble(RobotController rc, Direction d) {
-        try {
-            MapLocation loc = rc.getLocation().add(d);
+    static int getRubble(RobotController rc, Direction d) throws GameActionException {
+        MapLocation loc = rc.getLocation().add(d);
+        if (loc.x > 0 && loc.x < rc.getMapWidth() && loc.y > 0 && loc.y < rc.getMapHeight())
             return rc.senseRubble(loc);
-        }
-        catch (GameActionException e) {
-            // e.printStackTrace();
-            return GameConstants.MAX_RUBBLE;
         }
     }
 
