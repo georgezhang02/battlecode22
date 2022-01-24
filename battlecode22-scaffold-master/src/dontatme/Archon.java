@@ -29,6 +29,7 @@ public strictfp class Archon {
     static int curArchonOrder = -1;
 
     static double MAP_SCALER = -1;
+    static double INV_MAP_SCALER = -1;
     static int movesUntilLand = 1;
 
     static boolean landing = false;
@@ -53,6 +54,7 @@ public strictfp class Archon {
 
         if(MAP_SCALER == -1){
             MAP_SCALER = .5+ .5 * ((rc.getMapWidth() * rc.getMapHeight())/ 3600.0);
+            INV_MAP_SCALER = 1-.6 * ((rc.getMapWidth() * rc.getMapHeight())/ 3600.0);
         }
 
         if(pathfinder == null){
@@ -310,37 +312,44 @@ public strictfp class Archon {
             Communications.Command[]buildCommands = Communications.getBuildCommands(rc);
 
             // Build order and token passing
+            int minerLim= Math.min(Math.max(6, (int)(11 * MAP_SCALER)), 9);
+            int soldierLim = Math.min(Math.max(3, (int)(11 * MAP_SCALER)), 6);
 
+            rc.setIndicatorString(minerLim+" "+soldierLim);
             if( rc.isActionReady() && Communications.getArchonTurn(rc)  == curArchonOrder){
 
-                if (miners < 4 * MAP_SCALER) {
-                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
-                        buildTowardsLowRubble(rc, RobotType.MINER);
-                    }
+                if(labCount < 1 && builderCount >= 1){
+                    // waiting on getting enough lead
                 }
-
-                else if (minerCount / rc.getArchonCount() < 1){
-                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
-                        buildTowardsLowRubble(rc, RobotType.MINER);
-
+                else if(builderCount < 1  && rc.getRoundNum() > 50 ){
+                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 40) {
+                        buildTowardsLowRubble(rc, RobotType.BUILDER);
                     }
                 }
                 else if (rc.getTeamGoldAmount(rc.getTeam()) >= 20) {
                     buildTowardsLowRubble(rc, RobotType.SAGE);
 
-                }else if (soldiers < 4 * MAP_SCALER  ) {
+                } else if ( minerCount< minerLim ) {
+                    rc.setIndicatorString(minerCount+" ");
+                    if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
+                        buildTowardsLowRubble(rc, RobotType.MINER);
+                    }
+                }
+
+                else if (soldierCount < soldierLim){
+                    rc.setIndicatorString(soldierCount+" "+(11 * INV_MAP_SCALER));
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
                         buildTowardsLowRubble(rc, RobotType.SOLDIER);
+
                     }
-                }else if(builderCount < 1){
+                }
+                else if(builderCount < 1 && labCount < 1){
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 40) {
                         buildTowardsLowRubble(rc, RobotType.BUILDER);
                     }
                 }
 
-                else if(labCount < 1 && buildCommands[0] != null){
-                    // waiting on getting enough lead
-                }else if (soldierCount / rc.getArchonCount() < 5  * MAP_SCALER) {
+                 /* else if (soldierCount / rc.getArchonCount() < 5  * MAP_SCALER) {
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
                         buildTowardsLowRubble(rc, RobotType.SOLDIER);
                     }
@@ -356,8 +365,8 @@ public strictfp class Archon {
                             buildTowardsLowRubble(rc, RobotType.SOLDIER);
                         }
                     }
-                } else {
-                    int x = (int)(100000 * Math.random()) % 10;
+                }*/ else {
+                    int x = (int)(100000 * Math.random()) % Math.max(minerCount/4, 2);
                     if( x == 0){
                         if (rc.getTeamLeadAmount(rc.getTeam()) >=50) {
                             buildTowardsLowRubble(rc, RobotType.MINER);
