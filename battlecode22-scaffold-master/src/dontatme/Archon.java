@@ -332,7 +332,7 @@ public strictfp class Archon {
                 } else if ( minerCount< minerLim ) {
                     rc.setIndicatorString(minerCount+" ");
                     if (rc.getTeamLeadAmount(rc.getTeam()) >= 50) {
-                        buildTowardsLowRubble(rc, RobotType.MINER);
+                        buildMiner(rc);
                     }
                 }
 
@@ -351,7 +351,7 @@ public strictfp class Archon {
                     int x = (int)(100000 * Math.random()) % Math.max((int) (INV_MAP_SCALER*  minerCount/4), 2);
                     if( x == 0){
                         if (rc.getTeamLeadAmount(rc.getTeam()) >=50) {
-                            buildTowardsLowRubble(rc, RobotType.MINER);
+                            buildMiner(rc);
                         }
                     } else{
                         if (rc.getTeamLeadAmount(rc.getTeam()) >= 75) {
@@ -446,6 +446,32 @@ public strictfp class Archon {
                         break;
                 }
             }
+        }
+    }
+
+    static void buildMiner(RobotController rc) throws GameActionException{
+        MapLocation[] leads = rc.senseNearbyLocationsWithLead(34);
+        MapLocation me = rc.getLocation();
+        MapLocation closest = null;
+        int shortestDist = 10000;
+        for (MapLocation lead : leads) {
+            int distanceTo = me.distanceSquaredTo(lead);
+            if (closest == null || distanceTo < shortestDist) {
+                shortestDist = distanceTo;
+                closest = lead;
+            }
+        }
+        if (closest != null) {
+            Direction towards = me.directionTo(closest);
+            if (rc.canBuildRobot(RobotType.MINER, towards)) {
+                rc.buildRobot(RobotType.MINER, towards);
+                Communications.incrementArchonTurn(rc);
+                miners++;
+            } else {
+                buildTowardsLowRubble(rc, RobotType.MINER);
+            }
+        } else {
+            buildTowardsLowRubble(rc, RobotType.MINER);
         }
     }
 
