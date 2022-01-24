@@ -423,8 +423,8 @@ public strictfp class Miner {
 
     static double goldMineRate(RobotController rc, MapLocation loc, int offX, int offY, int[][] goldAmounts) throws GameActionException {
         int goldCount = 0;
-        for (int x = offX + 2 ; x <= offX + 4; x++) {
-            for (int y = offY + 2; y <= offY + 4; y++) {
+        for (int x = offX + 1 ; x <= offX + 3; x++) {
+            for (int y = offY + 1; y <= offY + 3; y++) {
                 if (goldAmounts[x][y] > 0) {
                     goldCount += goldAmounts[x][y];
                 }
