@@ -15,6 +15,9 @@ public strictfp class Builder {
     static int moves = 0;
     static int turn = 0;
 
+    static int labCooldown = 0;
+    static boolean startBuilding = false;
+
     static Direction[]buildDir = new Direction[]{Direction.SOUTH, Direction.NORTHEAST, Direction.NORTHWEST,
             Direction.SOUTHWEST, Direction.SOUTH, Direction.SOUTHEAST, Direction. NORTHEAST, Direction.NORTHEAST,
             Direction.NORTHWEST, Direction.NORTHWEST, Direction.SOUTHWEST, Direction.SOUTHWEST};
@@ -56,15 +59,23 @@ public strictfp class Builder {
             }
         }*/
 
+        int maxLab = (int)(2 * (.3+ 2 * ((rc.getMapWidth() * rc.getMapHeight())/ 3600.0)));
+        maxLab = Math.max(Math.min(maxLab, 4), 1);
 
-        if(labCount < 1){
+        MapLocation toRepair = findBuildingToRepair(rc, robots);
+        rc.setIndicatorString("lab cd: " + labCooldown);
+        if(toRepair!= null){
+            if(rc.getLocation().distanceSquaredTo(toRepair) > 5){
+                move(rc, pathfinder.pathToTarget(toRepair, false));
+            } else if(rc.canRepair(toRepair)){
+                rc.repair(toRepair);
+            }
+        } else if(labCount < 1){
             if(robots.length > 1
                     && moves < 5
                     && (curTarget== null || !pathfinder.targetWithinRadius(curTarget, 20))){
                 curTarget = getClosestCorner(rc);
                 move(rc, pathfinder.pathToTarget(curTarget, false));
-                rc.setIndicatorString("moving");
-
             }
             else if (robots.length > 3  && moves < 10){
                 int index = 0;
@@ -89,30 +100,31 @@ public strictfp class Builder {
                         Direction dir = findDirLowestRubble(rc, rc.getLocation());
                         if(dir != null && rc.canBuildRobot(RobotType.LABORATORY, dir)){
                             rc.buildRobot(RobotType.LABORATORY, dir);
+                            labCooldown = 100;
                         }
                     }
                 }
 
             }
-        } else{
+        } else if (labCount < maxLab) {
+            if (startBuilding) {
+                Communications.sendBuildCommand(rc, rc.getLocation(), RobotType.LABORATORY); 
+                if(rc.isActionReady() && rc.getTeamLeadAmount(rc.getTeam()) >= 180){
 
-
-
-            MapLocation toRepair = findBuildingToRepair(rc, robots);
-            if(toRepair!= null){
-                if(rc.getLocation().distanceSquaredTo(toRepair) > 5){
-                    move(rc, pathfinder.pathToTarget(toRepair, false));
-                } else if(rc.canRepair(toRepair)){
-                    rc.repair(toRepair);
+                    Direction dir = findDirLowestRubble(rc, rc.getLocation());
+                    if(dir != null && rc.canBuildRobot(RobotType.LABORATORY, dir)){
+                        rc.buildRobot(RobotType.LABORATORY, dir);
+                        startBuilding = false;
+                    }
                 }
             }
+            if (labCooldown > 0) {
+                labCooldown--;
+                startBuilding = true;
+            } else {
+                labCooldown = 100;
+            }
         }
-
-
-
-
-
-
     }
 
     static MapLocation findBuildingToRepair(RobotController rc, RobotInfo[]robotInfo) {

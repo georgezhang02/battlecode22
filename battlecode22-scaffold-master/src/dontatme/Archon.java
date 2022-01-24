@@ -309,16 +309,15 @@ public strictfp class Archon {
                 }
             }
 
-            Communications.Command[]buildCommands = Communications.getBuildCommands(rc);
+            Communications.Command[] buildCommands = Communications.getBuildCommands(rc);
 
             // Build order and token passing
             int minerLim= Math.min(Math.max(6, (int)(11 * MAP_SCALER)), 9);
             int soldierLim = Math.min(Math.max(3, (int)(11 * MAP_SCALER)), 6);
 
-            rc.setIndicatorString(minerLim+" "+soldierLim);
             if( rc.isActionReady() && Communications.getArchonTurn(rc)  == curArchonOrder){
 
-                if(labCount < 1 && builderCount >= 1){
+                if(buildCommands[0].location.x < 60){
                     // waiting on getting enough lead
                 }
                 else if(builderCount < 1  && rc.getRoundNum() > 50 ){
