@@ -28,14 +28,14 @@ public strictfp class Builder {
         //search areas near me in cardinal directions
         int lowestRubble = Integer.MAX_VALUE;
         int lowestIndex = Integer.MAX_VALUE;
-        for (int i = 0; i < dontatme.Helper.directions.length; i++) {
-            int amountRubble = rc.senseRubble(rc.getLocation().add(dontatme.Helper.directions[i]));
-            if (amountRubble < lowestRubble && rc.canMove(dontatme.Helper.directions[i])) {
+        for (int i = 0; i < dontatme_multilab.Helper.directions.length; i++) {
+            int amountRubble = rc.senseRubble(rc.getLocation().add(dontatme_multilab.Helper.directions[i]));
+            if (amountRubble < lowestRubble && rc.canMove(dontatme_multilab.Helper.directions[i])) {
                 lowestRubble = amountRubble;
                 lowestIndex = i;
             }
         }
-        Direction dir = dontatme.Helper.directions[lowestIndex];
+        Direction dir = dontatme_multilab.Helper.directions[lowestIndex];
         rc.move(dir);
         rc.disintegrate();
 
@@ -100,20 +100,20 @@ public strictfp class Builder {
     }
 
     static Direction findPlaceToBuildTower(RobotController rc) throws GameActionException {
-        Direction dir = dontatme.Helper.directions[0];
+        Direction dir = dontatme_multilab.Helper.directions[0];
         int counter = 1;
         boolean canBuildTower = rc.canBuildRobot(RobotType.WATCHTOWER, dir);
         int lowestRubble = Integer.MAX_VALUE;
         int bestIndex = Integer.MAX_VALUE;
 
-        while (counter < dontatme.Helper.directions.length) {
-            dir = dontatme.Helper.directions[counter];
+        while (counter < dontatme_multilab.Helper.directions.length) {
+            dir = dontatme_multilab.Helper.directions[counter];
             //find the rubble count on all squares that a watchtower can be built
             if (rc.canBuildRobot(RobotType.WATCHTOWER, dir)) {
                 //finds new position
                 MapLocation location = new MapLocation(rc.getLocation().x +
-                        dontatme.Helper.directions[counter].dx, rc.getLocation().y +
-                        dontatme.Helper.directions[counter].dy);
+                        dontatme_multilab.Helper.directions[counter].dx, rc.getLocation().y +
+                        dontatme_multilab.Helper.directions[counter].dy);
                 int rubbleCount = rc.senseRubble(location);
                 if (rubbleCount < lowestRubble) {
                     lowestRubble = rubbleCount;

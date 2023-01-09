@@ -1,0 +1,310 @@
+int xDiff = target.x - ml0.x;
+int yDiff = target.y - ml0.y;
+switch (xDiff){
+case -4:
+switch (yDiff){
+case -2:
+return dir68 ;
+}
+switch (yDiff){
+case -1:
+return dir67 ;
+}
+switch (yDiff){
+case 0:
+return dir66 ;
+}
+switch (yDiff){
+case 1:
+return dir65 ;
+}
+switch (yDiff){
+case 2:
+return dir64 ;
+}
+break;
+}
+switch (xDiff){
+case -3:
+switch (yDiff){
+case -3:
+return dir45 ;
+}
+switch (yDiff){
+case -2:
+return dir44 ;
+}
+switch (yDiff){
+case -1:
+return dir43 ;
+}
+switch (yDiff){
+case 0:
+return dir42 ;
+}
+switch (yDiff){
+case 1:
+return dir41 ;
+}
+switch (yDiff){
+case 2:
+return dir40 ;
+}
+switch (yDiff){
+case 3:
+return dir63 ;
+}
+break;
+}
+switch (xDiff){
+case -2:
+switch (yDiff){
+case -4:
+return dir46 ;
+}
+switch (yDiff){
+case -3:
+return dir25 ;
+}
+switch (yDiff){
+case -2:
+return dir24 ;
+}
+switch (yDiff){
+case -1:
+return dir23 ;
+}
+switch (yDiff){
+case 0:
+return dir22 ;
+}
+switch (yDiff){
+case 1:
+return dir21 ;
+}
+switch (yDiff){
+case 2:
+return dir20 ;
+}
+switch (yDiff){
+case 3:
+return dir39 ;
+}
+switch (yDiff){
+case 4:
+return dir62 ;
+}
+break;
+}
+switch (xDiff){
+case -1:
+switch (yDiff){
+case -4:
+return dir47 ;
+}
+switch (yDiff){
+case -3:
+return dir26 ;
+}
+switch (yDiff){
+case -2:
+return dir9 ;
+}
+switch (yDiff){
+case -1:
+return dir8 ;
+}
+switch (yDiff){
+case 0:
+return dir7 ;
+}
+switch (yDiff){
+case 1:
+return dir6 ;
+}
+switch (yDiff){
+case 2:
+return dir19 ;
+}
+switch (yDiff){
+case 3:
+return dir38 ;
+}
+switch (yDiff){
+case 4:
+return dir61 ;
+}
+break;
+}
+switch (xDiff){
+case 0:
+switch (yDiff){
+case -4:
+return dir48 ;
+}
+switch (yDiff){
+case -3:
+return dir27 ;
+}
+switch (yDiff){
+case -2:
+return dir10 ;
+}
+switch (yDiff){
+case -1:
+return dir1 ;
+}
+switch (yDiff){
+case 1:
+return dir5 ;
+}
+switch (yDiff){
+case 2:
+return dir18 ;
+}
+switch (yDiff){
+case 3:
+return dir37 ;
+}
+switch (yDiff){
+case 4:
+return dir60 ;
+}
+break;
+}
+switch (xDiff){
+case 1:
+switch (yDiff){
+case -4:
+return dir49 ;
+}
+switch (yDiff){
+case -3:
+return dir28 ;
+}
+switch (yDiff){
+case -2:
+return dir11 ;
+}
+switch (yDiff){
+case -1:
+return dir2 ;
+}
+switch (yDiff){
+case 0:
+return dir3 ;
+}
+switch (yDiff){
+case 1:
+return dir4 ;
+}
+switch (yDiff){
+case 2:
+return dir17 ;
+}
+switch (yDiff){
+case 3:
+return dir36 ;
+}
+switch (yDiff){
+case 4:
+return dir59 ;
+}
+break;
+}
+switch (xDiff){
+case 2:
+switch (yDiff){
+case -4:
+return dir50 ;
+}
+switch (yDiff){
+case -3:
+return dir29 ;
+}
+switch (yDiff){
+case -2:
+return dir12 ;
+}
+switch (yDiff){
+case -1:
+return dir13 ;
+}
+switch (yDiff){
+case 0:
+return dir14 ;
+}
+switch (yDiff){
+case 1:
+return dir15 ;
+}
+switch (yDiff){
+case 2:
+return dir16 ;
+}
+switch (yDiff){
+case 3:
+return dir35 ;
+}
+switch (yDiff){
+case 4:
+return dir58 ;
+}
+break;
+}
+switch (xDiff){
+case 3:
+switch (yDiff){
+case -3:
+return dir51 ;
+}
+switch (yDiff){
+case -2:
+return dir30 ;
+}
+switch (yDiff){
+case -1:
+return dir31 ;
+}
+switch (yDiff){
+case 0:
+return dir32 ;
+}
+switch (yDiff){
+case 1:
+return dir33 ;
+}
+switch (yDiff){
+case 2:
+return dir34 ;
+}
+switch (yDiff){
+case 3:
+return dir57 ;
+}
+break;
+}
+switch (xDiff){
+case 4:
+switch (yDiff){
+case -2:
+return dir52 ;
+}
+switch (yDiff){
+case -1:
+return dir53 ;
+}
+switch (yDiff){
+case 0:
+return dir54 ;
+}
+switch (yDiff){
+case 1:
+return dir55 ;
+}
+switch (yDiff){
+case 2:
+return dir56 ;
+}
+break;
+}

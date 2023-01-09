@@ -1,14 +1,13 @@
-package dontatme;
+package dontatme_test;
 
 import battlecode.common.*;
 
-public strictfp class Soldier {
-
-    public enum SoldierState {
-        Rushing, Defending, Exploring, PURSUING, ArchonDefense, Anomaly, Healing
+public strictfp class Sage {
+    public enum SageState {
+        Rushing, Defending, Exploring, PURSUING, ArchonDefense, Anomaly
     }
 
-    static SoldierState currentState = SoldierState.Exploring;
+    static SageState currentState = SageState.Exploring;
 
     static Pathfinder pathfinder;
 
@@ -26,74 +25,74 @@ public strictfp class Soldier {
 
     static int combatCooldown = 0;
 
+    static int enemyCount;
+    static int allyCount;
+
+    static int soldierCount;
+    static int sageCount;
+    static int watchCount;
+    static int archonCount;
+    static int labCount;
 
 
-    public Soldier (RobotController rc) throws GameActionException {
+
+    public Sage (RobotController rc) throws GameActionException {
         this.rc = rc;
-        pathfinder = new BFPathing20(rc);
+        pathfinder = new BFPathing34(rc);
     }
 
     public void run() throws GameActionException {
         Communications.runStart(rc);
-        
+
         Team opponent = rc.getTeam().opponent();
-        enemies = rc.senseNearbyRobots(RobotType.SOLDIER.visionRadiusSquared, opponent);
-        allies = rc.senseNearbyRobots(RobotType.SOLDIER.visionRadiusSquared, rc.getTeam());
+
+        enemies = rc.senseNearbyRobots(34, opponent);
+        allies = rc.senseNearbyRobots(34, rc.getTeam());
 
         combatCooldown--;
 
-        MapLocation healingLoc = findHealingArchon();
+        soldierCount = 0;
+        sageCount = 0;
+        watchCount = 0;
+        archonCount = 0;
+        labCount = 0;
 
-        if(currentState == SoldierState.Healing){
-            currentTarget = healingLoc;
+        if(commandTimer <= 0){
+            clearCommand();
         } else{
-            if(commandTimer <= 0){
-                clearCommand();
-            } else{
-                commandTimer--;
-            }
-
-            Helper.updateEnemyLocations(rc, enemies);
-            readComms();
-            if(command != null){
-                if(command.type == RobotType.ARCHON){
-                    currentState = command.isAttack ? SoldierState.Rushing : SoldierState.ArchonDefense;
-                } else {
-                    currentState = command.isAttack ? SoldierState.PURSUING : SoldierState.Defending;
-                }
-            } else {
-                currentState = SoldierState.Exploring;
-            }
+            commandTimer--;
         }
 
-        switch (currentState){
-            case Healing:
-                healAt(currentTarget);
-                rc.setIndicatorString("Healing");
-                break;
-            case Rushing:
+        Helper.updateEnemyLocations(rc, enemies);
+        readComms();
+        if(command != null){
+            if(command.type == RobotType.ARCHON){
+                currentState = command.isAttack ? SageState.Rushing : SageState.ArchonDefense;
+            } else {
+                currentState = command.isAttack ? SageState.PURSUING : SageState.Defending;
+            }
+        } else {
+            currentState = SageState.Exploring;
+            }
 
+
+        switch (currentState){
+            case Rushing:
                 offense(currentTarget, 0);
-                rc.setIndicatorString("Rushing ");
                 break;
             case PURSUING:
                 offense(currentTarget, 1);
-                rc.setIndicatorString("Pursuing");
                 break;
             case Defending:
                 defense(currentTarget, 6);
-                rc.setIndicatorString("Defending");
                 break;
             case Exploring:
                 explore();
-                rc.setIndicatorString("Exploring");
                 break;
             case ArchonDefense:
                 defense(currentTarget, 10);
-                rc.setIndicatorString("ArchonDefense");
                 break;
             case Anomaly:
-                prepForAnomaly(AnomalyType.ABYSS);
                 rc.setIndicatorString("Anomaly");
                 break;
 
@@ -111,7 +110,7 @@ public strictfp class Soldier {
         command = null;
         commandTimer = 0;
         currentPriority = 0;
-        currentState = SoldierState.Exploring;
+        currentState = SageState.Exploring;
     }
 
     static void setCommand(Communications.Command c) {
@@ -151,52 +150,10 @@ public strictfp class Soldier {
             }
         }
 
-        // for all defend commmand
-        for(int i = 0; i < defendCommands.length; i++){
-            Communications.Command dc = defendCommands[i];
-            // if location is valid
-            if(dc.location.x < 60){
-                // if command is a stop defending command and we're defending
-                if(dc.type == null && dc.location.equals(currentTarget) && !currentlyAttacking()){
-                    // stop doing whatever we are doing
-                    clearCommand();
-                    return;
-                    // if its not a stop defending command
-                } else{
-                    // get the command with the highest priority that is within our range
-                    if(dc.priority() > maxPrio && Communications.inCommandRadius(rc, dc.type, dc.location, false)){
-                        maxPrio = dc.priority();
-
-                        setCommand(dc);
-                    }
-                }
-            }
-        }
 
 
     }
 
-    static MapLocation findHealingArchon() throws GameActionException {
-        MapLocation ans = null;
-        if(rc.getHealth() <= RobotType.SOLDIER.getMaxHealth(1) / 3){
-            double lowestDist = 120;
-            for(int i = 0; i< 4; i++){
-                MapLocation archonLoc = Communications.getTeamArchonLocationByIndex(rc, i);
-
-                if(archonLoc.x < 60){
-                    double dist = Math.sqrt(rc.getLocation().distanceSquaredTo(archonLoc));
-                    if(dist < lowestDist){
-                        if(rc.getHealth() < 600 / dist){
-                            lowestDist = dist;
-                            ans = archonLoc;
-                            currentState = SoldierState.Healing;
-                        }
-                    }
-                }
-            }
-        }
-        return ans;
-    }
 
     static void checkCurrentAttackingTarget() throws GameActionException {
         if(command != null &&
@@ -229,22 +186,41 @@ public strictfp class Soldier {
 
         // check everything that you can see
 
-        int enemyCount = 0;
-        int allyCount = 1;
+        enemyCount = 0;
+        allyCount = 1;
 
         MapLocation[] enemyPos = new MapLocation[5];
 
-        int closestEnemy = 21;
+        int closestEnemy = 35;
 
         for(RobotInfo robot:enemies){
-            if(isAttackableDroid(robot.getType())){
-                int dist =  robot.getLocation().distanceSquaredTo(rc.getLocation());
-                if(dist < closestEnemy){
-                    closestEnemy = dist;
-                    enemyPos[0] = robot.getLocation();
+            if(withinActionRadius(robot.getLocation())){
+                if(isAttackableDroid(robot.getType()) ){
+                    int dist =  robot.getLocation().distanceSquaredTo(rc.getLocation());
+                    if(dist < closestEnemy){
+                        closestEnemy = dist;
+                        enemyPos[0] = robot.getLocation();
+                    }
+                    enemyCount++;
+
+
+
                 }
-                enemyCount++;
+                if( robot.getType() == RobotType.SAGE){
+                    sageCount++;
+                } else if (robot.getType() == RobotType.SOLDIER) {
+                    soldierCount++;
+                }
+                else if(robot.getType() == RobotType.WATCHTOWER){
+                    watchCount ++;
+                } else if (robot.getType() == RobotType.ARCHON){
+                    archonCount++;
+                } else {
+                    labCount ++ ;
+                }
+
             }
+
         }
         for(RobotInfo robot: allies){
             if(isAttackableDroid(robot.getType())){
@@ -254,18 +230,17 @@ public strictfp class Soldier {
 
         if(enemyCount > 0){
             if(commandTimer <= 0){
-                if(commandTimer <= 0){
-                    Communications.sendAttackCommand(rc, enemyPos[0], RobotType.SOLDIER);
-                    commandTimer = Communications.getCommandCooldown(rc, RobotType.SOLDIER, true);
-                }
+                Communications.sendAttackCommand(rc, enemyPos[0], RobotType.SOLDIER);
                 commandTimer = Communications.getCommandCooldown(rc, RobotType.SOLDIER, true);
             }
+            commandTimer = Communications.getCommandCooldown(rc, RobotType.SOLDIER, true);
+
 
             currentTarget = enemyPos[0];
         }
 
         // initial attack
-        MapLocation ml = attack(attackType);
+        attack();
 
         // looking for best movement
 
@@ -278,52 +253,71 @@ public strictfp class Soldier {
             if(enemyCount > 0){
                 Communications.sendMoveToCommand(rc, rc.getLocation(), enemyCount );
             }
-            if(!rc.isActionReady() ){ // action not ready
+            if(!rc.isActionReady() &&  closestEnemy <= 20){ // action not ready
                 dir = pathfinder.pathAwayFrom(enemyPos, 0); // kite
             } else if(enemyCount >= allyCount){
                 dir = lookForBetterSquare();
-            }  else {
+            }  else if (target != null ){
                 //action is ready, but you outnumber all opponents in your attack radius
                 dir = pathfinder.pathToTargetGreedy(target, 0); // path to target close
             }
         } // travelling
-        else if(target != null && !pathfinder.targetWithinRadius(target, 34)){
+        else if(target != null && !pathfinder.targetWithinRadius(target, 52)){
             move(pathfinder.pathToTarget(target, false)); // path to target from far away
-        } else if(target != null && pathfinder.targetWithinRadius(target, 34)){
+        } else if(target != null && pathfinder.targetWithinRadius(target, 52)){
             dir = pathfinder.pathToTargetGreedy(target, 0); // path to target close
         }else{
-            currentState = SoldierState.Exploring;
+            currentState = SageState.Exploring;
         }
         if(rc.canMove(dir) && rc.senseRubble(rc.getLocation().add(dir)) + 10
-                <= 1.5 * (rc.senseRubble(rc.getLocation())+ 10) ){
+                <=  1.5 * (rc.senseRubble(rc.getLocation())+ 10) ){
             move(dir); // path to target from far away
         }
 
 
         if(rc.isActionReady()){
-            ml = attack(attackType);
+            attack();
 
-            if(ml != null){
-                Communications.sendAttackCommand(rc, ml, RobotType.SOLDIER);
-                currentTarget = ml;
-                currentState = SoldierState.PURSUING;
+            if(enemyPos[0] != null){
+                Communications.sendAttackCommand(rc, enemyPos[0], RobotType.SOLDIER);
+                currentTarget = enemyPos[0];
+                currentState = SageState.PURSUING;
             }
         }
     }
 
     static void defense(MapLocation target, int minDistance) throws GameActionException {
-        int enemyCount = 0;
-        int allyCount = 1;
+        enemyCount = 0;
+        allyCount = 1;
 
+        int closestEnemy = 35;
         MapLocation[] enemyPos = new MapLocation[5];
 
         for(RobotInfo robot:enemies){
-            if(isAttackableDroid(robot.getType())){
-                enemyCount++;
-                if(enemyCount < 5){
-                    enemyPos[enemyCount] = robot.getLocation();
+            if(withinActionRadius(robot.getLocation())){
+                if(isAttackableDroid(robot.getType())){
+                    int dist =  robot.getLocation().distanceSquaredTo(rc.getLocation());
+                    if(dist < closestEnemy){
+                        closestEnemy = dist;
+                        enemyPos[0] = robot.getLocation();
+                    }
                 }
+                if( robot.getType() == RobotType.SAGE){
+                    sageCount++;
+                } else if (robot.getType() == RobotType.SOLDIER) {
+                    soldierCount++;
+                }
+                else if(robot.getType() == RobotType.WATCHTOWER){
+                    watchCount ++;
+                } else if (robot.getType() == RobotType.ARCHON){
+                    archonCount++;
+                } else {
+                    labCount ++ ;
+                }
+
+
             }
+
         }
         for(RobotInfo robot: allies){
             if(isAttackableDroid(robot.getType())){
@@ -331,7 +325,7 @@ public strictfp class Soldier {
             }
         }
 
-        MapLocation ml = attack(1);
+        attack();
 
         if(2 * enemyCount >= 3 * allyCount){
             move(pathfinder.pathAwayFrom(enemyPos));
@@ -339,13 +333,13 @@ public strictfp class Soldier {
         else if(target != null && !pathfinder.targetWithinRadius(target, minDistance)){
             move(pathfinder.pathToTarget(target, false));
         } else{
-            if(ml== null){
+            if(enemies == null || enemies.length == 0 || enemies[0]== null){
                 clearCommand();
             }
         }
 
         if(rc.isActionReady()){
-            ml = attack(1);
+            attack();
         }
     }
 
@@ -355,70 +349,13 @@ public strictfp class Soldier {
             currentTarget = null;
         }
 
-        int enemyCount = 0;
-        int allyCount = 1;
-
+        enemyCount = 0;
+        allyCount = 1;
+        int closestEnemy = 35;
         MapLocation[] enemyPos = new MapLocation[5];
 
         for(RobotInfo robot:enemies){
-            if(isAttackableDroid(robot.getType())){
-
-                if(enemyCount < 5){
-                    enemyPos[enemyCount] = robot.getLocation();
-                }
-                enemyCount++;
-            }
-        }
-        for(RobotInfo robot: allies){
-            if(isAttackableDroid(robot.getType())){
-                allyCount++;
-            }
-        }
-
-        MapLocation ml = attack(1);
-
-
-        if(enemyCount >=1){
-            move(pathfinder.pathAwayFrom(enemyPos));
-            Communications.sendAttackCommand(rc, enemyPos[0], RobotType.SOLDIER);
-            currentTarget = enemyPos[0];
-            currentState = SoldierState.PURSUING;
-            combatCooldown = 3;
-        } else{
-            move(pathfinder.pathToExplore());
-            rc.setIndicatorLine(rc.getLocation(), pathfinder.explorer.target, 255,255,0);
-        }
-
-        if(rc.isActionReady()){
-            ml = attack(1);
-
-            if(ml != null){
-                Communications.sendAttackCommand(rc, ml, RobotType.SOLDIER);
-                currentTarget = ml;
-                currentState = SoldierState.PURSUING;
-                combatCooldown = 3;
-            }
-        }
-    }
-
-    void healAt(MapLocation target) throws GameActionException {
-
-        if(rc.getHealth() >= RobotType.SOLDIER.getMaxHealth(1) * 0.8){
-            currentState = SoldierState.Exploring;
-            clearCommand();
-            this.run();
-        } else{
-            rc.setIndicatorString("Healing");
-
-            // check everything that you can see
-            int enemyCount = 0;
-            int allyCount = 1;
-
-            MapLocation[] enemyPos = new MapLocation[5];
-
-            int closestEnemy = 21;
-
-            for(RobotInfo robot:enemies){
+            if(withinActionRadius(robot.getLocation())){
                 if(isAttackableDroid(robot.getType())){
                     int dist =  robot.getLocation().distanceSquaredTo(rc.getLocation());
                     if(dist < closestEnemy){
@@ -427,66 +364,82 @@ public strictfp class Soldier {
                     }
                     enemyCount++;
                 }
-            }
-            for(RobotInfo robot: allies){
-                if(isAttackableDroid(robot.getType())){
-                    allyCount++;
+                if( robot.getType() == RobotType.SAGE){
+                    sageCount++;
+                } else if (robot.getType() == RobotType.SOLDIER) {
+                    soldierCount++;
                 }
-            }
-
-            if(enemyCount > 0){
-                if(commandTimer <= 0){
-                    Communications.sendAttackCommand(rc, enemyPos[0], RobotType.SOLDIER);
-                    commandTimer = Communications.getCommandCooldown(rc, RobotType.SOLDIER, true);
+                else if(robot.getType() == RobotType.WATCHTOWER){
+                    watchCount ++;
+                } else if (robot.getType() == RobotType.ARCHON){
+                    archonCount++;
+                } else {
+                    labCount ++ ;
                 }
 
 
+            }
+
+        }
+        for(RobotInfo robot: allies){
+            if(isAttackableDroid(robot.getType())){
+                allyCount++;
+            }
+        }
+
+       attack();
+
+
+        if(enemyCount >=1){
+            move(pathfinder.pathAwayFrom(enemyPos));
+            Communications.sendAttackCommand(rc, enemyPos[0], RobotType.SOLDIER);
+            currentTarget = enemyPos[0];
+            currentState = SageState.PURSUING;
+            combatCooldown = 3;
+        } else{
+            move(pathfinder.pathToExplore());
+        }
+
+        if(rc.isActionReady()){
+            attack();
+
+            if(enemyPos[0] != null){
+                Communications.sendAttackCommand(rc, enemyPos[0], RobotType.SOLDIER);
                 currentTarget = enemyPos[0];
+                currentState = SageState.PURSUING;
             }
-
-            // initial attack
-            MapLocation ml = attack(1);
-
-            // looking for best movement
-            Direction dir = Direction.CENTER;
-
-            if(enemyCount > 0 || !rc.isActionReady() && pathfinder.targetWithinRadius(target, 20)){ // in combat
-                if(!rc.isActionReady() ){ // action not ready
-                    dir = pathfinder.pathAwayFrom(enemyPos, 0); // kite
-                } else if(enemyCount >= allyCount){
-                    dir = lookForBetterSquare();
-                }  else {
-                    if(enemyPos[0]!= null && target != null){
-                        dir = pathfinder.pathToTargetGreedy(target, 0); // path to target close
-                    }
-                }
-            } // travelling
-            else if(target != null && !pathfinder.targetWithinRadius(target, 8)){
-                move(pathfinder.pathToTarget(target, false)); // path to target from far away
-            } else{
-                //move(Direction.allDirections()[(int) (10000 * Math.random()) % 9]);
-
-                // possibly move randomly to create space?
-            }
-            if(rc.isMovementReady()){
-                if(rc.canMove(dir) && rc.senseRubble(rc.getLocation().add(dir)) + 10
-                        <= 1.5 * (rc.senseRubble(rc.getLocation())+ 10) ){
-                    move(dir); // path to target from far away
-                }
-            }
-            if(rc.isActionReady()){
-                ml = attack(1);
-                if(ml != null){
-                    Communications.sendAttackCommand(rc, ml, RobotType.SOLDIER);
-                }
-            }
-
-
-            currentState = SoldierState.Healing;
         }
     }
 
-    static MapLocation attack(int attackType) throws GameActionException {
+
+    static void attack() throws GameActionException {
+        int droidCount = (soldierCount + sageCount);
+        rc.setIndicatorString(droidCount+""+rc.isActionReady());
+        if(rc.isActionReady()){
+            if((soldierCount + sageCount + archonCount + labCount + watchCount) > 0){
+                int totalEnemyMaxHealth = soldierCount * 50 + sageCount * 100;
+                int totalBuildingMaxHealth = archonCount * 600 + labCount * 100 + watchCount * 150;
+
+                // if deals more damage just purely attacking
+                if (totalEnemyMaxHealth * 0.22f < 45) {
+
+                    rawAttack(1);
+                }
+                // if there are more than 2 droids
+                else if(droidCount > 1){
+                    rc.envision(AnomalyType.CHARGE);
+                // if there are more than 1 building
+                } else if(totalBuildingMaxHealth > 100) {
+                    rc.envision(AnomalyType.FURY);
+                }
+                else {
+                    rawAttack(3);
+                }
+            }
+        }
+    }
+
+    static MapLocation rawAttack(int attackType) throws GameActionException {
         RobotInfo attackLoc;
 
         if(attackType == 0){ // attack all (droids, buildings, archons, miners)
@@ -516,7 +469,7 @@ public strictfp class Soldier {
             RobotType type = robot.getType();
             int health = robot.getHealth();
             int id = robot.getID();
-            if(rc.getLocation().distanceSquaredTo(robot.getLocation()) <= 13){
+            if(rc.getLocation().distanceSquaredTo(robot.getLocation()) <= RobotType.SAGE.actionRadiusSquared){
                 if(type.isBuilding()){
                     if(type.equals(RobotType.ARCHON)){
                         if(health < minHealth[0]){
@@ -570,6 +523,7 @@ public strictfp class Soldier {
         return ml[prio4];
     }
 
+
     static void move(Direction dir) throws GameActionException {
         if(dir != null && rc.canMove(dir)){
             rc.move(dir);
@@ -577,12 +531,12 @@ public strictfp class Soldier {
         }
     }
 
-    static void prepForAnomaly(AnomalyType anomalyType)
-    {
-
+    static Boolean isAttackableDroid(RobotType t) {
+        return t == RobotType.SOLDIER || t == RobotType.WATCHTOWER ||
+                t == RobotType.SAGE ;
     }
 
-    static Boolean isAttackableDroid(RobotType t) {
-        return t == RobotType.SOLDIER || t == RobotType.WATCHTOWER || t == RobotType.SAGE;
+    static Boolean withinActionRadius(MapLocation l) {
+        return rc.getLocation().distanceSquaredTo(l) < 25;
     }
 }

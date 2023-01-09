@@ -9,8 +9,6 @@ public strictfp class Builder {
 
     //checks if the builder has moved towards the center already
     static Pathfinder pathfinder;
-
-
     static MapLocation curTarget;
     static int moves = 0;
     static int turn = 0;

@@ -1,0 +1,25 @@
+ml*0 = ml*1.add(Direction.*d);
+S 1
+E 1
+N 2
+W 2
+S 3
+E 3
+N 4
+W 4
+S 5
+E 4
+NE 1
+N 4
+NW 1
+W 4
+SW 1
+S 5
+SE 1
+E 4
+NE 2
+N 4
+NW 2
+W 4
+SW 2
+S 4

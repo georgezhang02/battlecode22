@@ -1,0 +1,8 @@
+static Direction dir1 = Direction.SOUTH;
+static Direction dir2 = Direction.SOUTHEAST;
+static Direction dir3 = Direction.EAST;
+static Direction dir4 = Direction.NORTHEAST;
+static Direction dir5 = Direction.NORTH;
+static Direction dir6 = Direction.NORTHWEST;
+static Direction dir7 = Direction.WEST;
+static Direction dir8 = Direction.SOUTHWEST;

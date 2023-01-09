@@ -1,4 +1,4 @@
-package dontatme;
+package dontatme_test;
 
 import battlecode.common.*;
 
@@ -43,6 +43,8 @@ public strictfp class Soldier {
         combatCooldown--;
 
         MapLocation healingLoc = findHealingArchon();
+
+
 
         if(currentState == SoldierState.Healing){
             currentTarget = healingLoc;

@@ -1,0 +1,12 @@
+if(rc.onTheMap(ml*0)){
+if(!rc.isLocationOccupied(ml*0){
+    dist*0 = rc.senseRubble(ml*0) + 10;
+}
+cost*0 = rc.senseRubble(ml*0) + 10;
+if(cost*0 + dist*1 < dist*0){
+    dist*0 = cost*0 + dist*1;
+    dir*0 = dir*1;
+}
+9 24
+25 44
+45 68

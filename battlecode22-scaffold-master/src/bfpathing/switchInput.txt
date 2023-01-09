@@ -1,0 +1,10 @@
+int xDiff = target.x - ml0.x;
+int yDiff = target.y - ml0.y;
+switch (xDiff){
+case *x:
+switch (yDiff){
+case *y:
+return dir*0;
+}
+break;
+}

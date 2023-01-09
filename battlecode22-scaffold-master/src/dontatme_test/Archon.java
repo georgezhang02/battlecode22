@@ -1,8 +1,8 @@
-package dontatme_multilab;
-
-import java.util.Arrays;
+package dontatme_test;
 
 import battlecode.common.*;
+
+import java.util.Arrays;
 
 public strictfp class Archon {
 
@@ -308,16 +308,16 @@ public strictfp class Archon {
                 }
             }
 
-            Communications.Command[] buildCommands = Communications.getBuildCommands(rc);
+            Communications.Command[]buildCommands = Communications.getBuildCommands(rc);
 
             // Build order and token passing
             int minerLim= Math.min(Math.max(6, (int)(11 * MAP_SCALER)), 9);
             int soldierLim = Math.min(Math.max(3, (int)(11 * MAP_SCALER)), 6);
 
+            rc.setIndicatorString(minerLim+" "+soldierLim);
             if( rc.isActionReady() && Communications.getArchonTurn(rc)  == curArchonOrder){
 
-                if(builderCount > 0 && Communications.isBuildingLab(rc)){
-                    rc.setIndicatorString("Bulding");
+                if(labCount < 1 && builderCount >= 1){
                     // waiting on getting enough lead
                 }
                 else if(builderCount < 1  && rc.getRoundNum() > 50 ){

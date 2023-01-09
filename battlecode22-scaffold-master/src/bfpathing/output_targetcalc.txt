@@ -1,0 +1,165 @@
+double gain;
+Direction ans = Direction.CENTER;
+double initDist = Math.sqrt(ml0.distanceSquaredTo(target));
+double maxGainPerCost = 0;
+gain = (initDist - Math.sqrt(ml45.distanceSquaredTo(target))) / dist45;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir45;
+}
+gain = (initDist - Math.sqrt(ml46.distanceSquaredTo(target))) / dist46;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir46;
+}
+gain = (initDist - Math.sqrt(ml47.distanceSquaredTo(target))) / dist47;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir47;
+}
+gain = (initDist - Math.sqrt(ml48.distanceSquaredTo(target))) / dist48;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir48;
+}
+gain = (initDist - Math.sqrt(ml49.distanceSquaredTo(target))) / dist49;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir49;
+}
+gain = (initDist - Math.sqrt(ml50.distanceSquaredTo(target))) / dist50;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir50;
+}
+gain = (initDist - Math.sqrt(ml51.distanceSquaredTo(target))) / dist51;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir51;
+}
+gain = (initDist - Math.sqrt(ml52.distanceSquaredTo(target))) / dist52;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir52;
+}
+gain = (initDist - Math.sqrt(ml53.distanceSquaredTo(target))) / dist53;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir53;
+}
+gain = (initDist - Math.sqrt(ml54.distanceSquaredTo(target))) / dist54;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir54;
+}
+gain = (initDist - Math.sqrt(ml55.distanceSquaredTo(target))) / dist55;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir55;
+}
+gain = (initDist - Math.sqrt(ml56.distanceSquaredTo(target))) / dist56;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir56;
+}
+gain = (initDist - Math.sqrt(ml57.distanceSquaredTo(target))) / dist57;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir57;
+}
+gain = (initDist - Math.sqrt(ml58.distanceSquaredTo(target))) / dist58;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir58;
+}
+gain = (initDist - Math.sqrt(ml59.distanceSquaredTo(target))) / dist59;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir59;
+}
+gain = (initDist - Math.sqrt(ml60.distanceSquaredTo(target))) / dist60;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir60;
+}
+gain = (initDist - Math.sqrt(ml61.distanceSquaredTo(target))) / dist61;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir61;
+}
+gain = (initDist - Math.sqrt(ml62.distanceSquaredTo(target))) / dist62;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir62;
+}
+gain = (initDist - Math.sqrt(ml63.distanceSquaredTo(target))) / dist63;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir63;
+}
+gain = (initDist - Math.sqrt(ml64.distanceSquaredTo(target))) / dist64;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir64;
+}
+gain = (initDist - Math.sqrt(ml65.distanceSquaredTo(target))) / dist65;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir65;
+}
+gain = (initDist - Math.sqrt(ml66.distanceSquaredTo(target))) / dist66;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir66;
+}
+gain = (initDist - Math.sqrt(ml67.distanceSquaredTo(target))) / dist67;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir67;
+}
+gain = (initDist - Math.sqrt(ml68.distanceSquaredTo(target))) / dist68;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir68;
+}
+gain = (initDist - Math.sqrt(ml44.distanceSquaredTo(target))) / dist44;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir44;
+}
+gain = (initDist - Math.sqrt(ml25.distanceSquaredTo(target))) / dist25;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir25;
+}
+gain = (initDist - Math.sqrt(ml29.distanceSquaredTo(target))) / dist29;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir29;
+}
+gain = (initDist - Math.sqrt(ml30.distanceSquaredTo(target))) / dist30;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir30;
+}
+gain = (initDist - Math.sqrt(ml34.distanceSquaredTo(target))) / dist34;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir34;
+}
+gain = (initDist - Math.sqrt(ml35.distanceSquaredTo(target))) / dist35;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir35;
+}
+gain = (initDist - Math.sqrt(ml39.distanceSquaredTo(target))) / dist39;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir39;
+}
+gain = (initDist - Math.sqrt(ml40.distanceSquaredTo(target))) / dist40;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir40;
+}
+return ans;

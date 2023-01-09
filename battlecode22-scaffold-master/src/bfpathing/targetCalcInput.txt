@@ -1,0 +1,11 @@
+double gain;
+Direction ans = Direction.CENTER;
+double initDist = Math.sqrt(ml0.distanceSquaredTo(target));
+double maxGainPerCost = 0;
+gain = (initDist - Math.sqrt(ml*0.distanceSquaredTo(target))) / dist*0;
+if(gain > maxGainPerCost){
+    maxGainPerCost = gain;
+    ans = dir*0;
+}
+45 68
+44 25 29 30 34 35 39 40

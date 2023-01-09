@@ -1,0 +1,11 @@
+20 68
+static Direction dir*;
+static int dist*;
+static int cost*;
+static MapLocation ml*;
+
+
+
+
+
+
